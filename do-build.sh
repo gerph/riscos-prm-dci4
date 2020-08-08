@@ -14,7 +14,7 @@ xsltproc index-makefile.xsl index.xml > Makefile
 # Clean things
 make clean > logs/clean-stdout 2>&1
 
-OUTPUTDIR=output/help
+OUTPUTDIR=output/html
 
 mkdir -p "${OUTPUTDIR}"
 
