@@ -1257,35 +1257,19 @@ struct rx_hdr
 </extended-example>
 
 <p>The fields in this structure are:</p>
-<p><b>rx _ptr</b> This field is for internal use by the receive
-handler, its value is undefined upon entry.</p>
-<p><b>rx _tag</b> This field is reserved for use by the IEEE 802.2
-implementor, and must be set to zero by the device driver.</p>
-<p><b>rx _src _addr</b> The hardware source address of the frame.
-(Must be zeroed if hardware addresses not supported)</p>
-<p><b>_spad</b> Space filler to align the next field (dst_addr) on
-a word boundary. Must be zero filled.</p>
-<p><b>rx _dst _addr</b> The hardware destination address of the
-frame. (Must be zeroed if hardware addresses not supported)</p>
-<p><b>_dpad</b> Space filler to align the next field (frame_type)
-on a word boundary. Must be zero filled.</p>
-<p><b>rx _frame _type</b> The length (for IEEE 802.3), or the type
-(for Ethernet 2.0) of the received frame, i.e. the last 2 bytes of
-the frame's MAC header.</p>
-<p><b>rx _error _level</b> This field is zero if the frame was
-received with no errors, otherwise it contains a driver specific
-error code.</p>
-<p><b>rx _cksum</b> If bit 3 was set in the Filter call, this field
-must be filled in with the checksum of the complete frame. The
-checksum algorithm is that used by IP, ie the one's complement of
-the one's complement sum of all 16 bit words in the frame (padded
-with a zero-byte at the end if necessary to make a multiple of two
-bytes). Note that no knowledge of the IP packet format is required;
-in particular the complete frame should be checksummed, not just
-the length specified in the IP header. Furthermore, the frame need
-not even be an IP packet - other protocols may use the same
-checksum. The rx_cksum field is 32 bits wide only for ease of
-access - the most significant two bytes must be zero.</p>
+
+<offset-table head-name='Field'>
+    <offset number='0' name='rx_ptr'>This field is for internal use by the receive handler, its value is undefined upon entry.</offset>
+    <offset number='4' name='rx_tag'>This field is reserved for use by the IEEE 802.2 implementor, and must be set to zero by the device driver.</offset>
+    <offset number='8' name='rx_src_addr'>The hardware source address of the frame. (Must be zeroed if hardware addresses not supported)</offset>
+    <offset number='14' name='_spad'>Space filler to align the next field (dst_addr) on a word boundary. Must be zero filled.</offset>
+    <offset number='16' name='rx_dst_addr'>The hardware destination address of the frame. (Must be zeroed if hardware addresses not supported)</offset>
+    <offset number='22' name='_dpad'>Space filler to align the next field (frame_type) on a word boundary. Must be zero filled.</offset>
+    <offset number='24' name='rx_frame_type'>The length (for IEEE 802.3), or the type (for Ethernet 2.0) of the received frame, i.e. the last 2 bytes of the frame's MAC header.</offset>
+    <offset number='28' name='rx_error_level'>This field is zero if the frame was received with no errors, otherwise it contains a driver specific error code.</offset>
+    <offset number='32' name='rx_cksum'>If bit 3 was set in the Filter call, this field must be filled in with the checksum of the complete frame. The checksum algorithm is that used by IP, ie the one's complement of the one's complement sum of all 16 bit words in the frame (padded with a zero-byte at the end if necessary to make a multiple of two bytes). Note that no knowledge of the IP packet format is required; in particular the complete frame should be checksummed, not just the length specified in the IP header. Furthermore, the frame need not even be an IP packet - other protocols may use the same checksum. The rx_cksum field is 32 bits wide only for ease of access - the most significant two bytes must be zero.</offset>
+</offset-table>
+
 <p>This frame header is passed in the first mbuf of each frame, the
 first byte of the frame data is in the second mbuf in the
 chain.</p>
@@ -1299,14 +1283,19 @@ extra fields.</p>
 <category title="Mbuf Chaining">
 <p>An mbuf contains two fields which point to the next mbuf in a
 linked list, specifically</p>
-<p><b>m_next</b> --- typically used to link mbufs in a chain.</p>
-<p><b>m_list</b> --- typically used to link separate mbuf chains
-together.</p>
+
+<value-table head-number='field'>
+    <value number='m_next'>typically used to link mbufs in a chain.</value>
+    <value number='m_list'>typically used to link separate mbuf chains
+together.</value>
+</value-table>
+
 <p>When a device driver calls a protocol module's receive handler,
 it uses a single mbuf chain to hold each received frame, and can
 link several frames together for passing via the single call.
 Figure 2 shows how m_next and m_list are used to link chains of
 mbufs together into a list.</p>
+
 <p>Note that, although this structure allows different frame types
 to be passed to the protocol module (because the first mbuf+ in
 each chain contains a struct rx_hdr which includes the frame_type
@@ -1333,9 +1322,9 @@ independent set of statistics is maintained for each unit that the
 driver controls.</p>
 <p>The <b>Stats SWI</b> serves two purposes:</p>
 <list type='ordered'>
-    <item><p>1. It identifies which statistics the driver gathers for a
+    <item><p>It identifies which statistics the driver gathers for a
 particular unit.</p></item>
-    <item><p>2. It allows reading of the gathered statistics.</p></item>
+    <item><p>It allows reading of the gathered statistics.</p></item>
 </list>
 </subsection>
 
@@ -1358,7 +1347,7 @@ struct stats
     unsigned long st_excess_collisions;
     unsigned long st_heartbeat_failures;
     unsigned long st_not_listening;
-    unsigned long st_net_error;
+    /* unsigned long st_net_error; */ /* CJF: This is no longer part of the statistics structure */
     unsigned long st_tx_frames;
     unsigned long st_tx_bytes;
     unsigned long st_tx_general_errors;
@@ -1379,11 +1368,14 @@ struct stats
     unsigned char st_last_src_addr[8];
 };
 </extended-example>
+<fixme> Add history note about st_net_error being present in earlier versions </fixme>
 
 <p>The fields within this structure are:</p>
-<p><b>st _interface _type</b> A single byte coding the specific
+<offset-table head-name='Field'>
+<offset number='0' name='st_interface_type'><p>A single byte coding the specific
 hardware interface type. Values so far defined are:</p>
 
+<p>
 <value-table head-number='Code' head-value='Interface type'>
     <value number='1'>10-base5</value>
     <value number='2'>10-base2</value>
@@ -1403,72 +1395,73 @@ hardware interface type. Values so far defined are:</p>
     <value number='16'>ATM 25.6</value>
     <value number='17'>ATM 155</value>
 </value-table>
+</p>
 
 <p>Note that the use of 'combination' types is deprecated in favour
 of returning a specific value reflecting the interface's current
 configuration.</p>
-<p><b>st _link _status</b></p>
+</offset>
+
+<offset number='1' name='st_link_status'>
 <p>A bitfield describing the current state of the interface;
 significant bits are:</p>
-<p>Bit 0: 0 --- Interface bad (i.e. self-test failed).</p>
 
-<p>1 --- Interface OK.</p>
-<p>Bit 1: 0 --- Interface is inactive.</p>
+<p>
+<bitfield-table>
+    <bit number='0' state='clear'><p>Interface bad (i.e. self-test failed).</p></bit>
+    <bit number='0' state='set'><p>Interface OK.</p></bit>
+    <bit number='1' state='clear'><p>Interface is inactive.</p></bit>
+    <bit number='1' state='set'><p>Interface is active.</p></bit>
+    <bit number='2-3'><p>Describe the currently configured receive level as follows:</p>
+<p>
+<value-table head-number='Binary value'>
+    <value number='00'>Accept directly addressed frames only.</value>
+    <value number='01'>Accept directly addressed and broadcast frames only.</value>
+    <value number='10'>Accept direct, broadcast, and multicast frames.</value>
+    <value number='11'>Promiscuous mode, accept <i>all</i> frames.</value>
+</value-table>
+</p>
+</bit>
 
-<p>1 --- Interface is active.</p>
-<p>Bits 2--3: Describe the currently configured receive level as
-follows:</p>
-<p>00 --- Accept directly addressed frames only.</p>
-<p>01 --- Accept directly addressed and broadcast frames only.</p>
-<p>10 --- Accept direct, broadcast, and multicast frames.</p>
-<p>11 --- Promiscuous mode, accept <i>all</i> frames.</p>
-<p>Bit 4: 0 --- Link is half duplex.</p>
+<bit number='4' state='clear'><p>Link is half duplex.</p></bit>
+<bit number='4' state='set'><p>Link is full duplex.</p></bit>
+<bit number='5-7' state='reserved'/>
+</bitfield-table>
+</p>
+</offset>
 
-<p>1 --- Link is full duplex.</p>
-<p>Bits 5--7: Reserved, must be zero.</p>
-<p><b>st _link _polarity</b></p>
+<offset number='2' name='st_link_polarity'>
 <p>A bitfield where:</p>
-<p>Bit 0: 1 --- Link polarity correct.</p>
+<bitfield-table>
+    <bit number='0' state='set'>Link polarity correct</bit>
+    <bit number='0' state='clear'>Link polarity incorrect</bit>
+    <bit number='1-7' state='reserved'/>
+</bitfield-table>
+</offset>
 
-<p>0 --- Link polarity incorrect.</p>
-<p>Bits 1-7: Reserved, must be zero.</p>
-<p><b>st _blank1</b> Unused, must be set to zero.</p>
-<p><b>st _link _failures</b> Counts the number of times a good link
-went away.</p>
-<p><b>st _network _collisions</b> Counts the <i>total</i> number of
-collisions on the network.</p>
-<p><b>st _collisions</b> The number of times a collision has
-occured when trying to transmit a packet.</p>
-<p><b>st _excess _collisions</b> A count of excess transmit
-collisions.</p>
-<p><b>st _heartbeat _failures</b> The number of times the Signal
-Quality Error Test failed to detect a collision.</p>
-<p><b>st _not _listening</b> A count of the number of times when
-the remote station was not listening.</p>
-<p>(This statistic will usually be specific to Acorn Econet)</p>
-<p><b>st_net_error</b> General TX error (Typically used by EconetA
-module)</p>
-<p><b>st _tx _frames</b> The total number of frames transmitted
-since driver initialisation.</p>
-<p><b>st _tx _bytes</b> The total number of bytes transmitted since
-driver initialisation.</p>
-<p><b>st _tx _general _errors</b> A count of the number of
-non-specific network errors that occured during transmission.</p>
-<p><b>st _last _dest _addr</b> Hardware address of the last
-interface to which a frame was sent.</p>
-<p><b>st _jabbers</b> The number of times the interface was caught
-jabbering.</p>
-<p><b>st _unwanted _frames</b> The number of frames received, but
-not claimed by any protocol module.</p>
-<p><b>st _rx _frames</b> The total number of frames received since
-driver initialisation.</p>
-<p><b>st _rx _bytes</b> The total number of bytes received since
-driver initialisation.</p>
-<p><b>st _tx _general _errors</b> A count of the number of
-non-specific network errors that occured during frame
-reception.</p>
-<p><b>st _last _src _addr</b> Hardware address of the last
-interface from which a frame was received.</p>
+<offset number='3' name='st_blank1'><p>Unused, must be set to zero.</p></offset>
+
+<offset number='4' name='st_link_failures'><p>Counts the number of times a good link
+went away.</p></offset>
+<offset number='8' name='st_network_collisions'>Counts the <i>total</i> number of collisions on the network.</offset>
+<offset number='12' name='st_collisions'>The number of times a collision has occured when trying to transmit a packet.</offset>
+<offset number='16' name='st_excess_collisions'>A count of excess transmit collisions.</offset>
+<offset number='20' name='st_heartbeat_failures'>The number of times the Signal Quality Error Test failed to detect a collision.</offset>
+<offset number='24' name='st_not_listening'><p>A count of the number of times when the remote station was not listening.</p><p>(This statistic will usually be specific to Acorn Econet)</p></offset>
+<offset number='28' name='st_tx_frames'>The total number of frames transmitted since driver initialisation.</offset>
+<offset number='32' name='st_tx_bytes'>The total number of bytes transmitted since driver initialisation.</offset>
+<offset number='36' name='st_tx_general_errors'>A count of the number of non-specific network errors that occured during transmission.</offset>
+<offset number='40' name='st_last_dest_addr'>Hardware address of the last interface to which a frame was sent.</offset>
+<fixme>The specification is missing a number of these descriptions</fixme>
+<offset number='68' name='st_jabbers'>The number of times the interface was caught jabbering.</offset>
+<fixme> Another missing </fixme>
+<offset number='76' name='st_unwanted_frames'>The number of frames received, but not claimed by any protocol module.</offset>
+<offset number='80' name='st_rx_frames'>The total number of frames received since driver initialisation.</offset>
+<offset number='84' name='st_rx_bytes'>The total number of bytes received since driver initialisation.</offset>
+<offset number='88' name='st_tx_general_errors'>A count of the number of non-specific network errors that occured during frame reception.</offset>
+<offset number='92' name='st_last_src_addr'>Hardware address of the last interface from which a frame was received.</offset>
+</offset-table>
+
 <p>Note that statistics are gathered for <i>all</i> frames received
 --- even if a driver subsequently decides that no protocol wants a
 given frame, that frame still appears in the relevant receive
@@ -1507,18 +1500,11 @@ network data within BSD Unix kernels.</p>
 <p>Mbufs within DCI 4 are noticeably different from their brethren,
 both those from BSD, and those from earlier versions of the DCI,
 the main distinctions being:</p>
-<p>- Mbufs and the data they describe no longer occupy a contiguous
-piece of memory.</p>
-<p>- It is no longer the responsibility of protocol modules to
-allocate and maintain pools of free memory --- DCI 4 introduces a
-single, centralised, memory manager module which all protocol and
-device driver modules claim memory from in the form of mbufs.</p>
-<p>- The set of function calls and macros for manipulating mbufs
-(i.e. those operations defined in mbuf.c and mbuf.h) provided by
-the new memory manager module are completely changed from those
-used in earlier versions of the DCI. Any module being upgraded to
-DCI 4 will have to have all these calls changed to the new
-versions.</p>
+<list>
+    <item><p>Mbufs and the data they describe no longer occupy a contiguous piece of memory.</p></item>
+    <item><p>It is no longer the responsibility of protocol modules to allocate and maintain pools of free memory --- DCI 4 introduces a single, centralised, memory manager module which all protocol and device driver modules claim memory from in the form of mbufs.</p></item>
+    <item><p>The set of function calls and macros for manipulating mbufs (i.e. those operations defined in mbuf.c and mbuf.h) provided by the new memory manager module are completely changed from those used in earlier versions of the DCI. Any module being upgraded to DCI 4 will have to have all these calls changed to the new versions.</p></item>
+</list>
 </subsection>
 
 <subsection title="8.2 Memory Manager Module">
@@ -1529,9 +1515,9 @@ storage, but there are some differences. These differences are for
 the following reasons:</p>
 
 <list type='ordered'>
-    <item><p>1. Correct design oversights in previous versions of the DCI.</p></item>
-    <item><p>2. Provide a more modular, and upgradeable, system.</p></item>
-    <item><p>3. Offer single mbuf arbiter with optimised routines available to all DCI4 components.</p></item>
+    <item><p>Correct design oversights in previous versions of the DCI.</p></item>
+    <item><p>Provide a more modular, and upgradeable, system.</p></item>
+    <item><p>Offer single mbuf arbiter with optimised routines available to all DCI4 components.</p></item>
 </list>
 
 <p>The memory manager, the arbiter module, is central to the DCI4
@@ -1553,20 +1539,20 @@ entry/exit characteristics follows (using APCS register naming
 convention):</p>
 
 <list type='ordered'>
-    <item><p>1. a1 always points at an mbctl structure for all direct entry calls</p></item>
-    <item><p>2. the processor must be in supervisor mode</p></item>
-    <item><p>3. a1--a4 are the only parameter registers</p></item>
-    <item><p>4. a2--a4 and ip are corrupted by the call</p></item>
-    <item><p>5. a1 is either the call result or corrupted</p></item>
-    <item><p>6. other registers preserved by call</p></item>
-    <item><p>7. the processor flags are preserved by the call</p></item>
-    <item><p>8. no V set error convention (incompatible with APCS)</p></item>
-    <item><p>9. in general, an error results in a1=0 on exit</p></item>
-    <item><p>10. IRQ state preserved across call</p></item>
-    <item><p>11. IRQs may be disabled during calls</p></item>
-    <item><p>12. IRQs may be enabled during calls ONLY if specifically documented</p></item>
-    <item><p>13. FIQs assumed enabled on entry</p></item>
-    <item><p>14. FIQs preserved across calls</p></item>
+    <item><p>a1 always points at an mbctl structure for all direct entry calls</p></item>
+    <item><p>the processor must be in supervisor mode</p></item>
+    <item><p>a1--a4 are the only parameter registers</p></item>
+    <item><p>a2--a4 and ip are corrupted by the call</p></item>
+    <item><p>a1 is either the call result or corrupted</p></item>
+    <item><p>other registers preserved by call</p></item>
+    <item><p>the processor flags are preserved by the call</p></item>
+    <item><p>no V set error convention (incompatible with APCS)</p></item>
+    <item><p>in general, an error results in a1=0 on exit</p></item>
+    <item><p>IRQ state preserved across call</p></item>
+    <item><p>IRQs may be disabled during calls</p></item>
+    <item><p>IRQs may be enabled during calls ONLY if specifically documented</p></item>
+    <item><p>FIQs assumed enabled on entry</p></item>
+    <item><p>FIQs preserved across calls</p></item>
 </list>
 
 <p>Currently, no direct entry point routine will enable interrupts
@@ -1615,32 +1601,36 @@ typedef struct mbuf
 mbuf must have its maximum size checked individually. Likewise,
 reseting m_off now requires examining the <b>m_inioff</b> field of
 the mbuf - just setting it to zero is no longer good enough.</p>
+
 <p><b>m_act</b> has been renamed m_list.</p>
+
 <p><b>m_inilen</b> and <b>m_inioff</b> are provided to replace the
-MMINOFF and MMAXLEN macros, as the values are now</p>
-<p>dependent upon the particular mbuf in question. <b>m_indir</b>
-has disappeared --- specific routines exist for determining if
-an</p>
-<p>mbuf chain contains unsafe data.</p>
+MMINOFF and MMAXLEN macros, as the values are now dependent upon the particular mbuf in question.</p>
+
+<p><b>m_indir</b> has disappeared --- specific routines exist for determining if
+an mbuf chain contains unsafe data.</p>
+
 <p>The mbuf structure has been separated from the underlying
 storage it describes. The underlying storage blocks may now be
 different sizes (128 and 1536 byte blocks are currently used).</p>
+
 <p>Earlier versions of the DCI had big mbufs, but they were weakly
 defined and dtom did not work with them. DCI 4 corrects both these
 points --- indirect mbufs, which at times were not distinguishable
 from large mbufs, have been formalised into unsafe mbufs.</p>
+
 <p>As an mbuf chain passes around the system, ownership of that
 chain is also transferred. Ownership brings with it the
 responsibility to free the mbuf chain (unless it is transferred to
 another component, although this is unlikely).</p>
+
 <p>The other crucial structure in DCI 4 memory management is
 <b>mbctl:</b></p>
 
-<fixme>This structure has been corrupted</fixme>
 <extended-example type='c'>
 typedef struct mbctl
 {
-    reserved for mbuf manager use in establishing context */
+    /* reserved for mbuf manager use in establishing context */
     int opaque; /* mbuf manager use only */
 
     /* Client initialises before session is established */
@@ -1763,13 +1753,13 @@ manager cares to use.</p>
 <category title="Using the memory manager module">
 <p>Basic use of the memory manager is performed as follows</p>
 <list type='ordered'>
-    <item>1. module loads and looks for memory manager</item>
-    <item>2. if memory manager is absent, module goes into a pre-active state, awaiting the arrival of the memory manager</item>
-    <item>3. once the memory manager is present, a "session" is opened with it</item>
-    <item>4. the device driver/protocol may now become active if it is pre-active (this might involve delaying arrival service calls until now)</item>
-    <item>5. the device driver/protocol uses direct entry points to communicate with the memory manager</item>
-    <item>6. the device driver/protocol is about to die --- it first closes the open session with the memory manager</item>
-    <item>7. the device driver/protocol can now die</item>
+    <item>module loads and looks for memory manager</item>
+    <item>if memory manager is absent, module goes into a pre-active state, awaiting the arrival of the memory manager</item>
+    <item>once the memory manager is present, a "session" is opened with it</item>
+    <item>the device driver/protocol may now become active if it is pre-active (this might involve delaying arrival service calls until now)</item>
+    <item>the device driver/protocol uses direct entry points to communicate with the memory manager</item>
+    <item>the device driver/protocol is about to die --- it first closes the open session with the memory manager</item>
+    <item>the device driver/protocol can now die</item>
 </list>
 
 <p>Initialisation with the memory manager is performed with code
@@ -1778,7 +1768,7 @@ something like:</p>
 <extended-example type='c'>
 static _kernel_oserror *open_mbuf_manager_session(void)
 {
-    _kernel_swi_regs r ;
+    _kernel_swi_regs r;
     memset(&amp;mbctl, 0, sizeof(struct mbctl));
     mbctl.mbcsize = sizeof(struct mbctl);
     mbctl.mbcvers = MBUF_MANAGER_VERSION;
@@ -1788,76 +1778,66 @@ static _kernel_oserror *open_mbuf_manager_session(void)
     mbctl.mincontig = 0;
     mbctl.spare1 = 0;
     r.r[0] = (int) &amp;mbctl;
-    return(_kernel_swi(XOS_Bit Mbuf_OpenSession, &amp;r, &amp;r));
+    return(_kernel_swi(Mbuf_OpenSession, &amp;r, &amp;r));
 }
 </extended-example>
 
 Finalisation is performed with code something like:
 
-<fixme>This example is corrupted</fixme>
 <extended-example type='c'>
 static _kernel_oserror *close_mbuf_manager_session(void)
 {
-    r ;
+    _kernel_swi_regs r;
     r.r[0] = (int) &amp;mbctl;
-    return(_kernel_swi(XOS_Bit Mbuf_CloseSession, &amp;r, &amp;r));
+    return(_kernel_swi(Mbuf_CloseSession, &amp;r, &amp;r));
 }
 </extended-example>
 
 <p>A quick summary of the available direct entry point
 routines:</p>
-<p><b>alloc</b>: standard allocator. Can import data, but cannot
-zero the underlying storage, force single mbuf allocation or
-allocate unsafe data.</p>
-<p><b>alloc_g</b>: the allocator which can emulate the other
-allocator functions.</p>
-<p><b>alloc_u</b>: allocate unsafe mbufs</p>
-<p><b>alloc_s</b>: force allocation to a single mbuf</p>
-<p><b>alloc_c</b>: clear the underlying storage after
-allocation.</p>
-<p><b>ensure_safe</b>: Examines each mbuf and returns a modified
-mbuf chain if any mbufs are unsafe.</p>
-<p><b>ensure_contig</b>: Ensures that a given region of the
-described data is contiguous in memory, to permit structures to be
-"cast over it".</p>
-<p><b>free</b>: Frees a single mbuf</p>
-<p><b>freem</b>: Frees an mbuf chain</p>
-<p><b>dtom_free</b>: Performs a dtom operation and then a free
-operation on the result</p>
-<p><b>dtom_freem</b>: Performs a dtom operation and then a freem
-operation on the result</p>
-<p><b>dtom</b>: Transform a data pointer to the mbuf describing
-it</p>
-<p><b>any_unsafe</b>: scan an mbuf chain for unsafe mbufs</p>
-<p><b>this_unsafe</b>: determine whether an mbuf is safe or
-unsafe.</p>
-<p><b>count_bytes</b>: return the number of bytes described by an
-mbuf chain</p>
-<p><b>cat</b>: concatenate two mbuf chains together</p>
-<p><b>trim</b>: adjust m _len and m _off values to remove data from
-an mbuf chain.</p>
-<p><b>copy</b>: produce an mbuf chain containing a copy of the data
-described by an mbuf chain.</p>
-<p><b>copy_p</b>: produce an mbuf chain containing a copy of the
-data described by an mbuf chain. The only difference between this
-routine and copy is that this routine assumes that the m_type,
-m_flags and m_pkthdr fields contain important data which should be
-preserved during the copy.</p>
-<p><b>copy_u:</b> produce an unsafe copy of of the data described
-by an mbuf chain.</p>
-<p><b>import</b>: import data from raw memory into an mbuf
-chain</p>
-<p><b>export:</b> export from from an mbuf chain into raw
-memory</p>
+
+<offset-table>
+    <offset number='48' name='alloc'>standard allocator. Can import data, but cannot zero the underlying storage, force single mbuf allocation or allocate unsafe data.</offset>
+    <offset number='52' name='alloc_g'>the allocator which can emulate the other allocator functions.</offset>
+    <offset number='56' name='alloc_u'>allocate unsafe mbufs</offset>
+    <offset number='60' name='alloc_s'>force allocation to a single mbuf</offset>
+    <offset number='64' name='alloc_c'>clear the underlying storage after allocation.</offset>
+    <offset number='68' name='ensure_safe'>Examines each mbuf and returns a modified mbuf chain if any mbufs are unsafe.</offset>
+    <offset number='72' name='ensure_contig'>Ensures that a given region of the described data is contiguous in memory, to permit structures to be "cast over it".</offset>
+    <offset number='76' name='free'>Frees a single mbuf</offset>
+    <offset number='80' name='freem'>Frees an mbuf chain</offset>
+    <offset number='84' name='dtom_free'>Performs a dtom operation and then a free operation on the result</offset>
+    <offset number='88' name='dtom_freem'>Performs a dtom operation and then a freem operation on the result</offset>
+    <offset number='92' name='dtom'>Transform a data pointer to the mbuf describing it</offset>
+    <offset number='96' name='any_unsafe'>scan an mbuf chain for unsafe mbufs</offset>
+    <offset number='100' name='this_unsafe'>determine whether an mbuf is safe or unsafe.</offset>
+    <offset number='104' name='count_bytes'>return the number of bytes described by an mbuf chain</offset>
+    <offset number='108' name='cat'>concatenate two mbuf chains together</offset>
+    <offset number='112' name='trim'>adjust m _len and m _off values to remove data from an mbuf chain.</offset>
+    <offset number='116' name='copy'>produce an mbuf chain containing a copy of the data described by an mbuf chain.</offset>
+    <offset number='120' name='copy_p'>produce an mbuf chain containing a copy of the data described by an mbuf chain. The only difference between this routine and copy is that this routine assumes that the m_type, m_flags and m_pkthdr fields contain important data which should be preserved during the copy.</offset>
+    <offset number='124' name='copy_u'>produce an unsafe copy of of the data described by an mbuf chain.</offset>
+    <offset number='128' name='import'>import data from raw memory into an mbuf chain</offset>
+    <offset number='132' name='export'>export from from an mbuf chain into raw memory</offset>
+</offset-table>
+
 <p>So, a device driver might use the allocator as follows:</p>
+
+<code type='c'>
 <p>struct mbuf *mp = mbctl.alloc(&amp;mbctl, packlen, NULL);</p>
+</code>
+
 <p>which allocates an mbuf chain of "packlen" bytes.</p>
 <p>The entire chain might later be freed thus:</p>
+
+<code type='c'>
 <p>mbctl.freem(&amp;mbctl, mp);</p>
-<p>The reason all the direct entry point calls take a (struct mbctl
-*) value as there first parameter is to permit the mbuf</p>
-<p>manager to establish a context within which it is operating (ie
-find its workspace!).</p>
+</code>
+
+<p>The reason all the direct entry point calls take a (struct mbctl *)
+    value as there first parameter is to permit the MBufManager to
+    establish a context within which it is operating (ie find its workspace!).</p>
+
 <p>Finally, the memory manager supports the DCI4 statistics
 interface. This can be useful in fine tuning your DCI4
 component.</p>
