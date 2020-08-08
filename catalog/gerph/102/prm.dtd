@@ -16,6 +16,8 @@
 
 <!-- Some entities for the PRM DTD -->
 
+<!ENTITY nbsp "&#160;">
+<!-- no-break space = non-breaking space, U+00A0 ISOnum -->
 <!ENTITY times "&#215;">
 <!-- multiplication sign, U+00D7 ISOnum -->
 <!-- <!ENTITY ne "&#8800;"> -->

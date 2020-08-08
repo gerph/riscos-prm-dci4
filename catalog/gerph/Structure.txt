@@ -101,6 +101,7 @@ file be expanded with time, and as they are found to be necessary.
 
 Some of the entities that can be used are :
 
+   &nbsp;    no-breaking space, for keeping words together.
    &times;   multiplication symbol. Do not use 'x'.
    &ne;      not equal. Do not use '!=' or '<>'
    &equiv;   equivilence. Try to get the difference between equality and

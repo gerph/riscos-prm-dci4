@@ -19,8 +19,8 @@ OUTPUTDIR=output/help
 mkdir -p "${OUTPUTDIR}"
 
 # Now build stuff
-make > logs/build-stdout 2>&1 || echo "ERROR: Build failed"
-make validate > logs/validate-stdout 2>&1 || echo "ERROR: Validate failed"
+make > logs/build-stdout 2>&1 || echo "ERROR: Build failed - see logs/build-stdout"
+make validate > logs/validate-stdout 2>&1 || echo "ERROR: Validate failed - see logs/validate-stdout"
 echo Processing plain index
 xsltproc                                 -o "${OUTPUTDIR}/index.html" index.xsl index.xml > logs/index-stdout 2>&1
 echo Processing source links
