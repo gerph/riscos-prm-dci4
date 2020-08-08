@@ -77,7 +77,7 @@ Service_DCIDriverStatus respectively.</p></item>
 
     <item><p>To prevent old device drivers getting confused by
 Service_ProtocolStatus, which no longer provides a sensible (as far
-as old DCI versions are concerned) value in r2, this service call
+as old DCI versions are concerned) value in R2, this service call
 has been made obsolete, and has been replaced by
 Service_DCIProtocolStatus.</p></item>
 </list>
@@ -330,7 +330,7 @@ drivers</register-use>
 <use>
 <p>This service call is used to obtain a list of all active
 network device drivers in the system. When the service call is
-issued, r0 is a NULL pointer; upon receipt of this call, a network
+issued, R0 is a NULL pointer; upon receipt of this call, a network
 device driver should chain Driver Information Blocks to the
 <i>head</i> of the list, one for each logical interface the driver
 controls. Section 4.1 describes the struct chaindib used to hold
@@ -364,21 +364,21 @@ must be static data, as explained in section 3.2.</p>
 <use>
 <p>
     Service_DCIDriverStatus is issued by a network driver
-module during its initialisation (r2 = 0), and finalisation (r2 =
+module during its initialisation (R2 = 0), and finalisation (R2 =
 1) calls. If a network device driver controls multiple logical
 interfaces, then a separate service call must be issued for each
 interface the driver is responsible for.</p>
 <p>Upon receipt of this service call from a driver that is starting
-up (i.e. r2 = 0), a protocol module should add the driver</p>
+up (i.e. R2 = 0), a protocol module should add the driver</p>
 <p>to its list of known device drivers. If a service call is
 received from a driver that is terminating, the protocol module
 should scan its list of known device drivers for a Driver
-Information Block matching the one addressed by r0, removing it
+Information Block matching the one addressed by R0, removing it
 from the list if a match is found. A Driver Information Block is
 uniquely identified by its dib_name and dib_unit fields, therefore
 a comparison of these two fields is sufficient to prove a
 match.</p>
-<p>The supported DCI version passed in r3 is in the same format as
+<p>The supported DCI version passed in R3 is in the same format as
 described for the DCIVersion SWI (Section 5.3), i.e. 405 decimal
 for this version.</p>
 <p>When this call is issued while starting, device drivers should
@@ -420,7 +420,7 @@ protocol module called the Filter SWI), or implicit (the protocol
 module issued a Service_DCIProtocolStatus service call).</p>
 <p>If a protocol module wishes to claim the newly relinquished
 frame type for itself, it should use the Filter SWI to do so, and
-then claim the service call by setting r1 to 0.</p>
+then claim the service call by setting R1 to 0.</p>
 <p>Note: the concepts of frame types and the various filtering
 levels available are explained fully in section 6.2.</p>
 </use>
@@ -450,13 +450,13 @@ levels available are explained fully in section 6.2.</p>
 
 <use>
     <p>Service_DCIProtocolStatus is issued by a protocol module
-during its initialisation (r2 = 0), and finalisation (r2 = 1)
-calls. The private word pointer in r0 is the same as that supplied
+during its initialisation (R2 = 0), and finalisation (R2 = 1)
+calls. The private word pointer in R0 is the same as that supplied
 by the protocol module in the Filter SWI (see section 5.3).</p>
-<p>The supported DCI version passed in r3 is in the same format as
+<p>The supported DCI version passed in R3 is in the same format as
 described for the DCIVersion SWI, i.e. 405 decimal for this
 version.</p>
-<p>The title string pointed to by r4 should be identical to the
+<p>The title string pointed to by R4 should be identical to the
 title string in the protocol module's header. This string is not
 used anywhere else in the DCI --- it is intended for use by modules
 that rely on the protocol module, but which do not communicate with
@@ -580,7 +580,7 @@ faults.</p>
 <list>
     <item><p>Any SWI:</p>
         <p><value-table head-number='Error number' head-name='Unix error'>
-            <value name='EINVAL' number='&hex;20E16'>Incorrect flags word in r0</value>
+            <value name='EINVAL' number='&hex;20E16'>Incorrect flags word in R0</value>
             <value name='ENXIO' number='&hex;20E06'>Invalid unit number supplied</value>
         </value-table></p>
     </item>
@@ -710,7 +710,7 @@ version, i.e. 1 or 2 (as opposed to 100 or 200).</p>
 
 <use>
 <p>This SWI is used to ascertain the characteristics of a
-device driver. The flag bits within r2 are:</p>
+device driver. The flag bits within R2 are:</p>
 
 <bitfield-table>
     <bit number='0'>Multicast reception is supported</bit>
@@ -770,16 +770,16 @@ specifically:</p>
 
 <use>
 <p>This SWI returns the MTU (Maximum Transmission Unit) for
-the unit specified in r0. Ethernet has a fixed MTU of 1500 bytes,
+the unit specified in R0. Ethernet has a fixed MTU of 1500 bytes,
 other hardware layers (e.g. PPP) may have a variable MTU.</p>
 <p>Note: this SWI has changed with respect to earlier versions of
 the DCI, in as much as</p>
 
 <list type='ordered'>
-    <item>There is now the standard flags word in r0.</item>
-    <item>A unit number is now passed in r1.</item>
-    <item>Results are returned in r2.</item>
-    <item>A default return (r2 = 0), implying Ethernet MTU is no longer supported.</item>
+    <item>There is now the standard flags word in R0.</item>
+    <item>A unit number is now passed in R1.</item>
+    <item>Results are returned in R2.</item>
+    <item>A default return (R2 = 0), implying Ethernet MTU is no longer supported.</item>
 </list>
 </use>
 <related>
@@ -801,7 +801,7 @@ the DCI, in as much as</p>
 
 <use>
     <p>For those device drivers that allow it (e.g. PPP), this SWI
-sets the Maximum Transmission Unit for the unit given in r1.</p>
+sets the Maximum Transmission Unit for the unit given in R1.</p>
 <p>If the device driver has an immutable MTU, then it must still
 support this SWI, but return an error indicating an illegal</p>
 <p>operation.</p>
@@ -831,19 +831,19 @@ a guideline --- other protocol modules may set a</p>
 
 <use>
 <p>This SWI is a request from the protocol module for the
-device driver to send the packet addressed by r3 to the hardware
-address specified in r4. The "frame type" passed in r2 is something
+device driver to send the packet addressed by R3 to the hardware
+address specified in R4. The "frame type" passed in R2 is something
 of a misnomer: the value given is copied into the last 2 bytes of
 an Ethernet frame header, i.e. it is the length field according to
 the IEEE 802.3 spec., and the frame type as far as Ethernet 2.0 is
 concerned.</p>
 <p>If a previous frame is still being transmitted, the driver
 should queue the new request if possible, otherwise return an error indicating that transmission is blocked.</p>
-<p>The flag bits within r0 are:</p>
+<p>The flag bits within R0 are:</p>
 
 <bitfield-table>
     <bit number='0' state='clear'>Use interface's own hardware address.</bit>
-    <bit number='0' state='set'>Use address given by r5 for source hardware address.</bit>
+    <bit number='0' state='set'>Use address given by R5 for source hardware address.</bit>
 
     <bit number='1' state='clear'>Device driver assumes ownership of memory resources</bit>
     <bit number='1' state='set'>Protocol module retains ownership of memory resources</bit>
@@ -852,14 +852,14 @@ should queue the new request if possible, otherwise return an error indicating t
 </bitfield-table>
 
 <p>Regardless of who initially allocated the memory resources (i.e.
-mbuf chains) passed in r3, it is the new owner of these resources
-(i.e. the device driver if r0, bit1 = 0; the protocol module if r0,
+mbuf chains) passed in R3, it is the new owner of these resources
+(i.e. the device driver if R0, bit1 = 0; the protocol module if R0,
 bit 1 = 1) that is responsible for returning these resources to the
 free pool when they are no longer needed.</p>
 <p>This SWI uses the scheme, described in section 6.3 for linking
 several received mbuf chains, to pass multiple output chains to the
 device driver via asingle call to this SWI. Care must be taken to
-ensure that the flag bits in r0 are applicable to <i>all</i> , mbuf
+ensure that the flag bits in R0 are applicable to <i>all</i> , mbuf
 chains passed to the driver.</p>
 <p>The data passed to the driver can be either "safe", or "unsafe"
 (section 8.3 explains the concept of unsafe data) --- if the device
@@ -918,7 +918,7 @@ the module's workspace.</p>
 <p>This pointer is passed round in R0 by the protocol module in the
 Service_DCIProtocolStatus service call.</p>
 <p>When a device driver receives a network frame of a type claimed
-by a protocol module, it will call the routine given in r6. Section
+by a protocol module, it will call the routine given in R6. Section
 6.3 describes the parameters which must be passed to this received
 frame handler.</p>
 <p>The concept of safe and unsafe data, as used in bit 1 of the
@@ -949,8 +949,8 @@ flags is explained in section 8.3.</p>
 
 <use>
 <p>This SWI is the mechanism by which device drivers return
-statistics they have gathered while running. A full description of these statistics, including the structure copied into the the addressed by r2 is provided in section 7.</p>
-<p>The flag bits within r0 are:</p>
+statistics they have gathered while running. A full description of these statistics, including the structure copied into the the addressed by R2 is provided in section 7.</p>
+<p>The flag bits within R0 are:</p>
 
 <bitfield-table>
     <bit number='0' state='clear'>Return an indication of which statistics are
@@ -959,7 +959,7 @@ gathered.</bit>
     <bit number='1-31' state='reserved'/>
 </bitfield-table>
 
-<p>The buffer addressed by r2 <i>must</i> be large enough to hold
+<p>The buffer addressed by R2 <i>must</i> be large enough to hold
 the full statistics structure, i.e. at least 100 bytes long; the
 driver is free to copy that many bytes into the buffer without
 thought for the consequences if the buffer is too small.</p>
@@ -1262,11 +1262,11 @@ longer needed.</p></item>
 
 <category title="Handler Details">
 <p>On entry:</p>
-<p>r0 = pointer to Driver Information Block describing the source
+<p>R0 = pointer to Driver Information Block describing the source
 interface</p>
-<p>r1 = pointer to head of mbuf list of received frames</p>
-<p>r12 = protocol module's private word pointer, i.e. value passed
-in r5 to Filter SWI</p>
+<p>R1 = pointer to head of mbuf list of received frames</p>
+<p>R12 = protocol module's private word pointer, i.e. value passed
+in R5 to Filter SWI</p>
 <p>On exit:</p>
 <p>All registers preserved.</p>
 <p>Interrupt Status: Both interrupts and fast interrupts are
@@ -1504,7 +1504,7 @@ statistics (i.e. st_rx_bytes, st_last_src_addr etc.).</p>
 <subsection title="7.3 Statistics">
 <p>The basic interface for reading statistics from a driver is the
 Stats SWI, outlined in section 5.3 There are two different forms of
-this SWI, selected by bit 0 of r0 --- the first form is used to
+this SWI, selected by bit 0 of R0 --- the first form is used to
 determine which statistics are supported by the driver, while the
 second form is used to read the statistics.</p>
 <p>To indicate which statistics it supports, a device driver
@@ -2007,7 +2007,7 @@ these flags should also be set.</p>
     <revision number='F' date='14 Mar 1995' author='Acorn/ANT' title='DCI version 4.02'>
         <change>This is now DCI version 4.02.</change>
         <change>Added a paragraph to the description of Service_DCIDriverStatus to define (by cross-reference) the format of the supported DCI version.</change>
-        <change>Service_DCIFrameTypeFree has been changed to reflect the changes made to the Filter SWI for revision D, i.e. frame type and frame level have been merged into a single 32-bit register, <b>r2</b>; parameters that were in registers <b>r4</b> &amp; <b>r5</b> have been moved into <b>r3</b> &amp; <b>r4</b> respectively.</change>
+        <change>Service_DCIFrameTypeFree has been changed to reflect the changes made to the Filter SWI for revision D, i.e. frame type and frame level have been merged into a single 32-bit register, <b>R2</b>; parameters that were in registers <b>R4</b> &amp; <b>R5</b> have been moved into <b>R3</b> &amp; <b>R4</b> respectively.</change>
         <change>Corrected some typos.</change>
         <change>Table of standardised errors (hopefully) made more explicit by adding a column detailing all the error numbers.</change>
         <change>Added a paragraph to the statistics section clarifying when statistics are gathered (i.e. for <i>all</i> frames).</change>
