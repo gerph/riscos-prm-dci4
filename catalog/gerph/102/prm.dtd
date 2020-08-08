@@ -111,7 +111,9 @@
 <!ELEMENT swi-definition ((entry?, exit?, use, (example)*, declaration?, related?)?)>
 <!ATTLIST swi-definition
     name CDATA #REQUIRED
-    number CDATA #REQUIRED
+    number CDATA #IMPLIED
+    offset CDATA #IMPLIED
+    offset-base CDATA #IMPLIED
     description CDATA #IMPLIED
     internal (yes | no) "no"
     irqs CDATA "undefined"

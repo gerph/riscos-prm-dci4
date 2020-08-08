@@ -683,6 +683,9 @@
 </xsl:template>
 
 <!-- SWI definition -->
+<!-- A SWI definition can have an offset defined, instead of a number, which is used for those cases
+     where multiple provides all use the same interface. For example FileCore modules or DCI drivers.
+ -->
 <xsl:template match="swi-definition|vector-definition">
 <xsl:variable name="deftype" select="substring-before(local-name(.),'-definition')" />
 <xsl:variable name="defsingular" select="document('')//localdb:definition-names[@type=$deftype]/@singular" />
@@ -710,8 +713,19 @@
     <br />
     (<acronym>
      <xsl:value-of select="$defsingular" />
-     <xsl:text> &amp;</xsl:text>
-     <xsl:value-of select="@number"/></acronym>
+     <xsl:choose>
+      <xsl:when test="@offset != ''">
+       <xsl:text> </xsl:text>
+       <xsl:value-of select="@offset-base"/>
+       <xsl:text>+&amp;</xsl:text>
+       <xsl:value-of select="@offset"/>
+      </xsl:when>
+      <xsl:otherwise>
+       <xsl:text> &amp;</xsl:text>
+       <xsl:value-of select="@number"/>
+      </xsl:otherwise>
+     </xsl:choose>
+     </acronym>
 <!--     <xsl:if test="@reason != ''"> -->
 <!--      <xsl:text> reason </xsl:text> -->
 <!--      <xsl:value-of select="@reason"/> -->

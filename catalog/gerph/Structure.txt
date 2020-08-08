@@ -816,12 +816,14 @@ the PRMs provide.
 
 
 Element:    swi-definition
-Attributes: name, number, reason, reasonname,
+Attributes: name, number, offset, reason, reasonname,
             description, internal, irqs, fiqs, processor-mode, re-entrant
 Contains:   (entry?, exit?, use, related?)
 
 name: the full name of this SWI, eg OS_Module
-number: the number of this SWI in hex
+number: (optional) the number of this SWI in hex
+offset: (optional) the offset of this SWI from a given base
+offset-base: (optional) the name of base for this SWI offset
 reason: (optional) the reason code for this SWI, eg 7
 reasonname: (optional) the name of this reason code as an unspaced
             capitalised name, eg FreeBlock
@@ -850,6 +852,10 @@ particular reason code of a call. It is expected that reasonname and the swi
 name should be usable as symbol names in a language, so their use is
 restricted to unspaced names, usually capitalised to indicate word breaks,
 and succinctly named to provide a simple to remember and type symbol.
+
+The SWI definition may be given as an offset, and an offset-base. This is
+useful when a collection of SWIs are defined which have a common base,
+as is the case with the DCI Drivers.
 
 The provision for internal SWIs is important. Whilst the full XML
 documentation may be publicly available and therefore any API you 'hide'

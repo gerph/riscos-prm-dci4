@@ -676,7 +676,7 @@ Attributes: name, number, reason, reasonname,
             description, internal, irqs, fiqs, processor-mode, re-entrant
 Contains:   (entry?, exit?, use, related?)
 
-<swi-definition name="DCIDriver_DCIVersion" offset="00"
+<swi-definition name="DCIDriver_DCIVersion" offset="00" offset-base='DCIDriver'
                 description="Returns DCI version numbers supported by the device driver">
 <entry>
     <register-use number='0'>Flags (all bits must be zero)</register-use>
@@ -696,7 +696,7 @@ version, i.e. 1 or 2 (as opposed to 100 or 200).</p>
 </use>
 </swi-definition>
 
-<swi-definition name="DCIDriver_Inquire" offset="01"
+<swi-definition name="DCIDriver_Inquire" offset="01" offset-base='DCIDriver'
                 description="Read the characteristics for the device driver">
 <entry>
     <register-use number='0'>Flags (all bits must be zero)</register-use>
@@ -756,7 +756,7 @@ specifically:</p>
 </swi-definition>
 
 
-<swi-definition name="DCIDriver_GetNetworkMTU" offset="02"
+<swi-definition name="DCIDriver_GetNetworkMTU" offset="02" offset-base='DCIDriver'
                 description="Return the MTU for the unit">
 <entry>
     <register-use number='0'>Flags (all bits must be zero)</register-use>
@@ -788,7 +788,7 @@ the DCI, in as much as</p>
 </swi-definition>
 
 
-<swi-definition name="DCIDriver_SetNetworkMTU" offset="03"
+<swi-definition name="DCIDriver_SetNetworkMTU" offset="03" offset-base='DCIDriver'
                 description="Set the MTU for the unit">
 <entry>
     <register-use number='0'>Flags (all bits must be zero)</register-use>
@@ -815,7 +815,7 @@ a guideline --- other protocol modules may set a</p>
 </swi-definition>
 
 
-<swi-definition name="DCIDriver_Transmit" offset="04"
+<swi-definition name="DCIDriver_Transmit" offset="04" offset-base='DCIDriver'
                 description="Request the driver send frames on the network">
 <entry>
     <register-use number='0'>Flags</register-use>
@@ -874,7 +874,7 @@ to standardise register usage as far as possible.</p>
 </swi-definition>
 
 
-<swi-definition name="DCIDriver_Filter" offset="05"
+<swi-definition name="DCIDriver_Filter" offset="05" offset-base='DCIDriver'
                 description="Register a request for network frames">
 <entry>
     <register-use number='0'>Flags</register-use>
@@ -886,7 +886,7 @@ to standardise register usage as far as possible.</p>
     <register-use number='6'>Address of handler routine for received frames</register-use>
 </entry>
 <exit>
-    <register-use number='0-9' state='reserved'/>
+    <register-use number='0-9' state='preserved'/>
 </exit>
 
 <use>
@@ -936,7 +936,7 @@ flags is explained in section 8.3.</p>
 </swi-definition>
 
 
-<swi-definition name="DCIDriver_Stats" offset="06"
+<swi-definition name="DCIDriver_Stats" offset="06" offset-base='DCIDriver'
                 description="Register a request for network frames">
 <entry>
     <register-use number='0'>Flags</register-use>
@@ -944,7 +944,7 @@ flags is explained in section 8.3.</p>
     <register-use number='2'>Pointer to buffer for holding results</register-use>
 </entry>
 <exit>
-    <register-use number='0-9' state='reserved'/>
+    <register-use number='0-9' state='preserved'/>
 </exit>
 
 <use>
@@ -968,7 +968,7 @@ thought for the consequences if the buffer is too small.</p>
 </swi-definition>
 
 
-<swi-definition name="DCIDriver_MulticastRequest" offset="07"
+<swi-definition name="DCIDriver_MulticastRequest" offset="07" offset-base='DCIDriver'
                 description="Manage multicast addresses received by the driver">
 <entry>
     <register-use number='0'>Flags</register-use>
@@ -982,7 +982,7 @@ pointer to IP address for frame type 0x800)</register-use>
     <register-use number='6'>address of handler routine for received frames</register-use>
 </entry>
 <exit>
-    <register-use number='0-9' state='reserved'/>
+    <register-use number='0-9' state='preserved'/>
 </exit>
 
 <use>

@@ -206,7 +206,14 @@
             <xsl:with-param name="length" select="$longest - string-length($symbol-name)" />
         </xsl:call-template>
         <xsl:text> 0x</xsl:text>
-        <xsl:value-of select="@number" />
+        <xsl:choose>
+            <xsl:when test="@offset != ''">
+                <xsl:value-of select="@offset" />
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:value-of select="@number" />
+            </xsl:otherwise>
+        </xsl:choose>
         <xsl:text> /* </xsl:text>
         <xsl:choose>
             <xsl:when test="@internal='yes'">

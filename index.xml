@@ -120,8 +120,9 @@
  <page>MimeMap</page>
 
  <section title="DCI 4 networking" dir="dci4">
-  <page href="devicedriver">Device drivers</page>
+  <page href="devicedriver">Network Device drivers</page>
   <page href="mbufmanager">MBuf Manager</page>
+  <page href="dcistatistics">DCI Statistics</page>
  </section>
 
  <section title="Legacy networking" dir="legacy">
