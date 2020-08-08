@@ -312,6 +312,10 @@ and has been removed.</p>
 
 <subsection title="4.2 Service Call Descriptions">
 
+<p>Note: as already mentioned in section 4, the old, unnamed,
+service call 0x41200 will not be issued by DCI 4 compliant versions
+of the Internet module when it is terminating.</p>
+
 <service-definition name="EnumerateNetworkDrivers" number='9B'
                     description="List all active network drivers in the system">
 <entry>
@@ -388,6 +392,9 @@ action to allow this is required of the driver module issuing the
 service call.</p>
 <p>This service call should never be claimed.</p>
 </use>
+<related>
+  <reference type="service" name="DCIProtocolStatus" />
+</related>
 </service-definition>
 
 <service-definition name="DCIFrameTypeFree" number='9E'
@@ -417,6 +424,10 @@ then claim the service call by setting r1 to 0.</p>
 <p>Note: the concepts of frame types and the various filtering
 levels available are explained fully in section 6.2.</p>
 </use>
+<related>
+  <reference type="service" name="DCIDriverStatus" />
+  <reference type="swi" name="DCIDriver_Filter" />
+</related>
 </service-definition>
 
 <service-definition name="DCIProtocolStatus" number='9F'
@@ -466,11 +477,10 @@ while processing the service call, but they should return with the
 interrupt state preserved.</p>
 <p>Device drivers must never claim this service call.</p>
 </use>
+<related>
+  <reference type="service" name="DCIDriverStatus" />
+</related>
 </service-definition>
-
-<p>Note: as already mentioned in section 4, the old, unnamed,
-service call 0x41200 will not be issued by DCI 4 compliant versions
-of the Internet module when it is terminating.</p>
 
 </subsection>
 
@@ -484,11 +494,12 @@ does not recognise a module's SWIs until <i>after</i> its
 initialisation routine has returned, which means that driver
 modules must take explicit steps to allow SWIs to be caught before
 issuing the service call, i.e. they must either:</p>
-<p>1. Install a handler on the unknown SWI software vector
-("UKSWIV"), and check all unknown SWIs for an appropriate</p>
-<p>chunk number.</p>
-<p>2. Setup a callback handler in the initialisation routine, and
-then issue the service call from within this callback handler.</p>
+
+<list type='ordered'>
+    <item><p>Install a handler on the unknown SWI software vector ("UKSWIV"), and check all unknown SWIs for an appropriate chunk number.</p></item>
+    <item><p>Setup a callback handler in the initialisation routine, and then issue the service call from within this callback handler.</p></item>
+</list>
+
 </subsection>
 </section>
 
