@@ -72,14 +72,14 @@ a device driver after either actively or passively learning of the
 device driver's presence; DCI 4 has replaced the active
 (Service_FindNetworkDriver) and passive
 (Service_NetworkDriverStatus) service calls used by protocol
-modules with Service_EnumerateNetworkDrivers and
-Service_DCIDriverStatus respectively.</p></item>
+modules with  <reference type='service' name='EnumerateNetworkDrivers'/> and
+<reference type='service' name='DCIDriverStatus'/> respectively.</p></item>
 
     <item><p>To prevent old device drivers getting confused by
 Service_ProtocolStatus, which no longer provides a sensible (as far
 as old DCI versions are concerned) value in R2, this service call
 has been made obsolete, and has been replaced by
-Service_DCIProtocolStatus.</p></item>
+<reference type='service' name='DCIProtocolStatus'/>.</p></item>
 </list>
 
 </category>
@@ -115,7 +115,7 @@ asking for all the trouble that they are about to receive. However,
 if a device driver module is re-initialised (via rmreinit), then
 the address of its Driver Information Block <i>will</i> change,
 therefore any protocol module's handler for the
-Service_DCIDriverStatus service call (page 6) cannot compare
+<reference type='service' name='DCIDriverStatus'/> service call (page 6) cannot compare
 addresses, but must fall back to comparing those fields which
 uniquely identify an interface, i.e. dib_name &amp; dib_unit.</p>
 </category>
@@ -139,7 +139,7 @@ an Ethernet driver at this interface by mapping "virtual Ethernet"
 values onto the real values meaningful to the network hardware.</p>
 </item>
     <item><p>At startup, driver modules must set the variable
-Inet$EtherType to the textual name of the controlled physical
+<sysvar>Inet$EtherType</sysvar> to the textual name of the controlled physical
 interface (e.g. "en", "ea"), with a suffix of `0'. This is for
 backwards compatibility with versions of Acorn's TCP/ IP Protocol
 Suite software already in the field. The textual name is the same
@@ -165,16 +165,16 @@ all now obsolete. To summarise, these calls are</p>
 
 <p>The new service calls defined in DCI 4 are</p>
 <list type='ordered'>
-    <item><p>Service_EnumerateNetworkDrivers (service call 0x9b).</p></item>
-    <item><p>Service_DCIDriverStatus (service call 0x9d).</p></item>
-    <item><p>Service_DCIFrameTypeFree (service call 0x9e).</p></item>
-    <item><p>Service_DCIProtocolStatus (service call 0x9f).</p></item>
+    <item><p><reference type='service' name='EnumerateNetworkDrivers'/></p></item>
+    <item><p><reference type='service' name='DCIDriverStatus'/></p></item>
+    <item><p><reference type='service' name='DCIFrameTypeFree'/></p></item>
+    <item><p><reference type='service' name='DCIProtocolStatus'/></p></item>
 </list>
 
 <p>Note that the old, unnamed, service call 0x41200, which was
-never part of any formal DCI specification, but which used</p>
-<p>to be issued during finalisation of the Internet module, has now
-been officially replaced by Service_DCIProtocolStatus.</p>
+never part of any formal DCI specification, but which used to be issued
+during finalisation of the Internet module, has now
+been officially replaced by <reference type='service' name='DCIProtocolStatus'/>.</p>
 
 <subsection title="4.1 Data Structures">
 <p>Some user applications need to associate device drivers with the
@@ -251,7 +251,7 @@ struct dib
 <p>The fields within this structure are:</p>
 
 <offset-table head-name='Field'>
-    <offset number='0' name='dib_swibase'>The base of the device driver's allocated SWIchunk.</offset>
+    <offset number='0' name='dib_swibase'>The base of the device driver's allocated SWI chunk.</offset>
     <offset number='4' name='dib_name'>A pointer to a short textual name unique to the driver (e.g. "en", "ppp"), and a terminating NULL.</offset>
     <offset number='8' name='dib_unit'>The unit number.</offset>
     <offset number='12' name='dib_address'>A pointer to a 6-byte character array which contains the hardware address of the interface.</offset>
@@ -282,7 +282,7 @@ still appear in the enumerated list of device drivers.</p>
 </category>
 
 <category title="Chained Driver Information blocks">
-<p>The results from the Service_EnumerateNetworkDrivers service
+<p>The results from the <reference type='service' name='EnumerateNetworkDrivers'/> service
 call are chained together into a linked list of Driver Information
 Blocks. The C structure used for this linked list is</p>
 
@@ -416,8 +416,8 @@ service call.</p>
 protocol module releases a claim it formerly had on a frame type
 (i.e. when the frame type becomes free for claiming by a different
 protocol module). This release may have been either explicit (the
-protocol module called the Filter SWI), or implicit (the protocol
-module issued a Service_DCIProtocolStatus service call).</p>
+protocol module called the <reference type='swi' name='DCIDriver_Filter'/> SWI), or implicit (the protocol
+module issued a <reference type='service' name='DCIProtocolStatus'/> service call).</p>
 <p>If a protocol module wishes to claim the newly relinquished
 frame type for itself, it should use the Filter SWI to do so, and
 then claim the service call by setting R1 to 0.</p>
@@ -452,9 +452,9 @@ levels available are explained fully in section 6.2.</p>
     <p>Service_DCIProtocolStatus is issued by a protocol module
 during its initialisation (R2 = 0), and finalisation (R2 = 1)
 calls. The private word pointer in R0 is the same as that supplied
-by the protocol module in the Filter SWI (see section 5.3).</p>
+by the protocol module in the <reference type='swi' name='DCIDriver_Filter'/> SWI (see section 5.3).</p>
 <p>The supported DCI version passed in R3 is in the same format as
-described for the DCIVersion SWI, i.e. 405 decimal for this
+described for the <reference type='swi' name='DCIDriver_DCIVersion'/> SWI, i.e. 405 decimal for this
 version.</p>
 <p>The title string pointed to by R4 should be identical to the
 title string in the protocol module's header. This string is not
@@ -462,7 +462,7 @@ used anywhere else in the DCI --- it is intended for use by modules
 that rely on the protocol module, but which do not communicate with
 it via the DCI; these modules need to have the name of significant
 protocol modules built into them.</p>
-<p>As with device drivers issuing Service_DCIDriverStatus, protocol
+<p>As with device drivers issuing <reference type='service' name='DCIDriverStatus'/>, protocol
 modules should already be capable of handling any SWIs at the time
 they issue this service call to announce that they are starting;
 the techniques described in section 4.3 are as equally valid for
@@ -486,7 +486,7 @@ interrupt state preserved.</p>
 
 <subsection title="4.3 Device Driver Initialisation">
 <p>When a device driver module initialises, it is expected to issue
-a Service_DCIDriverStatus service call to announce that it is
+a <reference type='service' name='DCIDriverStatus'/> service call to announce that it is
 starting; at the time this startup call is issued, the module must
 also be capable of handling SWIs raised by any protocol module
 interested in the device driver. Unfortunately, the RISC OS kernel
@@ -557,6 +557,7 @@ the device driver will set the V flag, and return with R0 pointing
 to an error block. Apart from the unavoidable corruption of R0, all
 other registers which are declared as being preserved by the SWI
 are still preserved, even when an error is returned.</p>
+
 <p><b>Error numbers</b> usually equate to Unix error numbers, as
 defined in the standard header file "errno.h"; these numbers
 are always less than 128, and are converted into offsets within
@@ -564,7 +565,7 @@ the standard error block that has been defined for DCI 4 and
 Internet. This error block starts at &amp;20E00, for example, the
 error EINVAL (invalid argument, defined as 22, &amp;16) would be
 returned as error number &amp;20E16. There are certain
-circumstances (e.g., the Transmit SWI indicating that transmission
+circumstances (e.g., the <reference type='swi' name='DCIDriver_Transmit'/> SWI indicating that transmission
 is blocked) where an appropriate Unix error number does not exist
 --- in this situation, a custom error number is defined
 specifically for this one error condition.</p>
@@ -584,20 +585,22 @@ faults.</p>
             <value name='ENXIO' number='&hex;20E06'>Invalid unit number supplied</value>
         </value-table></p>
     </item>
-    <item><p>SetNetworkMTU:</p>
+    <item><p><reference type='swi' name='DCIDriver_SetNetworkMTU'/>:</p>
         <p><value-table head-number='Error number' head-name='Unix error'>
             <value name='ENOTTY' number='&hex;20E19'>Illegal op for device</value>
         </value-table></p>
     </item>
-    <item><p>Transmit:</p>
+    <item><p><reference type='swi' name='DCIDriver_Transmit'/>:</p>
+        <p>
         <value-table head-number='Error number' head-name='Unix error'>
             <value name='' number='&hex;20E86'>Transmission is blocked</value>
             <value name='ENETDOWN' number='&hex;20E32'>Network hardware is down.</value>
             <value name='EMSGSIZE' number='&hex;20E28'>Frame length &gt; network MTU.</value>
             <value name='ENOBUFS' number='&hex;20E37'>Not enough mbufs available.</value>
         </value-table>
+        </p>
     </item>
-    <item><p>Filter</p>
+    <item><p><reference type='swi' name='DCIDriver_Filter'/>:</p>
         <p><value-table head-number='Error number' head-name='Unix error'>
             <value name='' number='&hex;20E87'>Frame type already claimed</value>
             <value name='EINVAL' number='&hex;20E16'>Trying to claim illegal frame type</value>
@@ -605,7 +608,7 @@ faults.</p>
             <value name='EPERM' number='&hex;20E01'>Trying to free another protocol's claim.</value>
         </value-table></p>
     </item>
-    <item><p>MulticastRequest:</p>
+    <item><p><reference type='swi' name='DCIDriver_MulticastRequest'/>:</p>
         <p><value-table head-number='Error number' head-name='Unix error'>
             <value name='EINVAL' number='&hex;20E16'>Trying to claim illegal frame type</value>
             <value name='EINVAL' number='&hex;20E16'>Trying to release a non-existent claim.</value>
@@ -619,7 +622,7 @@ faults.</p>
 <p>The device driver SWI interface has been given an extensive
 overhaul for DCI 4: the complete break between this, and older
 versions of the DCI (as explained in the section about backwards
-compatibility 3.1) mean that <i>all</i> SWIs, even DCIVersion can
+compatibility 3.1) mean that <i>all</i> SWIs, even <reference type='swi' name='DCIDriver_DCIVersion'/> can
 be altered without worrying about the impact on non-DCI 4 modules
 within a machine.</p>
 <p>The major changes made for DCI 4 are:</p>
@@ -633,22 +636,21 @@ set to zero, except where explicitly stated otherwise.</p></item>
 <item><p>Several new SWIs have been added, i.e.</p>
     <p>
     <list>
-        <item><p>SetNetworkMTU</p></item>
-        <item><p>Inquire</p></item>
-        <item><p>Filter</p></item>
-        <item><p>Stats</p></item>
-        <item><p>MulticastRequest (as of DCI 4.04)</p></item>
+        <item><p><reference type='swi' name='DCIDriver_SetNetworkMTU'/></p></item>
+        <item><p><reference type='swi' name='DCIDriver_Inquire'/></p></item>
+        <item><p><reference type='swi' name='DCIDriver_Filter'/></p></item>
+        <item><p><reference type='swi' name='DCIDriver_Stats'/></p></item>
+        <item><p><reference type='swi' name='DCIDriver_MulticastRequest'/> (as of DCI 4.04)</p></item>
     </list>
     </p>
 </item>
-<item><p>SWI NetworkMTU has been renamed to GetNetworkMTU, to
-differentiate it from the new SWI SetNetworkMTU.</p></item>
-<item><p>SWI NetworkIfSend has been renamed to Transmit, mainly
-because it is less of a mouthful.</p></item>
+<item><p>SWI NetworkMTU has been renamed to <reference type='swi' name='DCIDriver_GetNetworkMTU'/>, to
+differentiate it from the new SWI <reference type='swi' name='DCIDriver_SetNetworkMTU'/>.</p></item>
+<item><p>SWI NetworkIfSend has been renamed to <reference type='swi' name='DCIDriver_Transmit'/>, mainly because it is less of a mouthful.</p></item>
 <item><p>Some old SWIs have been deleted (see below).</p></item>
 <item><p>Offsets of SWIs within a driver's SWI chunk have been changed
 to fill in the gaps left by the deleted SWIs; for example,
-DCIVersion has been moved from offset 4 to the more logical offset
+<reference type='swi' name='DCIDriver_DCIVersion'/> has been moved from offset 4 to the more logical offset
 of 0.</p></item>
 </list>
 
@@ -670,12 +672,6 @@ of no significance to them.</p></value>
 </subsection>
 
 <subsection title="5.3 SWI Descriptions">
-
-Element:    swi-definition
-Attributes: name, number, reason, reasonname,
-            description, internal, irqs, fiqs, processor-mode, re-entrant
-Contains:   (entry?, exit?, use, related?)
-
 <swi-definition name="DCIDriver_DCIVersion" offset="00" offset-base='DCIDriver'
                 description="Returns DCI version numbers supported by the device driver">
 <entry>
@@ -738,15 +734,14 @@ allocation mechanism can be employed. For example, physical Econet
 requires a fixed station number and its driver should set bit 3 of
 the flags, but Ethernet does not, and any such driver should leave
 bit 3 clear.</p>
-<p>The concept of virtual interfaces (bits10 and 11) is explained
+<p>The concept of virtual interfaces (bits 10 and 11) is explained
 in section 9.2.</p>
 <p>The driver should only set bit 13 if it can checksum frames
 efficiently, either in hardware or while copying the data into
 mbufs. If it would involve an extra pass over memory, it should
 leave the checksum up to the protocol module. See section 6.3 for
 more details.</p>
-<p>Some of these characteristisc are inter-related,
-specifically:</p>
+<p>Some of these characteristisc are inter-related, specifically:</p>
 <list type='unordered'>
     <item><p>If bit 5 (interface has a hardware address) is not set, then bit 6 (driver can alter hardware address) is ignored.</p></item>
     <item><p>A driver cannot supply extended statistics (bit 9), without also supplying standard statistics (bit 8).</p></item>
@@ -916,7 +911,7 @@ frames into the RxHdr.</bit>
 protcol module's private word, which itself contains the address of
 the module's workspace.</p>
 <p>This pointer is passed round in R0 by the protocol module in the
-Service_DCIProtocolStatus service call.</p>
+<reference type='service' name='DCIProtocolStatus'/> service call.</p>
 <p>When a device driver receives a network frame of a type claimed
 by a protocol module, it will call the routine given in R6. Section
 6.3 describes the parameters which must be passed to this received
@@ -926,7 +921,7 @@ flags is explained in section 8.3.</p>
 <p>This SWI should return an error when:</p>
 <list>
     <item>An illegal frame type is claimed.</item>
-    <item>A frame type is already claimed. If a protocol module receives this error from a device driver, it can use Service_DCIFrameTypeFree to learn when the frame type is again free for claiming.</item>
+    <item>A frame type is already claimed. If a protocol module receives this error from a device driver, it can use <reference type='service' name='DCIFrameTypeFree'/> to learn when the frame type is again free for claiming.</item>
     <item>An attempt is made to free a frame type which has not been previously claimed by the protocol module.</item>
 </list>
 </use>
@@ -1002,7 +997,8 @@ operations (see state diagram below)</bit>
     <bit number='2-31' state='reserved'/>
 </bitfield-table>
 
-<p>If a protocol module calls the Filter SWI with bit 2 of R0
+<fixme>Graphic here</fixme>
+<p>If a protocol module calls the <reference type='swi' name='DCIDriver_Filter'/> SWI with bit 2 of R0
 clear, then it will receive all multicast frames (if the address
 level is multicast or promiscuous). If, however, it sets bit 2 of
 R0, and the address level is multicast, then it will initially
@@ -1012,8 +1008,11 @@ address -- Ethernet drivers will use only this. Non-Ethernet
 drivers will probably need to know what logical address is being
 requested, as there may not be a one-to-one mapping between the
 logical and hardware multicast addresses for the specified frame
-type (as indeed there isn't for IP/Ethernet). Contact Acorn for
+type (as indeed there isn't for IP/Ethernet).</p>
+<p>Contact Acorn for
 details of what to pass in R4 for specific frame types.</p>
+<fixme> Contact who now? </fixme>
+
 <p>R1, R2, R5, and R6 must match the values passed into the Filter
 SWI so that the device driver can tell which filter this call is
 intended for.</p>
@@ -1030,7 +1029,7 @@ have had to be switched off for the unselective protocol
 module.</p>
 <p>This actually aids compatibility with DCI 4.03 driver modules --
 a new protocol module need only set bit 2 of R0 when calling
-Filter, then ignore any "SWI not known" errors from the
+<reference type='swi' name='DCIDriver_Filter'/>, then ignore any "SWI not known" errors from the
 MulticastRequest SWI. It will then work fine with older
 drivers.</p>
 <p>Device drivers will need to track which filters are requesting
@@ -1039,6 +1038,7 @@ protocol module dies all its multicast claims can be automatically
 removed. However, as specified above, there is no need to check
 whether a multicast filter has requested a specific multicast
 address before passing a received frame to it.</p>
+
 <p>This SWI provides no function for filters with an address level
 other than ADDRLVL_MULTICAST, and if called for such a filter
 should return EINVAL.</p>
@@ -1123,7 +1123,7 @@ types.</p>
 </subsection>
 
 <subsection title="6.3 Frame Filtering">
-<p>A protocol module uses the <b>Filter SWI</b> to identify a
+<p>A protocol module uses <reference type='swi' name='DCIDriver_Filter'/> to identify a
 number of criteria which a received frame must match before being
 passed by the device driver to the protocol module; these criteria
 are</p>
@@ -1166,7 +1166,7 @@ following values:</p>
 </extended-example>
 
 <p>All other values for this subfield are illegal --- any attempt
-to use them in a <b>Filter SWI</b> should generate an error;
+to use them in a <reference type='swi' name='DCIDriver_Filter'/> SWI should generate an error;
 similarly, if the hi-order subfield of the frame type is
 FRMLVL_E2SPECIFIC, then the lo-order subfield can take any value
 from 0x0000 -- 0xffff, otherwise it must be set to 0x0000, and any
@@ -1207,7 +1207,7 @@ as</p>
 <value-table head-name='Level'>
     <value number='0' name='Specific'>only pass frames addressed to the interface's specific hardware address.</value>
     <value number='1' name='Normal'>only pass frames addressed to the interface's specific hardware address, and broadcast frames.</value>
-    <value number='2' name='Multicast'>pass all specifically addressed, broadcast and multicast frames. If bit 2 of R0 was set on entry to the DCI Filter SWI, and the DCI Inquire SWI returns with bit 12 set, then the driver should attempt to filter multicast frames -- see the DCI MulticastRequest SWI for details. Otherwise, all multicast frames will be passed.</value>
+    <value number='2' name='Multicast'>pass all specifically addressed, broadcast and multicast frames. If bit 2 of R0 was set on entry to the <reference type='swi' name='DCIDriver_Filter'/> SWI, and the <reference type='swi' name='DCIDriver_Inquire'/> SWI returns with bit 12 set, then the driver should attempt to filter multicast frames -- see the <reference type='swi' name='DCIDriver_MulticastRequest'/> SWI for details. Otherwise, all multicast frames will be passed.</value>
     <value number='3' name='Promiscuous'>pass all frames of the appropriate frame type, with no address matching at all.</value>
 </value-table>
 
@@ -1250,7 +1250,7 @@ of these receive handlers are</p>
 <item><p>Device drivers call a direct entry point within the protocol
 module (earlier DCI versions used a receive event). The address of
 this direct entry point is passed to the device driver at the same
-time the frame type is claimed via the Filter SWI .</p></item>
+time the frame type is claimed via the <reference type='swi' name='DCIDriver_Filter'/> SWI .</p></item>
 <item><p>A device driver can pass several received frames to the
 protocol module with one call to the receive handler, rather than
 having to call the protocol module once per frame.</p></item>
@@ -1266,7 +1266,7 @@ longer needed.</p></item>
 interface</p>
 <p>R1 = pointer to head of mbuf list of received frames</p>
 <p>R12 = protocol module's private word pointer, i.e. value passed
-in R5 to Filter SWI</p>
+in R5 to <reference type='swi' name='DCIDriver_Filter'/> SWI</p>
 <p>On exit:</p>
 <p>All registers preserved.</p>
 <p>Interrupt Status: Both interrupts and fast interrupts are
@@ -1343,7 +1343,7 @@ any one call to the handler must come from a single unit.</p>
 
 <section title="7 Statistics">
 <subsection title="7.1 Introduction">
-<p>The Inquire SWI makes mention of device drivers supporting both
+<p>The <reference type='swi' name='DCIDriver_Inquire'/> SWI makes mention of device drivers supporting both
 standard, and extended statistics interfaces. This version of the
 DCI does not define an extended statistics interface, but it
 <i>does</i> define a standard stats. interface, and that is what
@@ -1353,7 +1353,7 @@ list of network parameters, and the driver maintains a subset of
 these (remembering that the whole set is a valid subset). An
 independent set of statistics is maintained for each unit that the
 driver controls.</p>
-<p>The <b>Stats SWI</b> serves two purposes:</p>
+<p>The <reference type='swi' name='DCIDriver_Stats'/> serves two purposes:</p>
 <list type='ordered'>
     <item><p>It identifies which statistics the driver gathers for a
 particular unit.</p></item>
@@ -1503,7 +1503,7 @@ statistics (i.e. st_rx_bytes, st_last_src_addr etc.).</p>
 
 <subsection title="7.3 Statistics">
 <p>The basic interface for reading statistics from a driver is the
-Stats SWI, outlined in section 5.3 There are two different forms of
+<reference type='swi' name='DCIDriver_Stats'/> SWI, outlined in section 5.3 There are two different forms of
 this SWI, selected by bit 0 of R0 --- the first form is used to
 determine which statistics are supported by the driver, while the
 second form is used to read the statistics.</p>
@@ -1880,7 +1880,7 @@ component.</p>
 <subsection title="8.3 Unsafe Data">
 <p>The concept of indirect data mbufs was introduced in earlier
 versions of the DCI to eliminate the need for data to be copied
-where&nbsp;this is possible; this results in a significant
+where this is possible; this results in a significant
 improvement in frame rates. Typically, an mbuf is used to indirect
 to user data, rather than making a private copy of that data.</p>
 <p>An important implication of this is that a protocol module
@@ -1889,7 +1889,7 @@ uses them has returned to the user: if they need to keep the data
 after this time, then a private copy <i>must</i> be made of the
 data. Protocol modules should always know whether an mbuf chain is
 unsafe or not (since they create the chain in the first place);
-device drivers are informed via the flags in the Transmit SWI
+device drivers are informed via the flags in the <reference type='swi' name='DCIDriver_Transmit'/> SWI
 whether or not the passed mbuf chain is safe or not --- if they
 need to use any data from an unsafe mbuf chain after the SWI has
 returned, then they must make a copy of that chain.</p>
@@ -1975,7 +1975,7 @@ these flags should also be set.</p>
         <change>The concept of a protocol handle has been removed.</change>
         <change>Register usage for service calls has been changed.</change>
         <change>Service calls Service_ProtocolDying, Service_FindNetworkDriver, and Service_NetworkDriverStatus are now obsolete.</change>
-        <change>The new service calls Service_DCIProtocolDying,&nbsp;Service_DCIDriverStatus and Service_DCIFrameTypeFree have been added.</change>
+        <change>The new service calls Service_DCIProtocolDying, Service_DCIDriverStatus and Service_DCIFrameTypeFree have been added.</change>
         <change>All SWI calls now have a flags register. The gaps in the SWI chunk from earlier versions of the DCI have been closed.</change>
         <change>The Filter SWI has been heavily reworked:
             <list>
@@ -1988,10 +1988,10 @@ these flags should also be set.</p>
         <change>IEEE 802.3 frames are more complicated than originally thought, the concept of frame type for these frames has been extensively revised.</change>
         <change>The rx_frame_type field in struct rx_hdr now only contains the last 2 bytes of the MAC header.</change>
         <change>A completely new memory manager has been designed.</change>
-        <change>The dib_swibase field has been moved to the top of a&nbsp;struct dib.</change>
+        <change>The dib_swibase field has been moved to the top of a struct dib.</change>
         <change>Unsafe data are no longer flagged to the Transmit SWI.</change>
         <change>Added a small section on SWI re-entrancy, and re-enabling interrupts.</change>
-        <change>Added new sections on acceptance tests, and on development test&nbsp;strategies.</change>
+        <change>Added new sections on acceptance tests, and on development test strategies.</change>
     </revision>
 
     <revision number='E' date='03 Feb 1995' author='Acorn/ANT' title='DCI version 4.01'>
