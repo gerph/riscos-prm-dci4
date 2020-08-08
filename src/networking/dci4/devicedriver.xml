@@ -1623,8 +1623,8 @@ typedef struct mbuf
     const ptrdiff_t m_inioff; /* original offset to data from mbuf itself */
     const size_t m_inilen; /* original byte count (for underlying data) */
     unsigned char m_type; /* client use only */
-    const unsigned char m_sys1; /* mbuf manager use only */
-    const unsigned char m_sys2; /* mbuf manager use only */
+    const unsigned char m_sys1; /* MBufManager use only */
+    const unsigned char m_sys2; /* MBufManager use only */
     unsigned char m_flags /* client use only */
     struct pkthdr m_pkthdr; /* client use only */
 } dci4_mbuf;
@@ -1663,19 +1663,19 @@ another component, although this is unlikely).</p>
 <extended-example type='c'>
 typedef struct mbctl
 {
-    /* reserved for mbuf manager use in establishing context */
-    int opaque; /* mbuf manager use only */
+    /* reserved for MBufManager use in establishing context */
+    int opaque; /* MBufManager use only */
 
     /* Client initialises before session is established */
     size_t mbcsize; /* size of mbctl structure from client */
-    unsigned int mbcvers; /* client version of mbuf manager* spec */
+    unsigned int mbcvers; /* client version of MBufManager* spec */
     unsigned long flags; /* */
     size_t advminubs; /* Advisory desired minimum underlying block size */
     size_t advmaxubs; /* Advisory desired maximum underlying block size */
     size_t mincontig; /* client required min ensure_contig value */
     unsigned long spare1; /* Must be set to zero on initialisation */
 
-    /* Mbuf manager initialises during session establishment */
+    /* MBufManager initialises during session establishment */
     size_t minubs; /* Minimum underlying block size */
     size_t maxubs; /* Maximum underlying block size */
     size_t maxcontig; /* Maximum contiguify block size */
@@ -1964,10 +1964,10 @@ these flags should also be set.</p>
         <change>Initial draft revision, passed round for comment</change>
     </revision>
     <revision number='B' date='12 Aug 1994' author='Acorn/ANT'>
-        <change>Incorporated reviewers' comments. Added specification of mbuf manager module.</change>
+        <change>Incorporated reviewers' comments. Added specification of MBufManager module.</change>
     </revision>
     <revision number='C' date='16 Aug 1994' author='Acorn/ANT'>
-        <change>Description of mbuf manager module tidied up and clarified</change>
+        <change>Description of MBufManager module tidied up and clarified</change>
     </revision>
     <revision number='D' date='09 Nov 1994' author='Acorn/ANT'>
         <change>Large number of changes introduced following formal review, and feedback from external reviewers.</change>
