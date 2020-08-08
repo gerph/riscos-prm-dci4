@@ -46,11 +46,11 @@ build:
   stage: build
   script:
     - ./do-build.sh
+    - mv output artifacts/docs
   artifacts:
     when: always
     paths:
       - artifacts
-      - output
       - logs
     reports:
       junit: artifacts/build-results.xml
