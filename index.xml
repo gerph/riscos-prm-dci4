@@ -25,34 +25,34 @@
 <make-index type="section" />
 
 <section title="Overview" dir="overview">
- <page href="about">About this documentation</page>
- <page href="intro">An Introduction to RISC OS</page>
+ <page>About this documentation</page>
+ <page>An Introduction to RISC OS</page>
  <page>* Commands and the CLI</page>
  <page>An Introduction to SWIs</page>
- <page href="errors">Generating and handling errors</page>
+ <page>Generating and handling errors</page>
  <page>OS_Byte</page>
  <page>OS_Word</page>
- <page href="softwarevectors">Software vectors</page>
+ <page>Software vectors</page>
  <page>Hardware vectors</page>
  <page>Hardware vectors (supplement from 5a)</page>
  <page>Interrupts and handling them</page>
  <page>Interrupts (supplement from 5a)</page>
- <page href="events">Events</page>
- <page href="buffers">Buffers</page>
+ <page>Events</page>
+ <page>Buffers</page>
  <page>Communications within RISC OS</page>
  <page>Introduction to RISC OS 3.5 and RISC OS 3.6</page>
 </section>
 
 <section title="Memory management" dir="memory">
- <page href="memorymanagement">Memory management overview</page>
- <page href="heap">The Heap manager</page>
- <page href="das">Dynamic areas</page>
- <page href="cstorage">C storage manager</page>
+ <page>Memory management overview</page>
+ <page>The Heap manager</page>
+ <page>Dynamic areas</page>
+ <page>C storage manager</page>
 </section>
 
 <section title="Kernel and environment" dir="kernel">
   <section title="Modules" dir="modules">
-    <page href="using">Using modules</page>
+    <page>Using modules</page>
     <page>Writing a module</page>
   </section>
  <page>Program Environment</page>
@@ -67,7 +67,7 @@
  <section title="Input and output" dir="io">
   <page>Character Input</page>
   <page>Character Output</page>
-  <page href="vducodes">VDU codes</page>
+  <page>VDU codes</page>
   <page>Keyboard and mouse (supplement from 5a)</page>
  </section>
 </section>
@@ -77,121 +77,126 @@
  <page>FileSwitch</page>
  <page>FileSwitch (supplement from 5a)</page>
  <page>FileCore</page>
- <page href="filecore-discformats">FileCore disc formats</page>
+ <page>FileCore disc formats</page>
  <page>ADFS</page>
  <page>ADFS (supplement from 5a)</page>
- <page href="ramfs">RAMFS</page>
+ <page>RAMFS</page>
  <page>DOSFS</page>
  <page>DOSFS (supplement from 5a)</page>
  <page>NetFS</page>
- <page href="netprint">NetPrint</page>
- <page href="pipefs">PipeFS</page>
+ <page>NetPrint</page>
+ <page>PipeFS</page>
  <page>ResourceFS</page>
- <page href="devicefs">DeviceFS</page>
+ <page>DeviceFS</page>
  <page>Serial device</page>
  <page>Parallel and serial device drivers (supplement from 5a)</page>
  <page>System devices</page>
- <page href="cdfs">CDs and CD-ROMs</page>
+ <page>CDs and CD-ROMs</page>
  <page>Filing system locking and resets (supplement from 5a)</page>
- <page href="filetypes">FileTypes module</page>
+ <page>FileTypes module</page>
 
  <section title="Writing file systems" dir="writing">
   <page>Writing a filing system</page>
   <page>Writing a filing system (supplement from 5a)</page>
   <page>Writing a FileCore module</page>
   <page>Writing a FileCore module (supplement from 5a)</page>
-  <page href="devicedriver">Writing a device driver</page>
+  <page>Writing a device driver</page>
  </section>
 
  <section title="Obsolete" dir="obsolete">
-  <page href="deskfs">DeskFS</page>
+  <page>DeskFS</page>
  </section>
 </section>
 
 <section title="Networking" dir="networking">
  <page>AUN</page>
  <page>The Internet module</page>
- <page href="access">Access</page>
- <page href="freeway">Freeway</page>
- <page href="resolver">Resolver</page>
+ <page>Access</page>
+ <page>Freeway</page>
+ <page>Resolver</page>
  <page>InetServices</page>
  <page>FreewayHosts</page>
  <page>InetConfigre</page>
- <page href="mimemap">MimeMap</page>
+ <page>MimeMap</page>
+
+ <section title="DCI 4 networking" dir="dci4">
+  <page href="devicedriver">Device drivers</page>
+  <page href="mbufmanager">MBuf Manager</page>
+ </section>
 
  <section title="Legacy networking" dir="legacy">
-  <page href="econet">Econet</page>
+  <page>Econet</page>
   <page>Econet (supplement from 5a)</page>
   <page>Fileserver protocol interface</page>
   <page>Printer server protocol interface</page>
-  <page href="broadcastloader">The Broadcast Loader</page>
-  <page href="bbceconet">BBC Econet</page>
-  <page href="netstatus">NetStatus</page>
+  <page>The Broadcast Loader</page>
+  <page>BBC Econet</page>
+  <page>NetStatus</page>
  </section>
 </section>
 
 <section title="The desktop" dir="desktop">
  <section title="The window manager" dir="wimp">
   <!-- fill in more here -->
-  <page href="windows">Windows</page>
-  <page href="reason-codes">Wimp_Poll reason codes</page>
-  <page href="validation-strings">Icon validation strings</page>
+  <page>Windows</page>
+  <page>Wimp_Poll reason codes</page>
+  <page>Icon validation strings</page>
  </section>
  <page>The desktop (supplement from 5a)</page>
- <page href="pinboard">Pinboard</page>
- <page href="dragasprite">Drag A Sprite</page>
+ <page>Pinboard</page>
+ <page>Drag A Sprite</page>
  <page>Drag An Object</page>
- <page href="colourpicker">The colour picker</page>
- <page href="filtermanager">The Filter Manager</page>
- <page href="taskmanager">TaskManager</page>
- <page href="taskwindow">TaskWindow</page>
- <page href="shellcli">ShellCLI</page>
+ <page>The colour picker</page>
+ <page>The Filter Manager</page>
+ <page>TaskManager</page>
+ <page>TaskWindow</page>
+ <page>ShellCLI</page>
 
- <page href="filer">The Filer</page>
- <page href="fileraction">Filer_Action and FilerSWIs</page>
- <page href="clipboard">ClipboardHolder</page>
- <page href="free">Free</page>
+ <page>The Filer</page>
+ <page>Filer_Action and FilerSWIs</page>
+ <page>ClipboardHolder</page>
+ <page>Free</page>
 
  <section title="Messages" dir="messages">
-  <page href="alerter">Alerter protocol</page>
-  <page href="netfiler">NetFiler notifications</page>
+  <page>Alerter protocol</page>
+  <page>NetFiler notifications</page>
  </section>
 
  <section title="Toolbox" dir="toolbox">
   <page>The Toolbox modules</page>
-  <page href="colourmenu">ColourMenu object</page>
-  <page href="fileinfo">FileInfo object</page>
-  <page href="colourdbox">ColourDBox object</page>
-  <page href="dcs">DCS object</page>
-  <page href="fontdbox">FontDBox object</page>
-  <page href="fontmenu">FontMenu object</page>
-  <page href="iconbar">Iconbar object</page>
-  <page href="menu">Menu object</page>
-  <page href="print">PrintDBox object</page>
-  <page href="proginfo">ProgInfo object</page>
-  <page href="quit">Quit object</page>
-  <page href="saveas">SaveAs object</page>
-  <page href="scale">Scale object</page>
-  <page href="window">Window object</page>
-  <page href="toolbar">Window toolbar object</page>
+  <page>ColourMenu object</page>
+  <page>FileInfo object</page>
+  <page>ColourDBox object</page>
+  <page>DCS object</page>
+  <page>FontDBox object</page>
+  <page>FontMenu object</page>
+  <page>Iconbar object</page>
+  <page>Menu object</page>
+  <page>PrintDBox object</page>
+  <page>ProgInfo object</page>
+  <page>Quit object</page>
+  <page>SaveAs object</page>
+  <page>Scale object</page>
+  <page>Window object</page>
+  <page>Window toolbar object</page>
   <section title="Window gadgets" dir="gadgets">
-   <page href="gadgets">Gadgets introduction</page>
-   <page href="actionbutton">Action button gadget</page>
-   <page href="adjusterarrow">Adjuster arrow gadget</page>
-   <page href="button">Button gadget</page>
-   <page href="colourswatch">Colour swatch gadget</page>
-   <page href="display">Display field gadget</page>
-   <page href="draggable">Draggable gadget</page>
-   <page href="label">Label gadget</page>
-   <page href="labelledbox">Labelled box gadget</page>
-   <page href="numberrange">Number range gadget</page>
-   <page href="optionbutton">Option button gadget</page>
-   <page href="popup">Pop up menu gadget</page>
-   <page href="radiobutton">Radio button gadget</page>
-   <page href="slider">Slider gadget</page>
-   <page href="stringset">String set gadget</page>
-   <page href="textarea">TextArea gadget</page>
-   <page href="writable">Writable field gadget</page>
+   <page>Gadgets introduction</page>
+   <page>Action button gadget</page>
+   <page>Adjuster arrow gadget</page>
+   <page>Button gadget</page>
+   <page>Colour swatch gadget</page>
+   <page>Display field gadget</page>
+   <page>Draggable gadget</page>
+   <page>Label gadget</page>
+   <page>Labelled box gadget</page>
+   <page>Number range gadget</page>
+   <page>Option button gadget</page>
+   <page>Pop up menu gadget</page>
+   <page>Radio button gadget</page>
+   <page>Slider gadget</page>
+   <page>String set gadget</page>
+   <page>TextArea gadget</page>
+   <page>Writable field gadget</page>
    <!-- Undocumented ones go here -->
    <page>Scrollbar gadget</page>
    <page>ScrollList gadget</page>
@@ -202,23 +207,23 @@
 </section>
 
 <section title="Graphics" dir="graphics">
- <page href="intro">Introduction to the graphics system</page>
+ <page>Introduction to the graphics system</page>
  <page>VDU Drivers</page>
  <page>Sprites</page>
- <page href="palettevector">The Palette Vector</page>
- <page href="colourtrans">ColourTrans</page>
+ <page>The Palette Vector</page>
+ <page>ColourTrans</page>
  <page>The Font Manager</page>
- <page href="supersample">SuperSample module</page>
- <page href="draw">Draw module</page>
- <page href="drawfile">Draw file renderer</page>
- <page href="screenblanker">ScreenBlanker</page>
+ <page>SuperSample module</page>
+ <page>Draw module</page>
+ <page>Draw file renderer</page>
+ <page>ScreenBlanker</page>
  <page>Video (supplement from 5a)</page>
- <page href="jpeg">JPEG images</page>
- <page href="compressjpeg">CompressJPEG</page>
- <page href="hourglass">Hourglass</page>
- <page href="imagefilerender">Image file renderer</page>
- <page href="drawchart">Draw Chart creator</page>
- <page href="blendtable">BlendTable</page>
+ <page>JPEG images</page>
+ <page>CompressJPEG</page>
+ <page>Hourglass</page>
+ <page>Image file renderer</page>
+ <page>Draw Chart creator</page>
+ <page>BlendTable</page>
  <page>InverseTable</page>
 </section>
 
@@ -227,7 +232,7 @@
  <page>Printer Dumpers</page>
  <page>PDumperSupport</page>
  <page>Printer definition files</page>
- <page href="makepsfont">MakePSFont</page>
+ <page>MakePSFont</page>
  <page>Printing (supplement from 5a)</page>
 </section>
 
@@ -254,74 +259,74 @@
  <page>Expansion card support (supplement from 5a)</page>
  <page>Floating point emulator</page>
  <page>ARM3 Support</page>
- <page href="portable">The Portable module</page>
+ <page>The Portable module</page>
  <page>Joystick module</page>
- <page href="parallel">Parallel device</page>
- <page href="joystick">Joystick module</page>
+ <page>Parallel device</page>
+ <page>Joystick module</page>
  <page>DMA (supplement from 5a)</page>
  <page>Monitor power saving</page>
 </section>
 
 <section title="Programmers support" dir="programmers">
- <page href="buffermanager">The Buffer Manager</page>
- <page href="squash">Squash</page>
- <page href="zlib">ZLib</page>
- <page href="zipper">Zipper</page>
- <page href="pathutils">PathUtils</page>
- <page href="debugger">Debugger</page>
+ <page>The Buffer Manager</page>
+ <page>Squash</page>
+ <page>ZLib</page>
+ <page>Zipper</page>
+ <page>PathUtils</page>
+ <page>Debugger</page>
  <page>The shared C library</page>
- <page href="basic">BASIC and BASICTrans</page>
+ <page>BASIC and BASICTrans</page>
  <section title="The command line" dir="cli">
-  <page href="cli">The CLI</page>
+  <page>The CLI</page>
   <page>Command scripts</page>
  </section>
 </section>
 
 <section title="Boot applications and resources" dir="boot">
- <page href="choices">Choices</page>
+ <page>Choices</page>
  <section title="Configuration tools" dir="configuration">
   <page>... add bits here ...</page>
  </section>
  <section title="Library applications" dir="library">
   <page>ScanLibs</page>
   <section title="Archival" dir="archive">
-   <page href="minigzip">MiniGZip</page>
-   <page href="minizip">MiniZip</page>
-   <page href="miniunzip">MiniUnzip</page>
+   <page>MiniGZip</page>
+   <page>MiniZip</page>
+   <page>MiniUnzip</page>
    <page>Squash</page>
   </section>
   <section title="Core RISC OS utilities" dir="riscos">
-   <page href="addapp">AddApp</page>
+   <page>AddApp</page>
    <page>AppPath</page>
    <page>AppSize</page>
-   <page href="do">Do</page>
+   <page>Do</page>
    <page>FontMerge</page>
-   <page href="ifthere">IfThere</page>
-   <page href="loadcmos">LoadCMOS</page>
-   <page href="minigrep">MiniGrep</page>
+   <page>IfThere</page>
+   <page>LoadCMOS</page>
+   <page>MiniGrep</page>
    <page>PrepPath</page>
    <page>Repeat</page>
    <page>SafeLogon</page>
    <page>X</page>
   </section>
   <section title="Internet utilities" dir="internet">
-   <page href="arp">ARP</page>
-   <page href="finger">Finger</page>
-   <page href="gethost">GetHost</page>
-   <page href="host">Host</page>
-   <page href="ifconfig">IFConfig</page>
-   <page href="ifrconfig">IFRConfig</page>
+   <page>ARP</page>
+   <page>Finger</page>
+   <page>GetHost</page>
+   <page>Host</page>
+   <page>IFConfig</page>
+   <page>IFRConfig</page>
    <page>INetFW</page>
    <page>INetStat</page>
-   <page href="ping">Ping</page>
+   <page>Ping</page>
    <page>Pong</page>
    <page>Route</page>
-   <page href="rtime">RTime</page>
+   <page>RTime</page>
    <page>ShowStat</page>
    <page>SysCtl</page>
    <page>Telnet</page>
    <page>TFTP</page>
-   <page href="traceroute">TraceRoute</page>
+   <page>TraceRoute</page>
   </section>
   <section title="Graphics">
    <page>CJPEG</page>
@@ -334,14 +339,14 @@
   </section>
  </section>
  <section title="Boot utilities" dir="utilities">
-  <page href="filecoreck">FileCoreCheck</page>
+  <page>FileCoreCheck</page>
  </section>
 </section>
 
 <section title="Compatibility" dir="compatibility">
- <page href="patching">Patching for compatibility</page>
- <page href="deprecated">Deprecated calls under RISC OS 4</page>
- <page href="deprecated-discformats">FileCore - deprecated disc formats</page>
+ <page>Patching for compatibility</page>
+ <page>Deprecated calls under RISC OS 4</page>
+ <page>FileCore - deprecated disc formats</page>
 </section>
 
 <section title="Unsorted bits (to be decided)" dir="unsorted">
@@ -361,47 +366,47 @@
 </section>
 
 <section title="Style guide" dir="style">
- <page href="about_guide">About the Style guide</page>
- <page href="introduction">Introduction</page>
- <page href="starting_newapp">Starting a new application</page>
- <page href="desktop">The desktop</page>
- <page href="mouse">The mouse</page>
- <page href="icons">Icons</page>
- <page href="standard_ops">Standard operations</page>
- <page href="windows">Windows</page>
- <page href="menus">Menus</page>
- <page href="dialogue_boxes">Dialogue boxes and toolboxes</page>
- <page href="input">Handling keyboard input</page>
- <page href="selection">Handling selection</page>
- <page href="colour_sound">Colour and sound</page>
- <page href="configs">Configurations and user choices</page>
- <page href="cd-rom">Writing applications for CD-ROM</page>
- <page href="international">International suppport</page>
- <page href="implement">Implementing the design</page>
- <page href="app_dirs">Application directories</page>
- <page href="significant_changes">Significant changes</page>
- <page href="glossary">Glossary</page>
+ <page>About the Style guide</page>
+ <page>Introduction</page>
+ <page>Starting a new application</page>
+ <page>The desktop</page>
+ <page>The mouse</page>
+ <page>Icons</page>
+ <page>Standard operations</page>
+ <page>Windows</page>
+ <page>Menus</page>
+ <page>Dialogue boxes and toolboxes</page>
+ <page>Handling keyboard input</page>
+ <page>Handling selection</page>
+ <page>Colour and sound</page>
+ <page>Configurations and user choices</page>
+ <page>Writing applications for CD-ROM</page>
+ <page>International suppport</page>
+ <page>Implementing the design</page>
+ <page>Application directories</page>
+ <page>Significant changes</page>
+ <page>Glossary</page>
 </section>
 
 <!-- Command help messages -->
-<help path="boot/library/archive" href="minigzip"/>
-<help path="boot/library/archive" href="miniunzip"/>
-<help path="boot/library/archive" href="minizip"/>
-<help path="boot/library/internet" href="arp"/>
-<help path="boot/library/internet" href="finger"/>
-<help path="boot/library/internet" href="gethost"/>
-<help path="boot/library/internet" href="host"/>
-<help path="boot/library/internet" href="ifconfig"/>
-<help path="boot/library/internet" href="ifrconfig"/>
-<help path="boot/library/internet" href="ping"/>
-<help path="boot/library/internet" href="rtime"/>
-<help path="boot/library/internet" href="traceroute"/>
-<help path="boot/library/riscos" href="addapp"/>
-<help path="boot/library/riscos" href="do"/>
-<help path="boot/library/riscos" href="ifthere"/>
-<help path="boot/library/riscos" href="loadcmos"/>
-<help path="boot/library/riscos" href="minigrep"/>
-<help path="boot/utilities" href="filecoreck"/>
+<help path="boot/library/archive"/>
+<help path="boot/library/archive"/>
+<help path="boot/library/archive"/>
+<help path="boot/library/internet"/>
+<help path="boot/library/internet"/>
+<help path="boot/library/internet"/>
+<help path="boot/library/internet"/>
+<help path="boot/library/internet"/>
+<help path="boot/library/internet"/>
+<help path="boot/library/internet"/>
+<help path="boot/library/internet"/>
+<help path="boot/library/internet"/>
+<help path="boot/library/riscos"/>
+<help path="boot/library/riscos"/>
+<help path="boot/library/riscos"/>
+<help path="boot/library/riscos"/>
+<help path="boot/library/riscos"/>
+<help path="boot/utilities"/>
 
 </index>
 

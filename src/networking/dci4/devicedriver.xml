@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<!DOCTYPE riscos-prm PUBLIC "-//Gerph//DTD PRM documentation 1.02//EN"
+                            "http://www.movspclr.co.uk/dtd/102/prm.dtd">
+
+<riscos-prm>
+<chapter title="Device Drivers">
+<section title="Overview">
+</section>
+
+</chapter>
+
+
+<!-- MetaData -->
+<meta>
+ <maintainer>
+  <email name="Charles Ferguson" address="gerph@gerph.org" />
+ </maintainer>
+ <disclaimer>
+    Insert disclaimer here, once, we've worked out what it should be.
+ </disclaimer>
+
+ <history>
+  <revision number="X" date="08 Aug 2020" author="CJF" title="Issue X" />
+ </history>
+</meta>
+
+</riscos-prm>
