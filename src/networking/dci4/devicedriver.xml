@@ -311,14 +311,20 @@ and has been removed.</p>
 </subsection>
 
 <subsection title="4.2 Service Call Descriptions">
-<category title="Service_EnumerateNetworkDrivers">
-<p>Service Call 0x9b</p>
-<p>On entry: r0 = pointer to head of linked list of device
-drivers</p>
-<p>r1 = 0x9b (reason code)</p>
-<p>On exit: r0 = pointer to new head of linked list</p>
-<p>All other registers are preserved.</p>
-<p>Use: This service call is used to obtain a list of all active
+
+<service-definition name="EnumerateNetworkDrivers" number='9B'
+                    description="List all active network drivers in the system">
+<entry>
+    <register-use number='0'>pointer to head of linked list of device
+drivers</register-use>
+    <register-use number='1'>&hex;9B (reason code)</register-use>
+</entry>
+<exit>
+    <register-use number='0'>pointer to new head of linked list</register-use>
+    <register-use number='1-9' state='preserved'/>
+</exit>
+<use>
+<p>This service call is used to obtain a list of all active
 network device drivers in the system. When the service call is
 issued, r0 is a NULL pointer; upon receipt of this call, a network
 device driver should chain Driver Information Blocks to the
@@ -331,17 +337,29 @@ allocated from RMA by the device drivers, and freed back into the
 RMA by the protocol module which issued the service call. The
 Driver Information Blocks <i>referenced</i> by the struct chaindibs
 must be static data, as explained in section 3.2.</p>
-</category>
+</use>
+</service-definition>
 
-<category title="Service_DCIDriverStatus">
-<p>Service Call 0x9d</p>
-<p>On entry: r0 = pointer to Driver Information Block describing
-this driver</p>
-<p>r1 = 0x9d (reason code)</p>
-<p>r2 = status (0 = starting, 1 = terminating)</p>
-<p>r3 = DCI version supported</p>
-<p>On exit: All registers are preserved.</p>
-<p>Use: Service_DCIDriverStatus is issued by a network driver
+<service-definition name="DCIDriverStatus" number='9D'
+                    description="Announce initialisation and finalisation of driver">
+<entry>
+    <register-use number='0'>pointer to Driver Information Block describing this driver</register-use>
+    <register-use number='1'>&hex;9D (reason code)</register-use>
+    <register-use number='2'>Driver status:
+        <value-table>
+            <value number='0'>Starting</value>
+            <value number='1'>Terminating</value>
+        </value-table>
+    </register-use>
+    <register-use number='3'>DCI version supported &times; 100</register-use>
+</entry>
+<exit>
+    <register-use number='0-9' state='preserved'/>
+</exit>
+
+<use>
+<p>
+    Service_DCIDriverStatus is issued by a network driver
 module during its initialisation (r2 = 0), and finalisation (r2 =
 1) calls. If a network device driver controls multiple logical
 interfaces, then a separate service call must be issued for each
@@ -369,18 +387,25 @@ should not expect to be able to issue SWIs, therefore no special
 action to allow this is required of the driver module issuing the
 service call.</p>
 <p>This service call should never be claimed.</p>
-</category>
+</use>
+</service-definition>
 
-<category title="Service_DCIFrameTypeFree">
-<p>Service Call 0x9e</p>
-<p>On entry: r0 = pointer to Driver Information Block</p>
-<p>r1 = 0x9e (reason code)</p>
-<p>r2 = frame type being released</p>
-<p>r3 = address level of former claim</p>
-<p>r4 = error level of former claim</p>
-<p>On exit: r1 = 0 to claim the call, or preserved to pass it on.
-All other registers preserved</p>
-<p>Use: This service call is issued by a device driver when a
+<service-definition name="DCIFrameTypeFree" number='9E'
+                    description="Announce that a frame type has been freed by a driver">
+<entry>
+    <register-use number='0'>pointer to Driver Information Block describing this driver</register-use>
+    <register-use number='1'>&hex;9E (reason code)</register-use>
+    <register-use number='2'>frame type being released</register-use>
+    <register-use number='3'>address level of former claim</register-use>
+    <register-use number='4'>error level of former claim</register-use>
+</entry>
+<exit>
+    <register-use number='0' state='preserved'/>
+    <register-use number='1'>0 to claim the call, or preserved to pass it on.</register-use>
+    <register-use number='2-9' state='preserved'/>
+</exit>
+<use>
+<p>This service call is issued by a device driver when a
 protocol module releases a claim it formerly had on a frame type
 (i.e. when the frame type becomes free for claiming by a different
 protocol module). This release may have been either explicit (the
@@ -391,17 +416,29 @@ frame type for itself, it should use the Filter SWI to do so, and
 then claim the service call by setting r1 to 0.</p>
 <p>Note: the concepts of frame types and the various filtering
 levels available are explained fully in section 6.2.</p>
-</category>
+</use>
+</service-definition>
 
-<category title="Service_DCIProtocolStatus">
-<p>Service Call 0x9f</p>
-<p>On entry: r0 = Protocol module's private word pointer</p>
-<p>r1 = 0x9f (reason code)</p>
-<p>r2 = status (0 = starting, 1 = terminating)</p>
-<p>r3 = DCI version supported</p>
-<p>r4 = Pointer to protocol module's title string</p>
-<p>On exit: All registers are preserved</p>
-<p>Use: Service_DCIProtocolStatus is issued by a protocol module
+<service-definition name="DCIProtocolStatus" number='9F'
+                    description="Announce initialisation and finalisation of protocol">
+<entry>
+    <register-use number='0'>Protocol module's private word pointer</register-use>
+    <register-use number='1'>&hex;9F (reason code)</register-use>
+    <register-use number='2'>Protocol status:
+        <value-table>
+            <value number='0'>Starting</value>
+            <value number='1'>Terminating</value>
+        </value-table>
+    </register-use>
+    <register-use number='3'>DCI version supported &times; 100</register-use>
+    <register-use number='4'>Pointer to protocol module's title string</register-use>
+</entry>
+<exit>
+    <register-use number='0-9' state='preserved'/>
+</exit>
+
+<use>
+    <p>Service_DCIProtocolStatus is issued by a protocol module
 during its initialisation (r2 = 0), and finalisation (r2 = 1)
 calls. The private word pointer in r0 is the same as that supplied
 by the protocol module in the Filter SWI (see section 5.3).</p>
@@ -428,7 +465,8 @@ service call. If necessary, device drivers may enable interrupts
 while processing the service call, but they should return with the
 interrupt state preserved.</p>
 <p>Device drivers must never claim this service call.</p>
-</category>
+</use>
+</service-definition>
 
 <p>Note: as already mentioned in section 4, the old, unnamed,
 service call 0x41200 will not be issued by DCI 4 compliant versions
@@ -480,7 +518,7 @@ offsets) are</p>
     <value number='7'>MulticastRequest</value>
 </value-table>
 
-<p><b>Re-entrancy</b></p>
+<category title="Re-entrancy">
 <p>All device driver SWIs are potentially re-entrant, i.e. the
 protocol modules are not expected to take any explicit action to
 prevent re-entrance. If re-entrancy is undesirable during the
@@ -489,12 +527,15 @@ steps to prevent this, i.e. by disabling interrupts.</p>
 <p>In order to minimise interrupt latency within the machine as a
 whole, device drivers should take steps to minimise the length of
 time during which interrupts are disabled.</p>
-<p><b>Byte Sex</b></p>
+</category>
+
+<category title="Byte Sex">
 <p>All data passed between the protocol modules and device drivers
 use the host byte sex, i.e. little-endian, whereas all data
 transmitted over the wire are (obviously) in network, or
 big-endian, byte sex. Device drivers are responsible for converting
 data to the appropriate sex.</p>
+</category>
 
 <subsection title="5.1 Errors">
 <p>All the SWI descriptions given later in this section ignore what
