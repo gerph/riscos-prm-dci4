@@ -58,15 +58,15 @@ Structurally, the document consists of :
 
  <bnf xmlns="http://www.movspclr.co.uk/dtd/bnf/100/bnf.dtd"
       caption="Syntax for files processed by SomethingOrOther">
-      
+
   <rule-def name="Thing">
    <rule-use name="OtherThing" />
   </rule-def>
-      
+
   <rule-def name="OtherThing">
    <literal string="blah">
   </rule-def>
-  
+
  </bnf>
 
 
