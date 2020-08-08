@@ -1,0 +1,227 @@
+                      Structure of BNF syntax description
+                      ===================================
+
+(draft document, updated 21 Apr 2004)
+
+Introduction
+------------
+
+This document describes the structure of the XML documentation format for
+Augmented BNF descriptions. Augmented BNF, documented in RFC2234, provides
+a description of the format of structured data. It is usually used to
+describe documents or string constructs.
+
+Within the document, descriptions of elements are made with pseudo-SGML
+entity description notation. This is mostly to simplify description. Where
+the DTD and the descriptions in this document differ, the DTD should be
+regarded as correct, with this document merely giving guidance on the use
+of elements.
+
+
+HTML translation
+----------------
+Documents are translated to HTML through the XSLT stylesheet at :
+
+   http://www.movspclr.co.uk/dtd/bnf/100/html.xsl
+
+The translation is intentionally terse, allowing it to be imported into the
+PRM XML documentation very easily. Within the PRM documentation the elements
+can just be included with the root 'bnf' element being given a namespace :
+
+   <bnf xmlns="http://www.movspclr.co.uk/dtd/bnf/100/bnf.dtd"
+        caption="Syntax for files processed by SomethingOrOther">
+     ...
+   </bnf>
+
+
+Document validation
+-------------------
+Validation in the form of well-formedness is taken care of by the XML
+processor.
+
+Validation of the content is not performed at present. Future versions of
+the format may take more care of checking the structural content of the
+BNF description.
+
+
+Entities
+--------
+No entities are defined for use within BNF, and none should be necessary.
+
+
+Structural elements
+-------------------
+The PRMs have a number of structural elements which provide the basic
+framework upon which the rest of the information exists.
+
+Structurally, the document consists of :
+
+ <bnf xmlns="http://www.movspclr.co.uk/dtd/bnf/100/bnf.dtd"
+      caption="Syntax for files processed by SomethingOrOther">
+      
+  <rule-def name="Thing">
+   <rule-use name="OtherThing" />
+  </rule-def>
+      
+  <rule-def name="OtherThing">
+   <literal string="blah">
+  </rule-def>
+  
+ </bnf>
+
+
+Element:    bnf
+Attributes: caption
+Contents:   (rule-def | comment)*
+
+caption: gives a description to display with the BNF grammar
+
+The bnf element is the top level element, within which everthing else
+is contained. 'caption' should be set to some description of the format
+which the BNF defines. This may be used in indexing in the future.
+
+
+Element:    rule-def
+Attributes: name
+Contents:   (rule-use | group | literal | character)*
+
+name: names the rule which is being defined
+
+The rule-def holds all the information about a rule within the BNF grammar.
+Each rule definition can contain a number of different types of description,
+each of which corresponds to the equivilent structure type in the ABNF
+document (RFC2234). Whilst ABNF defines that rule names are
+case-insensitive, we strongly recommend that lower case names be used for
+rules which are not an implicit part of the ABNF (eg LF, ALPHA, etc).
+
+
+Element:    rule-use
+Attributes: name, <repetition attributes>
+Contents:   <none>
+
+name: names the rule which is being invoked
+
+The rule-use indicates that another rule is invoked within the rule
+definition. The element can use any of the repetition attributes.
+
+
+Element:    literal
+Attributes: string, <repetition attributes>
+Contents:   <none>
+
+string: gives the case-insensitive string as part of the rule
+
+The literal string element describes a case-insensitive string (us-ascii
+designation) which is part of the BNF grammar, as a terminal symbol. It is
+important to remember that the strings described in this way are
+case-insensitive. It may not, therefore, be suitable for some formats.
+
+
+Element:    character
+Attributes: base, value, limit, <repetition attributes>
+Contents:   <none>
+
+base: describes the base of the character, as per ABNF descriptions :
+        'd' = decimal (default)
+        'x' = hexadecimal
+        'b' = binary
+value: the value in the base given, if a range is being specified, this
+       is the low value.
+limit: if defined this describes the high value for the range.
+
+The character describes the terminal symbols in the BNF, using one of the
+bases given. Where a range is required, both 'value' and 'limit' should
+be specified. Where a single value is required, only 'value' is required.
+
+
+Element:    group
+Attributes: alternates, optional, <repetition attributes>
+Contents:   (rule-use | group | literal | character)*
+
+optional: may be 'true' or 'false' to indicate that the entire group
+          is optional (equivilent to "repeat-min='0' repeat-max='1'").
+alternates: may be 'true' or 'false' to indicate that all the elements
+          within this group are alternative, rather than sequencial
+          elements
+
+The group element is used to provide a means for introducing alternative
+elements, and bundling sequences of elements into repeated groups. Note
+that it is preferable to use the 'optional' attribute to indicate the
+use of the elements is optional, rather than using the repetition
+attributes.
+
+
+Repetition attributes
+---------------------
+
+A number of the elements listed above have been described as having
+'repetition attributes'. These are grouped together and can be used in the
+same way on any of the listed elements.
+
+Attributes: repeat, repeat-min, repeat-max
+
+repeat: may be 'true' or 'false' to indicate that the element may be
+        repeated any number of times. This is the most common use of
+        the repetition.
+repeat-min: may be unset or the minimum number of times the element
+        should be repeated.
+repeat-max: may be unset or the maximum number of times the element
+        should be repeated.
+
+If repeat-min or repeat-max is used, repeat need not be set to 'true'. If
+repeat-min and repeat-max give the same value, the shortened form of the
+repetition may be used in the displayed format, eg '3ALPHA' might be used
+where repeat-min and repeat-max were both '3'.
+
+
+Core ABNF rules
+---------------
+The following section is taken directly from RFC2234 section 6.1 :
+
+Certain basic rules are in uppercase, such as SP, HTAB, CRLF, DIGIT, ALPHA,
+etc.
+
+   ALPHA          =  %x41-5A / %x61-7A   ; A-Z / a-z
+
+   BIT            =  "0" / "1"
+
+   CHAR           =  %x01-7F             ; any 7-bit US-ASCII character,
+                                           excluding NUL
+
+   CR             =  %x0D
+                                         ; carriage return
+
+   CRLF           =  CR LF
+                                         ; Internet standard newline
+
+   CTL            =  %x00-1F / %x7F
+                                         ; controls
+
+   DIGIT          =  %x30-39
+                                         ; 0-9
+
+   DQUOTE         =  %x22
+                                         ; " (Double Quote)
+
+   HEXDIG         =  DIGIT / "A" / "B" / "C" / "D" / "E" / "F"
+
+   HTAB           =  %x09
+                                         ; horizontal tab
+
+   LF             =  %x0A
+                                         ; linefeed
+
+   LWSP           =  *(WSP / CRLF WSP)
+                                         ; linear white space (past newline)
+
+   OCTET          =  %x00-FF
+                                         ; 8 bits of data
+
+   SP             =  %x20
+                                         ; space
+
+   VCHAR          =  %x21-7E
+                                         ; visible (printing) characters
+
+   WSP            =  SP / HTAB
+                                         ; white space

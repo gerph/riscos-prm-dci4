@@ -1,0 +1,3 @@
+[submodule "ci"]
+	path = ci
+	url = https://gitlab.gerph.org/gerph/ci-scripts.git

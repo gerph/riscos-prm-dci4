@@ -1,0 +1,64 @@
+<!-- BNF DTD
+
+     Public identifier :
+        -//Gerph//DTD BNF syntax 1.00//EN
+     System identifier :
+        http://www.movspclr.co.uk/dtd/bnf/100/bnf.dtd
+
+     A DTD for describing BNF syntax specifications for my PRM
+     documentation project. Refer to RFC2234 for more details.
+
+     Written and designed by Justin Fletcher.
+
+     Updated 19 Apr 2004.
+  -->
+
+<!-- Note that NO entities are defined as part of this DTD - they
+     should not be necessary -->
+
+<!ENTITY % repetition "repeat (true | false) 'false'
+                       repeat-min CDATA #IMPLIED
+                       repeat-max CDATA #IMPLIED">
+<!ENTITY % anybnf "(group | rule-use | literal | character)*">
+
+<!-- Some real DTD stuff -->
+<!ELEMENT bnf (rule-def | comment)*>
+<!ATTLIST bnf
+    xmlns CDATA #FIXED "http://www.movspclr.co.uk/dtd/bnf/100/bnf.dtd"
+    caption CDATA #REQUIRED
+>
+
+<!ELEMENT comment (#PCDATA)>
+
+<!ELEMENT rule-def %anybnf; >
+<!ATTLIST rule-def
+    continue (true | false) "false"
+    name CDATA #REQUIRED
+>
+
+<!ELEMENT group %anybnf; >
+<!ATTLIST group
+    alternates (true | false) "false"
+    optional   (true | false) "false"
+    %repetition;
+>
+
+<!ELEMENT rule-use EMPTY>
+<!ATTLIST rule-use
+    name CDATA #REQUIRED
+    %repetition;
+>
+
+<!ELEMENT literal EMPTY>
+<!ATTLIST literal
+    string CDATA #REQUIRED
+    %repetition;
+>
+
+<!ELEMENT character EMPTY>
+<!ATTLIST character
+    base (d | x | b) "d"
+    value CDATA #REQUIRED
+    limit CDATA #IMPLIED
+    %repetition;
+>

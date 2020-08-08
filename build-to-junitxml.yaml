@@ -1,0 +1,60 @@
+---
+rules:
+  # Start a new file
+  - re: '^xsltproc -output [^ ]* [^ ]*/(prm-html)\.xsl (src/.*)$'
+    keys:
+      - classname
+      - file
+    set:
+      result: success
+      faulttype: ''
+      faultmessage: ''
+    case: start
+
+  # Report introducer
+  - re: "^(((Link) for '(.*?)' (has undefined destination)) at)"
+    keys:
+      - detail
+      - message
+      - faulttype
+      - title
+      - faultmessage
+    set:
+      result: failure
+    case: replace-success
+    retain:
+      - classname
+      - file
+
+  # Context
+  - re: "^   ([^ ].*)$"
+    keys:
+      - detail
+
+  # Unrecognised message
+  - re: "^([^ ]*)$"
+    keys:
+      - detail
+    set:
+      result: error
+      message: error
+      title: "{detail}"
+      faulttype: unknown
+      faultmessage: unknown
+    case: replace-success
+    retain:
+      - classname
+      - file
+
+case_format:
+  name: 'Build {file} with {classname}'
+  type: '{faulttype} {faultmessage}'
+
+suite_format:
+  name: "Build"
+
+default_config:
+  filename: ''
+  name: ''
+  package: ''
+  timestamp: now

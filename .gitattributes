@@ -1,0 +1,4 @@
+# All text files should be LFs
+* text=auto eol=lf
+
+*.png binary

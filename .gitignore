@@ -1,0 +1,13 @@
+# Platform annoyances
+.DS_Store
+
+# CI generated directories
+/.env
+/artifacts
+/ci-logs
+
+# Project-specific
+output/
+tmp/
+logs/
+Makefile
