@@ -14,16 +14,6 @@ xsltproc index-makefile.xsl index.xml > Makefile
 # Clean things
 make clean > logs/clean-stdout 2>&1
 
-# Generate the 'raw' XML archives
-if false ; then
-    cd ..
-    rm roldoc-xml.tar.gz
-    rm roldoc-xml.zip
-    tar zcf roldoc-xml.tar.gz roldoc > /dev/null 2> /dev/null
-    zip -9r roldoc-xml.zip roldoc > /dev/null 2> /dev/null
-    cd roldoc
-fi
-
 OUTPUTDIR=output/help
 
 mkdir -p "${OUTPUTDIR}"
@@ -40,17 +30,3 @@ xsltproc -param make-contents "'yes'"    -o "${OUTPUTDIR}/index.html" index.xsl 
 
 # remove any core dump if it failed
 rm -f core
-
-# Generate the 'full' archives
-if false ; then
-    cd ..
-    rm roldoc.tar.gz
-    rm roldoc.zip
-    tar zcf roldoc.tar.gz roldoc > /dev/null 2> /dev/null
-    zip -9r roldoc.zip roldoc > /dev/null 2> /dev/null
-    cd roldoc
-
-    # And some archives for the catalog files
-    tar zcf ../roldoc-catalog.tar.gz catalog > /dev/null 2> /dev/null
-    zip -9r ../roldoc-catalog.zip    catalog > /dev/null 2> /dev/null
-fi

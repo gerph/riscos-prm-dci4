@@ -16,7 +16,7 @@
   <email name="Charles Ferguson" address="gerph@gerph.org" />
  </maintainer>
  <disclaimer>
-    Insert disclaimer here, once, we've worked out what it should be.
+    <p>Insert disclaimer here, once, we've worked out what it should be.</p>
  </disclaimer>
 
  <history>
