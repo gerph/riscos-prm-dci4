@@ -1063,7 +1063,12 @@ operations (see state diagram below)</bit>
 </bitfield-table>
 </p>
 
-<fixme>Graphic here</fixme>
+<p>
+<image src='devicedriver-multicast.draw' type='draw' height='15em' caption=''>
+<image src='devicedriver-multicast.svg' type='svg' height='15em' caption=''/>
+</image>
+</p>
+
 <p>If a protocol module calls the <reference type='swi' name='DCIDriver_Filter'/> SWI with bit 2 of R0
 clear, then it will receive all multicast frames (if the address
 level is multicast or promiscuous). If, however, it sets bit 2 of
@@ -1076,8 +1081,9 @@ requested, as there may not be a one-to-one mapping between the
 logical and hardware multicast addresses for the specified frame
 type (as indeed there isn't for IP/Ethernet).</p>
 <p>Contact Acorn for
-details of what to pass in R4 for specific frame types.</p>
+details of what to pass in R4 for specific frame types.
 <fixme> Contact who now? </fixme>
+</p>
 
 <p>R1, R2, R5, and R6 must match the values passed into the Filter
 SWI so that the device driver can tell which filter this call is
@@ -1179,8 +1185,11 @@ protocol module itself.</p></item>
 </list>
 </p>
 
-<p>Figure 1: Filtering Ethernet 2.0 and IEEE 802.3 class frames</p>
-<fixme>Missing diagram</fixme>
+<p>
+<image src='devicedriver-filtering.draw' type='draw' height='15em' caption='Figure 1: Filtering Ethernet 2.0 and IEEE 802.3 class frames'>
+<image src='devicedriver-filtering.svg' type='svg' height='15em' caption='Figure 1: Filtering Ethernet 2.0 and IEEE 802.3 class frames'/>
+</image>
+</p>
 
 <p>In this scheme, device drivers can differentiate between the two
 frame classes, and, furthermore, can distinguish Ethernet 2.0 frame
@@ -1431,8 +1440,13 @@ each chain contains a struct rx_hdr which includes the frame_type
 field), the receive handler is only given a single Driver
 Information Block, and therefore <strong>all</strong> the frames passed in
 any one call to the handler must come from a single unit.</p>
-<p>Figure 2: Linking mbuf chains</p>
-<fixme>Missing diagram</fixme>
+
+<p>
+<image src='devicedriver-mbufchaining.draw' type='draw' height='25em' caption='Figure 2: Linking mbuf chains'>
+<image src='devicedriver-mbufchaining.svg' type='svg' height='25em' caption='Figure 2: Linking mbuf chains'/>
+</image>
+</p>
+
 </category>
 </subsection>
 </section>

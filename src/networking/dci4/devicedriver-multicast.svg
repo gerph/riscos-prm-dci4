@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox='0 0 450 250'>
+<!-- Constructed by RISC OS Draw -->
+<path style="fill-rule:evenodd;stroke-width:0.625;stroke:#000;fill:none;" d="M 159.78125 62.53125 L 283.8125 62.53125 L 283.8125 115.6875 L 159.78125 115.6875 L 159.78125 62.53125 L 159.78125 62.53125 Z " />
+<path style="fill-rule:evenodd;stroke-width:0.625;stroke:#000;fill:none;" d="M 319.25 151.125 L 443.28125 151.125 L 443.28125 204.28125 L 319.25 204.28125 L 319.25 151.125 L 319.25 151.125 Z " />
+<path style="fill-rule:evenodd;stroke-width:0.625;stroke:#000;fill:none;" d="M 0.3125 151.125 L 124.34375 151.125 L 124.34375 204.28125 L 0.3125 204.28125 L 0.3125 151.125 L 0.3125 151.125 Z " />
+<text textLength="67.625" style="font-size:12.000000pt; fill:#000;" x="26.890625" y="173.273437">No frames</text>
+<text textLength="47.875" style="font-size:12.000000pt; fill:#000;" x="35.75" y="189.273437">wanted</text>
+<text textLength="88.25" style="font-size:12.000000pt; fill:#000;" x="177.5" y="84.679687">Some frames</text>
+<text textLength="47.875" style="font-size:12.000000pt; fill:#000;" x="195.21875" y="103.679687">wanted</text>
+<text textLength="66.25" style="font-size:12.000000pt; fill:#000;" x="345.828125" y="173.273437">All frames</text>
+<text textLength="47.875" style="font-size:12.000000pt; fill:#000;" x="354.6875" y="192.273437">wanted</text>
+<path style="fill-rule:evenodd;stroke-width:0.625;stroke:#000;fill:none;" d="M 44.609375 151.125 L 44.609375 80.25 L 155.351562 80.25 " />
+<path style="fill-rule:evenodd;stroke-width:0.625;stroke:#000;fill:none;" d="M 80.046875 146.695312 L 80.046875 97.96875 L 159.78125 97.96875 " />
+<path style="fill-rule:evenodd;stroke-width:0.625;stroke:#000;fill:none;" d="M 283.8125 89.109375 L 381.265625 89.109375 L 381.265625 146.695312 " />
+<path style="fill-rule:evenodd;stroke-width:0.625;stroke:#000;fill:none;" d="M 124.34375 168.84375 L 314.820312 168.84375 " />
+<path style="fill-rule:evenodd;stroke-width:0.625;stroke:#000;fill:none;" d="M 128.773437 186.5625 L 319.25 186.5625 " />
+<text textLength="49" style="font-size:10.000000pt; fill:#000;" x="69.802734" y="72.390625">request 1</text>
+<text textLength="39.875" style="font-size:10.000000pt; fill:#000;" x="86.574219" y="113.353516">release</text>
+<text textLength="21.375" style="font-size:10.000000pt; fill:#000;" x="95.908203" y="128.019531">1/all</text>
+<text textLength="56.375" style="font-size:10.000000pt; fill:#000;" x="307.583984" y="80.25">request all</text>
+<text textLength="56.375" style="font-size:10.000000pt; fill:#000;" x="195.21875" y="159.984375">request all</text>
+<text textLength="55.625" style="font-size:10.000000pt; fill:#000;" x="195.21875" y="201.947266">release all</text>
+<path style="fill-rule:evenodd;stroke-width:0.625;stroke:#000;fill:none;" d="M 199.648437 62.53125 L 199.648437 31.523437 C 199.648437 24.144531  209.984375 18.234375  217.367187 18.234375 C 224.75 18.234375  235.085937 24.142578  235.085937 31.523437 L 235.085937 58.101562 " />
+<text textLength="93.5" style="font-size:10.000000pt; fill:#000;" x="177.5" y="9.375">request/release 1</text>
+<text textLength="327.375" style="font-size:10.000000pt; fill:#000;" x="71.1875" y="239.71875">How to interpret request/release calls when in a given state</text>
+</svg>

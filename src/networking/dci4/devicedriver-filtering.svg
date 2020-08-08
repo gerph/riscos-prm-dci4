@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox='0 0 220 220'>
+<!-- Constructed by RISC OS Draw -->
+<path style="fill-rule:evenodd;stroke:#000;fill:none;" d="M 0 141.75 L 212.625 141.75 L 212.625 212.625 L 0 212.625 L 0 141.75 Z " />
+<path style="fill-rule:evenodd;stroke:#000;fill:none;" d="M 0 0 L 70.875 0 L 70.875 35.4375 L 0 35.4375 L 0 0 Z " />
+<path style="fill-rule:evenodd;stroke:#000;fill:none;" d="M 212.625 0 L 141.75 0 L 141.75 35.4375 L 212.625 35.4375 L 212.625 0 Z " />
+<path style="fill-rule:evenodd;stroke:#000;fill:none;" d="M 141.75 70.875 L 212.625 70.875 L 212.625 106.3125 L 141.75 106.3125 L 141.75 70.875 Z " />
+<text textLength="53.625" style="font-size:8.000000pt; fill:#000;" x="7.458984" y="14.919922">Ethernet 2.0</text>
+<text textLength="40" style="font-size:8.000000pt; fill:#000;" x="13.058594" y="26.119141">protocols</text>
+<text textLength="49.75" style="font-size:8.000000pt; fill:#000;" x="152.009766" y="14.119141">IEEE 802.3</text>
+<text textLength="40" style="font-size:8.000000pt; fill:#000;" x="156.808594" y="25.517578">protocols</text>
+<text textLength="49.75" style="font-size:8.000000pt; fill:#000;" x="150.609375" y="85.792969">IEEE 802.2</text>
+<text textLength="54.75" style="font-size:8.000000pt; fill:#000;" x="148.408203" y="96.992187">implementor</text>
+<text textLength="80.125" style="font-size:10.000000pt; fill:#000;" x="68.875" y="179.529297">Device Drivers</text>
+<path style="fill-rule:evenodd;stroke-width:0.625;stroke:#000;fill:none;" d="M 22.148437 39.867187 L 22.148437 137.320312 " />
+<path style="fill-rule:evenodd;stroke-width:0.625;stroke:#000;fill:none;" d="M 48.726562 39.867187 L 48.726562 137.320312 " />
+<path style="fill-rule:evenodd;stroke-width:0.625;stroke:#000;fill:none;" d="M 163.898437 39.867187 L 163.898437 66.445312 " />
+<path style="fill-rule:evenodd;stroke-width:0.625;stroke:#000;fill:none;" d="M 190.476562 39.867187 L 190.476562 66.445312 " />
+<path style="fill-rule:evenodd;stroke-width:0.625;stroke:#000;fill:none;" d="M 177.1875 110.742187 L 177.1875 137.320312 " />
+</svg>

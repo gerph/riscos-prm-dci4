@@ -382,7 +382,7 @@
 <!ELEMENT image (image?)>
 <!ATTLIST image
     src CDATA #REQUIRED
-    type (png | draw) #REQUIRED
+    type (png | draw | svg) #REQUIRED
     width CDATA #IMPLIED
     height CDATA #IMPLIED
     caption CDATA #IMPLIED

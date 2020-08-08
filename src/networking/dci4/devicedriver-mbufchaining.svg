@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox='0 0 650 800'>
+<!-- Constructed by RISC OS Draw -->
+<g>
+<path style="fill-rule:evenodd;stroke-width:0.625;stroke:#000;fill:none;" d="M 0.625 0.625 L 71.5 0.625 L 71.5 142.375 L 0.625 142.375 L 0.625 0.625 Z " />
+<path style="fill-rule:evenodd;stroke-width:0.625;stroke:#000;fill:none;" d="M 0.625 36.0625 L 71.5 36.0625 " />
+<path style="fill-rule:evenodd;stroke-width:0.625;stroke:#000;fill:none;" d="M 0.625 106.9375 L 71.5 106.9375 " />
+<text textLength="48.375" style="font-size:12.000000pt; fill:#000;" x="11.34375" y="22.34375">m_next</text>
+<text textLength="38.25" style="font-size:12.000000pt; fill:#000;" x="18.34375" y="127.65625">m_list</text>
+</g>
+<g>
+<path style="fill-rule:evenodd;stroke-width:0.625;stroke:#000;fill:none;" d="M 142.375 0.625 L 213.25 0.625 L 213.25 142.375 L 142.375 142.375 L 142.375 0.625 Z " />
+<path style="fill-rule:evenodd;stroke-width:0.625;stroke:#000;fill:none;" d="M 142.375 36.0625 L 213.25 36.0625 " />
+<path style="fill-rule:evenodd;stroke-width:0.625;stroke:#000;fill:none;" d="M 142.375 106.9375 L 213.25 106.9375 " />
+<text textLength="48.375" style="font-size:12.000000pt; fill:#000;" x="153.09375" y="22.34375">m_next</text>
+<text textLength="38.25" style="font-size:12.000000pt; fill:#000;" x="160.09375" y="127.65625">m_list</text>
+</g>
+<g>
+<path style="fill-rule:evenodd;stroke-width:0.625;stroke:#000;fill:none;" d="M 284.125 0.625 L 355 0.625 L 355 142.375 L 284.125 142.375 L 284.125 0.625 Z " />
+<path style="fill-rule:evenodd;stroke-width:0.625;stroke:#000;fill:none;" d="M 284.125 36.0625 L 355 36.0625 " />
+<path style="fill-rule:evenodd;stroke-width:0.625;stroke:#000;fill:none;" d="M 284.125 106.9375 L 355 106.9375 " />
+<text textLength="48.375" style="font-size:12.000000pt; fill:#000;" x="294.84375" y="22.34375">m_next</text>
+<text textLength="38.25" style="font-size:12.000000pt; fill:#000;" x="301.84375" y="127.65625">m_list</text>
+</g>
+<g>
+<path style="fill-rule:evenodd;stroke-width:0.625;stroke:#000;fill:none;" d="M 425.875 0.625 L 496.75 0.625 L 496.75 142.375 L 425.875 142.375 L 425.875 0.625 Z " />
+<path style="fill-rule:evenodd;stroke-width:0.625;stroke:#000;fill:none;" d="M 425.875 36.0625 L 496.75 36.0625 " />
+<path style="fill-rule:evenodd;stroke-width:0.625;stroke:#000;fill:none;" d="M 425.875 106.9375 L 496.75 106.9375 " />
+<text textLength="48.375" style="font-size:12.000000pt; fill:#000;" x="436.59375" y="22.34375">m_next</text>
+<text textLength="38.25" style="font-size:12.000000pt; fill:#000;" x="443.59375" y="127.65625">m_list</text>
+</g>
+<g>
+<path style="fill-rule:evenodd;stroke-width:0.625;stroke:#000;fill:none;" d="M 0.625 248.6875 L 71.5 248.6875 L 71.5 390.4375 L 0.625 390.4375 L 0.625 248.6875 Z " />
+<path style="fill-rule:evenodd;stroke-width:0.625;stroke:#000;fill:none;" d="M 0.625 284.125 L 71.5 284.125 " />
+<path style="fill-rule:evenodd;stroke-width:0.625;stroke:#000;fill:none;" d="M 0.625 355 L 71.5 355 " />
+<text textLength="48.375" style="font-size:12.000000pt; fill:#000;" x="11.34375" y="270.40625">m_next</text>
+<text textLength="38.25" style="font-size:12.000000pt; fill:#000;" x="18.34375" y="375.71875">m_list</text>
+</g>
+<g>
+<path style="fill-rule:evenodd;stroke-width:0.625;stroke:#000;fill:none;" d="M 142.375 248.6875 L 213.25 248.6875 L 213.25 390.4375 L 142.375 390.4375 L 142.375 248.6875 Z " />
+<path style="fill-rule:evenodd;stroke-width:0.625;stroke:#000;fill:none;" d="M 142.375 284.125 L 213.25 284.125 " />
+<path style="fill-rule:evenodd;stroke-width:0.625;stroke:#000;fill:none;" d="M 142.375 355 L 213.25 355 " />
+<text textLength="48.375" style="font-size:12.000000pt; fill:#000;" x="153.09375" y="270.40625">m_next</text>
+<text textLength="38.25" style="font-size:12.000000pt; fill:#000;" x="160.09375" y="375.71875">m_list</text>
+</g>
+<g>
+<path style="fill-rule:evenodd;stroke-width:0.625;stroke:#000;fill:none;" d="M 0.625 496.75 L 71.5 496.75 L 71.5 638.5 L 0.625 638.5 L 0.625 496.75 Z " />
+<path style="fill-rule:evenodd;stroke-width:0.625;stroke:#000;fill:none;" d="M 0.625 532.1875 L 71.5 532.1875 " />
+<path style="fill-rule:evenodd;stroke-width:0.625;stroke:#000;fill:none;" d="M 0.625 603.0625 L 71.5 603.0625 " />
+<text textLength="48.375" style="font-size:12.000000pt; fill:#000;" x="11.34375" y="518.46875">m_next</text>
+<text textLength="38.25" style="font-size:12.000000pt; fill:#000;" x="18.34375" y="623.78125">m_list</text>
+</g>
+<g>
+<path style="fill-rule:evenodd;stroke-width:0.625;stroke:#000;fill:none;" d="M 142.375 496.75 L 213.25 496.75 L 213.25 638.5 L 142.375 638.5 L 142.375 496.75 Z " />
+<path style="fill-rule:evenodd;stroke-width:0.625;stroke:#000;fill:none;" d="M 142.375 532.1875 L 213.25 532.1875 " />
+<path style="fill-rule:evenodd;stroke-width:0.625;stroke:#000;fill:none;" d="M 142.375 603.0625 L 213.25 603.0625 " />
+<text textLength="48.375" style="font-size:12.000000pt; fill:#000;" x="153.09375" y="518.46875">m_next</text>
+<text textLength="38.25" style="font-size:12.000000pt; fill:#000;" x="160.09375" y="623.78125">m_list</text>
+</g>
+<g>
+<path style="fill-rule:evenodd;stroke-width:0.625;stroke:#000;fill:none;" d="M 284.125 496.75 L 355 496.75 L 355 638.5 L 284.125 638.5 L 284.125 496.75 Z " />
+<path style="fill-rule:evenodd;stroke-width:0.625;stroke:#000;fill:none;" d="M 284.125 532.1875 L 355 532.1875 " />
+<path style="fill-rule:evenodd;stroke-width:0.625;stroke:#000;fill:none;" d="M 284.125 603.0625 L 355 603.0625 " />
+<text textLength="48.375" style="font-size:12.000000pt; fill:#000;" x="294.84375" y="518.46875">m_next</text>
+<text textLength="38.25" style="font-size:12.000000pt; fill:#000;" x="301.84375" y="623.78125">m_list</text>
+</g>
+<g>
+<path style="fill-rule:evenodd;stroke-width:0.625;stroke:#000;fill:none;" d="M 567.3125 0.3125 L 638.1875 0.3125 L 638.1875 35.75 L 567.3125 35.75 L 567.3125 0.3125 Z " />
+<text textLength="37.375" style="font-size:12.000000pt; fill:#000;" x="585.03125" y="22.03125">NULL</text>
+</g>
+<g>
+<path style="fill-rule:evenodd;stroke-width:0.625;stroke:#000;fill:none;" d="M 0.3125 744.5 L 71.1875 744.5 L 71.1875 779.9375 L 0.3125 779.9375 L 0.3125 744.5 Z " />
+<text textLength="37.375" style="font-size:12.000000pt; fill:#000;" x="18.03125" y="766.21875">NULL</text>
+</g>
+<g>
+<path style="fill-rule:evenodd;stroke-width:0.625;stroke:#000;fill:none;" d="M 283.8125 248.375 L 354.6875 248.375 L 354.6875 283.8125 L 283.8125 283.8125 L 283.8125 248.375 Z " />
+<text textLength="37.375" style="font-size:12.000000pt; fill:#000;" x="301.53125" y="270.09375">NULL</text>
+</g>
+<g>
+<path style="fill-rule:evenodd;stroke-width:0.625;stroke:#000;fill:none;" d="M 425.5625 496.4375 L 496.4375 496.4375 L 496.4375 531.875 L 425.5625 531.875 L 425.5625 496.4375 Z " />
+<text textLength="37.375" style="font-size:12.000000pt; fill:#000;" x="443.28125" y="518.15625">NULL</text>
+</g>
+<path style="fill-rule:evenodd;stroke-width:0.625;stroke:#000;fill:none;" d="M 71.1875 18.03125 L 137.632812 18.03125 " />
+<path style="fill-rule:evenodd;stroke-width:0.625;stroke:#000;fill:none;" d="M 496.4375 18.03125 L 562.882812 18.03125 " />
+<path style="fill-rule:evenodd;stroke-width:0.625;stroke:#000;fill:none;" d="M 354.6875 18.03125 L 421.132812 18.03125 " />
+<path style="fill-rule:evenodd;stroke-width:0.625;stroke:#000;fill:none;" d="M 212.9375 18.03125 L 279.382812 18.03125 " />
+<path style="fill-rule:evenodd;stroke-width:0.625;stroke:#000;fill:none;" d="M 212.9375 266.09375 L 279.382812 266.09375 " />
+<path style="fill-rule:evenodd;stroke-width:0.625;stroke:#000;fill:none;" d="M 71.1875 266.09375 L 137.632812 266.09375 " />
+<path style="fill-rule:evenodd;stroke-width:0.625;stroke:#000;fill:none;" d="M 71.1875 514.15625 L 137.632812 514.15625 " />
+<path style="fill-rule:evenodd;stroke-width:0.625;stroke:#000;fill:none;" d="M 212.9375 514.15625 L 279.382812 514.15625 " />
+<path style="fill-rule:evenodd;stroke-width:0.625;stroke:#000;fill:none;" d="M 354.6875 514.15625 L 421.132812 514.15625 " />
+<path style="fill-rule:evenodd;stroke-width:0.625;stroke:#000;fill:none;" d="M 35.75 142.0625 L 35.75 243.945312 " />
+<path style="fill-rule:evenodd;stroke-width:0.625;stroke:#000;fill:none;" d="M 35.75 390.125 L 35.75 492.007812 " />
+<path style="fill-rule:evenodd;stroke-width:0.625;stroke:#000;fill:none;" d="M 35.75 638.1875 L 35.75 740.070312 " />
+</svg>

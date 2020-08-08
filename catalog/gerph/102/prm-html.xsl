@@ -50,7 +50,7 @@
 <localdb:definition-names type="vector" singular="Vector"  prefix="Vector " />
 <localdb:definition-names type="command"                   prefix="*" />
 
-<xsl:output method="xml" indent="no"/>
+<xsl:output method="xml" indent="no" encoding="utf-8"/>
 
 <xsl:variable name="title-to-id-src">ABCDEFGHIJKLMNOPQRSTUVWXYZ ,$:()-*?</xsl:variable>
 <xsl:variable name="title-to-id-map">abcdefghijklmnopqrstuvwxyz_-_-</xsl:variable>
@@ -76,7 +76,8 @@
 
 <xsl:template match="chapter">
 <head>
- <title>
+  <meta charset="utf-8"/>
+  <title>
   <xsl:value-of select="../@doc-group"/>
   <xsl:text> : </xsl:text>
   <xsl:value-of select="@title"/>
@@ -2213,11 +2214,19 @@
  <p align="center" />
 </xsl:if>
 <xsl:choose>
- <xsl:when test="@type = 'png'">
+ <xsl:when test="@type = 'png' or @type = 'svg'">
   <img align="center">
+    <xsl:variable name="style">
+     <xsl:if test="@width != ''">
+      <xsl:text>width: </xsl:text><xsl:value-of select="@width" /><xsl:text>; </xsl:text>
+     </xsl:if>
+     <xsl:if test="@height != ''">
+      <xsl:text>height: </xsl:text><xsl:value-of select="@height" /><xsl:text>; </xsl:text>
+     </xsl:if>
+     <xsl:value-of select="string(@href)"/>
+    </xsl:variable>
    <xsl:attribute name="src"><xsl:value-of select="@src" /></xsl:attribute>
-   <xsl:attribute name="width"><xsl:value-of select="@width" /></xsl:attribute>
-   <xsl:attribute name="height"><xsl:value-of select="@height" /></xsl:attribute>
+   <xsl:attribute name="style"><xsl:value-of select="$style" /></xsl:attribute>
    <xsl:attribute name="alt"><xsl:value-of select="@caption" /></xsl:attribute>
   </img>
   <xsl:apply-templates select="image"/>
