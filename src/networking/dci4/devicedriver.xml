@@ -36,7 +36,7 @@ more than one protocol module at any one time difficult.</p>
 <item>
 <p>Support for multicast and promiscuous frame reception.
 Promiscuous reception is when an Ethernet interface receives
-<i>all</i> frames, regardless of their destination address;
+<strong>all</strong> frames, regardless of their destination address;
 multicasting is a method used to transmit a single frame to
 multiple hosts simultaneously, it can be viewed as a form of
 limited broadcast: individual hosts on a network can choose whether
@@ -92,7 +92,7 @@ drivers. When a device driver receives a frame, it passes it along
 to the protocol module that expressed an interest in the frame's
 type. Transmission is much simpler --- the protocol module passes
 the frame to be transmitted to the appropriate device driver. In
-both cases it is generally the <i>recipient</i> of the frame that
+both cases it is generally the recipient of the frame that
 assumes responsibility for the memory containing the frame (i.e.
 the protocol module for received packets, the device driver for
 transmitted packets).</p>
@@ -106,14 +106,14 @@ uniquely identify each interface, but to prevent protocol modules
 having to make laborious (i.e. strcmp()) comparisons of these
 fields, device drivers should maintain a single, static, Driver
 Information Block for each interface it controls. In this way,
-protocol modules need only compare the <i>address</i> of Driver
+protocol modules need only compare the address of Driver
 Information Blocks to identify an interface.</p>
 <p>This scheme means that any use of the <command>*RMTidy</command> RISC OS command
 will kill any network stack on the machine --- this is not a great
 problem, since anyone who uses rmtidy in a modern RISC OS system is
 asking for all the trouble that they are about to receive. However,
 if a device driver module is re-initialised (via rmreinit), then
-the address of its Driver Information Block <i>will</i> change,
+the address of its Driver Information Block <strong>will</strong> change,
 therefore any protocol module's handler for the
 <reference type='service' name='DCIDriverStatus'/> service call (page 6) cannot compare
 addresses, but must fall back to comparing those fields which
@@ -145,7 +145,7 @@ backwards compatibility with versions of Acorn's TCP/ IP Protocol
 Suite software already in the field. The textual name is the same
 string as the field dib_name in the Driver Information Block (see
 page 4 for a description of Driver Information Blocks). Note that
-this field variable reflects the <i>last</i> driver initialised,
+this field variable reflects the <strong>last</strong> driver initialised,
 i.e. a driver will always set this field, regardless of whether or
 not it has been set previously.</p>
 </item>
@@ -197,19 +197,27 @@ struct slot
 </extended-example>
 
 <p>In this, and all other C code fragments, the standard Norcroft
-RISC OS compiler is assumed --- with this example, this means that
+RISC OS compiler is assumed - with this example, this means that
 bitfields start at the least significant end of a word, i.e.
-<b>slotid</b> is bits 0--7, <b>minor</b> bits 8--15, and so on.</p>
+<variable>slotid</variable> is bits 0-7, <variable>minor</variable> bits 8-15, and so on.</p>
+
+<bitfield-table head-name='Field'>
+    <bit number='0-7' name='slotid'><p>8 bits: Physical location of the device</p></bit>
+    <bit number='8-15' name='minor'><p>8 bits: Minor field</p></bit>
+    <bit number='16-20' name='pcmciaslot'><p>5 bits: PCMCIA virtual slot, or 0 for non-PCMIA devices</p></bit>
+    <bit number='21-31' name='mbz' state='reserved'/>
+</bitfield-table>
+
 <p>Device drivers are free to interpret the minor field as they
 wish, but a typical use would be to discriminate multiple units on
 a single physical card. The pcmciaslot field is used to
-differentiate between cards in different PCMCIA slots,
-(unfortunately , PCMCIA also uses the word "slot" to refer to the
-physical connection to a card. this field only has any significance
-when <b>slotid</b> is a PCMCIA virtual slot (see immediately below
+differentiate between cards in different PCMCIA slots
+(unfortunately, PCMCIA also uses the word "slot" to refer to the
+physical connection to a card). this field only has any significance
+when <variable>slotid</variable> is a PCMCIA virtual slot (see immediately below
 for a description of virtual slots).</p>
 <p>As well as the physical expansion card slots, which now number
-from 0--8 with the introduction of the latest Acorn machines, there
+from 0-8 with the introduction of the latest Acorn machines, there
 are also a number of "virtual" slots, i.e. network interfaces which
 don't use hardware in an expansion card slot. The list of physical
 and virtual slots can be summarised as</p>
@@ -264,20 +272,20 @@ struct dib
 <p>Note that there is a subtle, but important, distinction between
 this definition of a Driver Information Block and its definition in
 previous versions of the DCI: the new definition has one Driver
-Information Block per <i>unit</i> , rather than one per device
+Information Block per unit, rather than one per device
 driver; if a device driver controls several units, then it must
 provide one struct dib per unit.</p>
 
 <p><b>Units:</b> a single device driver may control more than one
 physical network interface, either by driving multiple network
 cards, or by driving multiple interfaces on a single card. The
-driver is responsible for allocating a <i>number</i> to each
+driver is responsible for allocating a number to each
 interface under its control --- the first interface being unit 0,
 the second interface being unit 1, and so on. Any particular
 network connection can then be uniquely identified by its driver
 name and unit number, e.g. en0, ea2. If an interface is found to be
 faulty during any hardware check its driver may perform, the
-interface <i>must</i> still be assigned a unit number, and must
+interface <strong>must</strong> still be assigned a unit number, and must
 still appear in the enumerated list of device drivers.</p>
 </category>
 
@@ -300,8 +308,9 @@ struct chaindib
     <offset number='0' name='chd_next'>A pointer to the next entry in the linked list. The last entry in the list contains a NULL pointer.</offset>
     <offset number='4' name='chd_dib'>A pointer to the Driver Information Block for this entry in the linked list.</offset>
 </offset-table>
+</category>
 
-<p><b>Protocol Information Blocks</b></p>
+<category title="Protocol Information Blocks">
 <p>In much the same way that device drivers are identified by their
 Driver Information Block, older versions of the DCI used to contain
 a Protocol Information Block which identified individual protocol
@@ -332,14 +341,14 @@ drivers</register-use>
 network device drivers in the system. When the service call is
 issued, R0 is a NULL pointer; upon receipt of this call, a network
 device driver should chain Driver Information Blocks to the
-<i>head</i> of the list, one for each logical interface the driver
+head of the list, one for each logical interface the driver
 controls. Section 4.1 describes the struct chaindib used to hold
 the linked list of Driver Information Blocks.</p>
 <p>This service call should never be claimed.</p>
 <p>Note: Struct chaindibs are transient objects: they should be
 allocated from RMA by the device drivers, and freed back into the
 RMA by the protocol module which issued the service call. The
-Driver Information Blocks <i>referenced</i> by the struct chaindibs
+Driver Information Blocks referenced by the struct chaindibs
 must be static data, as explained in section 3.2.</p>
 </use>
 </service-definition>
@@ -471,7 +480,7 @@ protocol modules as they are for device drivers.</p>
 call must be prepared to handle receive events for all frame types
 it has not explicitly relinquished until the service call returns;
 once the call has returned, device drivers should have deleted
-<i>all</i> references to the protocol module which issued the
+<strong>all</strong> references to the protocol module which issued the
 service call. If necessary, device drivers may enable interrupts
 while processing the service call, but they should return with the
 interrupt state preserved.</p>
@@ -490,7 +499,7 @@ a <reference type='service' name='DCIDriverStatus'/> service call to announce th
 starting; at the time this startup call is issued, the module must
 also be capable of handling SWIs raised by any protocol module
 interested in the device driver. Unfortunately, the RISC OS kernel
-does not recognise a module's SWIs until <i>after</i> its
+does not recognise a module's SWIs until <strong>after</strong> its
 initialisation routine has returned, which means that driver
 modules must take explicit steps to allow SWIs to be caught before
 issuing the service call, i.e. they must either:</p>
@@ -558,7 +567,7 @@ to an error block. Apart from the unavoidable corruption of R0, all
 other registers which are declared as being preserved by the SWI
 are still preserved, even when an error is returned.</p>
 
-<p><b>Error numbers</b> usually equate to Unix error numbers, as
+<p>Error numbers usually equate to Unix error numbers, as
 defined in the standard header file "errno.h"; these numbers
 are always less than 128, and are converted into offsets within
 the standard error block that has been defined for DCI 4 and
@@ -622,7 +631,7 @@ faults.</p>
 <p>The device driver SWI interface has been given an extensive
 overhaul for DCI 4: the complete break between this, and older
 versions of the DCI (as explained in the section about backwards
-compatibility 3.1) mean that <i>all</i> SWIs, even <reference type='swi' name='DCIDriver_DCIVersion'/> can
+compatibility 3.1) mean that <strong>all</strong> SWIs, even <reference type='swi' name='DCIDriver_DCIVersion'/> can
 be altered without worrying about the impact on non-DCI 4 modules
 within a machine.</p>
 <p>The major changes made for DCI 4 are:</p>
@@ -801,7 +810,7 @@ sets the Maximum Transmission Unit for the unit given in R1.</p>
 support this SWI, but return an error indicating an illegal</p>
 <p>operation.</p>
 <p><b>Note</b>: protocol modules can only ever consider this MTU as
-a guideline --- other protocol modules may set a</p>
+a guideline - other protocol modules may set a</p>
 <p>different MTU for the same logical unit.</p>
 </use>
 <related>
@@ -854,7 +863,7 @@ free pool when they are no longer needed.</p>
 <p>This SWI uses the scheme, described in section 6.3 for linking
 several received mbuf chains, to pass multiple output chains to the
 device driver via asingle call to this SWI. Care must be taken to
-ensure that the flag bits in R0 are applicable to <i>all</i> , mbuf
+ensure that the flag bits in R0 are applicable to <strong>all</strong> , mbuf
 chains passed to the driver.</p>
 <p>The data passed to the driver can be either "safe", or "unsafe"
 (section 8.3 explains the concept of unsafe data) --- if the device
@@ -954,7 +963,7 @@ gathered.</bit>
     <bit number='1-31' state='reserved'/>
 </bitfield-table>
 
-<p>The buffer addressed by R2 <i>must</i> be large enough to hold
+<p>The buffer addressed by R2 <strong>must</strong> be large enough to hold
 the full statistics structure, i.e. at least 100 bytes long; the
 driver is free to copy that many bytes into the buffer without
 thought for the consequences if the buffer is too small.</p>
@@ -1079,7 +1088,7 @@ and 2 more bytes. Unfortunately, there are two competing
 bytes: Ethernet 2.0, which considers them as 16 bits of frame type,
 and IEEE 802.3 which treats them as 16 bits of frame length.</p>
 <p>It is obviously not possible to refer to Ethernet 2.0 and IEEE
-802.3 as different <i>types</i> of frame, so this document uses the
+802.3 as different types of frame, so this document uses the
 term "class" to refer to the property of being either an Ethernet
 2.0, or an IEEE 802.3 frame.</p>
 <p>Since all Ethernet frames must be no more than 1500 bytes long,
@@ -1115,7 +1124,7 @@ protocol module itself.</p></item>
 <p>In this scheme, device drivers can differentiate between the two
 frame classes, and, furthermore, can distinguish Ethernet 2.0 frame
 types. However, no effort is made to ascertain frame types for IEEE
-802.3 frames, and <i>all</i> frames of this class are passed to a
+802.3 frames, and <strong>all</strong> frames of this class are passed to a
 pseudo-protocol module which implements the IEEE 802.2 Logical Link
 Control layer, and which provides a similar interface to DCI 4,
 allowing IEEE 802.3 protocol modules to claim specific frame
@@ -1135,7 +1144,7 @@ are</p>
 </list>
 
 <p>Only one protocol module is allowed to claim any given frame
-type, and when claimed, that frame type is <i>never</i> passed to
+type, and when claimed, that frame type is <strong>never</strong> passed to
 any other protocol module. For example, if one protocol module has
 claimed a frame type with an address filter of specifically
 addressed packets only, then a second protocol module:</p>
@@ -1143,8 +1152,8 @@ addressed packets only, then a second protocol module:</p>
 <list>
     <item><p>cannot claim the same frame type with an address level of
 promiscuous.</p></item>
-    <item><p><i>can</i> claim all frame types not specifically registered,
-with (e.g.) an address level of multicast, but will <i>not</i> be
+    <item><p><strong>can</strong> claim all frame types not specifically registered,
+with (e.g.) an address level of multicast, but will <strong>not</strong> be
 passed any broadcast frames of the type claimed by the first
 protocol module (which will not receive the frame either, because
 the address level will filter out broadcast packets).</p></item>
@@ -1176,7 +1185,7 @@ other value passed to Filter should be treated as an error.</p>
 <value-table head-name='Level'>
     <value number='1' name='Specific'>this is the standard frame level filter --- the protocol module is only passed Ethernet 2.0 frames whose type match that given in the lo-order, frame type subfield.</value>
     <value number='2' name='Sink'>pass all Ethernet 2.0 frames that are not explicitly claimed by any protocol module.</value>
-    <value number='3' name='Monitor'>pass <i>all</i> Ethernet 2.0 frames to the protocol module.</value>
+    <value number='3' name='Monitor'>pass <strong>all</strong> Ethernet 2.0 frames to the protocol module.</value>
 </value-table>
 
 <p>For Ethernet 2.0 frames, the table below gives a summary of what
@@ -1217,7 +1226,7 @@ configured to the loosest level of filtering requested by any
 protocol module. In the situation where two protocol modules have
 specified two different levels of address filtering, the device
 driver must still filter out unwanted frames; protocol modules are
-<i>only</i> responsible for filtering out any unwanted subset of
+<strong>only</strong> responsible for filtering out any unwanted subset of
 multicast frames.</p>
 </category>
 
@@ -1333,7 +1342,7 @@ mbufs together into a list.</p>
 to be passed to the protocol module (because the first mbuf+ in
 each chain contains a struct rx_hdr which includes the frame_type
 field), the receive handler is only given a single Driver
-Information Block, and therefore <i>all</i> the frames passed in
+Information Block, and therefore <strong>all</strong> the frames passed in
 any one call to the handler must come from a single unit.</p>
 <p>Figure 2: Linking mbuf chains</p>
 <fixme>Missing diagram</fixme>
@@ -1346,7 +1355,7 @@ any one call to the handler must come from a single unit.</p>
 <p>The <reference type='swi' name='DCIDriver_Inquire'/> SWI makes mention of device drivers supporting both
 standard, and extended statistics interfaces. This version of the
 DCI does not define an extended statistics interface, but it
-<i>does</i> define a standard stats. interface, and that is what
+does define a standard stats. interface, and that is what
 this section is all about.</p>
 <p>This document defines what it considers to be the definitive
 list of network parameters, and the driver maintains a subset of
@@ -1451,7 +1460,7 @@ significant bits are:</p>
     <value number='00'>Accept directly addressed frames only.</value>
     <value number='01'>Accept directly addressed and broadcast frames only.</value>
     <value number='10'>Accept direct, broadcast, and multicast frames.</value>
-    <value number='11'>Promiscuous mode, accept <i>all</i> frames.</value>
+    <value number='11'>Promiscuous mode, accept <strong>all</strong> frames.</value>
 </value-table>
 </p>
 </bit>
@@ -1476,7 +1485,7 @@ significant bits are:</p>
 
 <offset number='4' name='st_link_failures'><p>Counts the number of times a good link
 went away.</p></offset>
-<offset number='8' name='st_network_collisions'>Counts the <i>total</i> number of collisions on the network.</offset>
+<offset number='8' name='st_network_collisions'>Counts the total number of collisions on the network.</offset>
 <offset number='12' name='st_collisions'>The number of times a collision has occured when trying to transmit a packet.</offset>
 <offset number='16' name='st_excess_collisions'>A count of excess transmit collisions.</offset>
 <offset number='20' name='st_heartbeat_failures'>The number of times the Signal Quality Error Test failed to detect a collision.</offset>
@@ -1495,7 +1504,7 @@ went away.</p></offset>
 <offset number='92' name='st_last_src_addr'>Hardware address of the last interface from which a frame was received.</offset>
 </offset-table>
 
-<p>Note that statistics are gathered for <i>all</i> frames received
+<p>Note that statistics are gathered for <strong>all</strong> frames received
 --- even if a driver subsequently decides that no protocol wants a
 given frame, that frame still appears in the relevant receive
 statistics (i.e. st_rx_bytes, st_last_src_addr etc.).</p>
@@ -1632,15 +1641,15 @@ typedef struct mbuf
 
 <p>The MLEN macro value is no longer directly applicable --- each
 mbuf must have its maximum size checked individually. Likewise,
-reseting m_off now requires examining the <b>m_inioff</b> field of
+reseting m_off now requires examining the <variable>m_inioff</variable> field of
 the mbuf - just setting it to zero is no longer good enough.</p>
 
-<p><b>m_act</b> has been renamed m_list.</p>
+<p><variable>m_act</variable> has been renamed <variable>m_list</variable>.</p>
 
-<p><b>m_inilen</b> and <b>m_inioff</b> are provided to replace the
+<p><variable>m_inilen</variable> and <variable>m_inioff</variable> are provided to replace the
 MMINOFF and MMAXLEN macros, as the values are now dependent upon the particular mbuf in question.</p>
 
-<p><b>m_indir</b> has disappeared --- specific routines exist for determining if
+<p><variable>m_indir</variable> has disappeared --- specific routines exist for determining if
 an mbuf chain contains unsafe data.</p>
 
 <p>The mbuf structure has been separated from the underlying
@@ -1658,7 +1667,7 @@ responsibility to free the mbuf chain (unless it is transferred to
 another component, although this is unlikely).</p>
 
 <p>The other crucial structure in DCI 4 memory management is
-<b>mbctl:</b></p>
+<variable>mbctl</variable>:</p>
 
 <extended-example type='c'>
 typedef struct mbctl
@@ -1886,7 +1895,7 @@ to user data, rather than making a private copy of that data.</p>
 <p>An important implication of this is that a protocol module
 cannot rely on the indirect pointers after any system call which
 uses them has returned to the user: if they need to keep the data
-after this time, then a private copy <i>must</i> be made of the
+after this time, then a private copy <strong>must</strong> be made of the
 data. Protocol modules should always know whether an mbuf chain is
 unsafe or not (since they create the chain in the first place);
 device drivers are informed via the flags in the <reference type='swi' name='DCIDriver_Transmit'/> SWI
@@ -1900,7 +1909,7 @@ returned, then they must make a copy of that chain.</p>
 <subsection title="9.1 Network Card Self-Tests">
 <p>All network cards should support at least one *-command, used to
 initiate a hardware self-test. This * -command should be of the
-form <i>name</i>test, where <i>name</i> is the driver name as
+form <userreplace>name</userreplace>test, where <userreplace>name</userreplace> is the driver name as
 supplied in the dib_name field of the driver information block</p>
 <p>When invoked, the self-test command should, to the best of its
 ability, ascertain whether the network hardware is still
@@ -1926,7 +1935,7 @@ solution would be the expense --- any software-based solution that
 allowed one card to support two interfaces would be much
 cheaper.</p>
 <p>The optional software solution supported by DCI 4 is the concept
-of <i>virtual interfaces</i>. A virtual interface is where a driver
+of 'virtual interfaces'. A virtual interface is where a driver
 creates a second unit for a physical interface, this unit having an
 Ethernet hardware address that is different from the hardware
 address for the first, "real" unit for the interface.</p>
@@ -1971,13 +1980,13 @@ these flags should also be set.</p>
     </revision>
     <revision number='D' date='09 Nov 1994' author='Acorn/ANT'>
         <change>Large number of changes introduced following formal review, and feedback from external reviewers.</change>
-        <change>Device drivers can now be identified by the <i>address</i> of their Driver Information Block. A new subsection has been added to the introduction to explain this feature.</change>
+        <change>Device drivers can now be identified by the address of their Driver Information Block. A new subsection has been added to the introduction to explain this feature.</change>
         <change>The concept of a protocol handle has been removed.</change>
         <change>Register usage for service calls has been changed.</change>
         <change>Service calls Service_ProtocolDying, Service_FindNetworkDriver, and Service_NetworkDriverStatus are now obsolete.</change>
         <change>The new service calls Service_DCIProtocolDying, Service_DCIDriverStatus and Service_DCIFrameTypeFree have been added.</change>
         <change>All SWI calls now have a flags register. The gaps in the SWI chunk from earlier versions of the DCI have been closed.</change>
-        <change>The Filter SWI has been heavily reworked:
+        <change><p>The Filter SWI has been heavily reworked:</p>
             <list>
                 <item>Frame type, and frame level have been merged into a single register; register numbers have been shuffled to fill the gap left by frame level.</item>
                 <item>The read flag has been removed - it is no longer possible to read current filter levels.</item>
@@ -2007,10 +2016,10 @@ these flags should also be set.</p>
     <revision number='F' date='14 Mar 1995' author='Acorn/ANT' title='DCI version 4.02'>
         <change>This is now DCI version 4.02.</change>
         <change>Added a paragraph to the description of Service_DCIDriverStatus to define (by cross-reference) the format of the supported DCI version.</change>
-        <change>Service_DCIFrameTypeFree has been changed to reflect the changes made to the Filter SWI for revision D, i.e. frame type and frame level have been merged into a single 32-bit register, <b>R2</b>; parameters that were in registers <b>R4</b> &amp; <b>R5</b> have been moved into <b>R3</b> &amp; <b>R4</b> respectively.</change>
+        <change>Service_DCIFrameTypeFree has been changed to reflect the changes made to the Filter SWI for revision D, i.e. frame type and frame level have been merged into a single 32-bit register, R2; parameters that were in registers R4 &amp; R5 have been moved into R3 &amp; R4 respectively.</change>
         <change>Corrected some typos.</change>
         <change>Table of standardised errors (hopefully) made more explicit by adding a column detailing all the error numbers.</change>
-        <change>Added a paragraph to the statistics section clarifying when statistics are gathered (i.e. for <i>all</i> frames).</change>
+        <change>Added a paragraph to the statistics section clarifying when statistics are gathered (i.e. for all frames).</change>
         <change>Added some new members to struct stats: st_tx_general_errors, st_unwanted_frames, st_rx_general_errors</change>
         <change>Added codes 9 &amp; 10 for st_interface_type field in struct stats structure.</change>
         <change>Removed field st_net_error from struct stats --- it has been made redundant by new field st_tx_general_errors.</change>
@@ -2045,7 +2054,9 @@ these flags should also be set.</p>
     </revision>
 
     <revision number="1.04CJF" date="08 Aug 2020" author="Gerph" title="Restructure as PRM-in-XML">
-        <change>Exported from Impression, and converted to PRM-in-XML structured format</change>
+        <change>Exported from Impression, and converted to PRM-in-XML structured format.</change>
+        <change>Formatting changes have been made to use structured data formats, with tables of structures in addition to the C structure definitions.</change>
+        <change>Removed the st_net_error field from the statistics C definition; this field had been removed from the definitions in 4.02 (as seen in TCPIPLibs) but was still present within this document.</change>
     </revision>
  </history>
 </meta>

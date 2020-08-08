@@ -2105,7 +2105,7 @@
 
 <!-- Variable -->
 <xsl:template match="variable">
-<i>&lt;<xsl:apply-templates />&gt;</i>
+<tt><xsl:apply-templates /></tt>
 </xsl:template>
 
 <!-- Command example -->

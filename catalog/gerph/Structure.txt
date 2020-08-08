@@ -589,6 +589,15 @@ element describes a filename which should be, or can be, supplied to the
 system.
 
 
+Element:    variable
+Attributes: <none>
+Contains:   (<text> | <userreplace>)*
+
+The filename is usually represented in the PRMs by typewriter text. This
+element describes a filename which should be, or can be, supplied to the
+system.
+
+
 Element:    command
 Attributes: <none>
 Contains:   (<text> | <userreplace>)*
