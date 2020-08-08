@@ -662,33 +662,54 @@ reasonably expect the hardware to be enabled when they have
 declared an interest in one or more frame types; if they have no
 declared interests, then whether the hardware is enabled or not is
 of no significance to them.</p></value>
-<value number='NetworkIfUp'>this SWI has been removed for the same reasons as NetWorkIfStart (q.v.).</value>
-<value number='NetworkIfDown'>this SWI has been removed for the same reasons as NetWorkIfStart (q.v.).</value>
+<value number='NetworkIfUp'>this SWI has been removed for the same reasons as NetworkIfStart (q.v.).</value>
+<value number='NetworkIfDown'>this SWI has been removed for the same reasons as NetworkIfStart (q.v.).</value>
 <value number='TxEventRequired'>DCI 4 no longer uses events to communicate between device drivers and protocol modules, therefore this SWI has become redundant.</value>
 </value-table>
 </category>
 </subsection>
 
 <subsection title="5.3 SWI Descriptions">
-<category title="DCIVersion">
-<p><b>SWI (dib_swibase + 0)</b></p>
-<p>On entry: r0 = flags (all bits must be zero)</p>
-<p>On exit: r1 = Supported DCI version number (this version = 405
-decimal)</p>
-<p>All other registers preserved</p>
-<p>Use: Returns DCI major and minor version numbers supported by
+
+Element:    swi-definition
+Attributes: name, number, reason, reasonname,
+            description, internal, irqs, fiqs, processor-mode, re-entrant
+Contains:   (entry?, exit?, use, related?)
+
+<swi-definition name="DCIDriver_DCIVersion" offset="00"
+                description="Returns DCI version numbers supported by the device driver">
+<entry>
+    <register-use number='0'>Flags (all bits must be zero)</register-use>
+</entry>
+<exit>
+    <register-use number='0' state='reserved'/>
+    <register-use number='1'>Supported DCI version number (this version = 405 decimal)</register-use>
+</exit>
+
+<use>
+<p>Returns DCI major and minor version numbers supported by
 the device driver. The supported DCI version number is calculated
 as (major version &times; 100) + minor version.</p>
 <p>Note: earlier versions of the DCI only returned the major
 version, i.e. 1 or 2 (as opposed to 100 or 200).</p>
 <p>There was no formal version 3 of the DCI.</p>
-<p><b>Inquire</b></p>
-<p><b>SWI (dib_swibase +1)</b></p>
-<p>On entry: r0 = flags (all bits must be zero)</p>
-<p>r1 = unit number</p>
-<p>On exit: r2 = Bitmap of supported features (see below)</p>
-<p>All other registers are preserved.</p>
-<p>Use: This SWI is used to ascertain the characteristics of a
+</use>
+</swi-definition>
+
+<swi-definition name="DCIDriver_Inquire" offset="01"
+                description="Read the characteristics for the device driver">
+<entry>
+    <register-use number='0'>Flags (all bits must be zero)</register-use>
+    <register-use number='1'>Unit number</register-use>
+</entry>
+<exit>
+    <register-use number='0-1' state='reserved'/>
+    <register-use number='2'>Bitmap of supported features (see below)</register-use>
+    <register-use number='3-9' state='reserved'/>
+</exit>
+
+<use>
+<p>This SWI is used to ascertain the characteristics of a
 device driver. The flag bits within r2 are:</p>
 
 <bitfield-table>
@@ -726,22 +747,29 @@ leave the checksum up to the protocol module. See section 6.3 for
 more details.</p>
 <p>Some of these characteristisc are inter-related,
 specifically:</p>
-<p>- If bit 5 (interface has a hardware address) is not set, then
-bit 6 (driver can alter hardware address) is ignored.</p>
-<p>- A driver cannot supply extended statistics (bit 9), without
-also supplying standard statistics (bit 8).</p>
-<p>- If bit 11 (virtual interface is software based) is set, then
-bit 10 (this is a virtual interface) should always be set as
-well.</p>
-</category>
+<list type='unordered'>
+    <item><p>If bit 5 (interface has a hardware address) is not set, then bit 6 (driver can alter hardware address) is ignored.</p></item>
+    <item><p>A driver cannot supply extended statistics (bit 9), without also supplying standard statistics (bit 8).</p></item>
+    <item><p>If bit 11 (virtual interface is software based) is set, then bit 10 (this is a virtual interface) should always be set as well.</p></item>
+</list>
+</use>
+</swi-definition>
 
-<category title="GetNetworkMTU">
-<p><b>SWI (dib_swibase + 2)</b></p>
-<p>On entry: r0 = flags (all bits must be zero)</p>
-<p>r1 = unit number</p>
-<p>On exit: r2 = MTU</p>
-<p>All other registers preserved</p>
-<p>Use: This SWI returns the MTU (Maximum Transmission Unit) for
+
+<swi-definition name="DCIDriver_GetNetworkMTU" offset="02"
+                description="Return the MTU for the unit">
+<entry>
+    <register-use number='0'>Flags (all bits must be zero)</register-use>
+    <register-use number='1'>Unit number</register-use>
+</entry>
+<exit>
+    <register-use number='0-1' state='reserved'/>
+    <register-use number='2'>MTU</register-use>
+    <register-use number='3-9' state='reserved'/>
+</exit>
+
+<use>
+<p>This SWI returns the MTU (Maximum Transmission Unit) for
 the unit specified in r0. Ethernet has a fixed MTU of 1500 bytes,
 other hardware layers (e.g. PPP) may have a variable MTU.</p>
 <p>Note: this SWI has changed with respect to earlier versions of
@@ -753,16 +781,26 @@ the DCI, in as much as</p>
     <item>Results are returned in r2.</item>
     <item>A default return (r2 = 0), implying Ethernet MTU is no longer supported.</item>
 </list>
+</use>
+<related>
+    <reference type='swi' name='DCIDriver_SetNetworkMTU'/>
+</related>
+</swi-definition>
 
-</category>
 
-<category title="SetNetworkMTU">
-<p><b>SWI ( dib_swibase + 3)</b></p>
-<p>On entry: r0 = flags (all bits must be zero)</p>
-<p>r1 = unit number</p>
-<p>r2 = new MTU</p>
-<p>On exit: All registers are preserved.</p>
-<p>Use: For those device drivers that allow it (e.g. PPP), this SWI
+<swi-definition name="DCIDriver_SetNetworkMTU" offset="03"
+                description="Set the MTU for the unit">
+<entry>
+    <register-use number='0'>Flags (all bits must be zero)</register-use>
+    <register-use number='1'>Unit number</register-use>
+    <register-use number='2'>MTU</register-use>
+</entry>
+<exit>
+    <register-use number='0-9' state='reserved'/>
+</exit>
+
+<use>
+    <p>For those device drivers that allow it (e.g. PPP), this SWI
 sets the Maximum Transmission Unit for the unit given in r1.</p>
 <p>If the device driver has an immutable MTU, then it must still
 support this SWI, but return an error indicating an illegal</p>
@@ -770,19 +808,29 @@ support this SWI, but return an error indicating an illegal</p>
 <p><b>Note</b>: protocol modules can only ever consider this MTU as
 a guideline --- other protocol modules may set a</p>
 <p>different MTU for the same logical unit.</p>
-</category>
+</use>
+<related>
+    <reference type='swi' name='DCIDriver_GetNetworkMTU'/>
+</related>
+</swi-definition>
 
-<category title="Transmit">
-<p><b>SWI (dib_swibase + 4)</b></p>
-<p>On entry: r0 = flags (see below)</p>
-<p>r1 = unit number</p>
-<p>r2 = frame type</p>
-<p>r3 = pointer to mbuf chains containing data to transmit</p>
-<p>r4 = (byte aligned) pointer to destination hardware address</p>
-<p>r5 = (byte aligned) pointer to source hardware address (if
-applicable)</p>
-<p>On exit: All registers are preserved.</p>
-<p>Use: This SWI is a request from the protocol module for the
+
+<swi-definition name="DCIDriver_Transmit" offset="04"
+                description="Request the driver send frames on the network">
+<entry>
+    <register-use number='0'>Flags</register-use>
+    <register-use number='1'>Unit number</register-use>
+    <register-use number='2'>Frame type</register-use>
+    <register-use number='3'>Pointer to mbuf chains containing data to transmit</register-use>
+    <register-use number='4'>(byte aligned) pointer to destination hardware address</register-use>
+    <register-use number='5'>(byte aligned) pointer to source hardware address (if applicable)</register-use>
+</entry>
+<exit>
+    <register-use number='0-9' state='reserved'/>
+</exit>
+
+<use>
+<p>This SWI is a request from the protocol module for the
 device driver to send the packet addressed by r3 to the hardware
 address specified in r4. The "frame type" passed in r2 is something
 of a misnomer: the value given is copied into the last 2 bytes of
@@ -790,8 +838,7 @@ an Ethernet frame header, i.e. it is the length field according to
 the IEEE 802.3 spec., and the frame type as far as Ethernet 2.0 is
 concerned.</p>
 <p>If a previous frame is still being transmitted, the driver
-should queue the new request if possible, otherwise return an</p>
-<p>error indicating that transmission is blocked.</p>
+should queue the new request if possible, otherwise return an error indicating that transmission is blocked.</p>
 <p>The flag bits within r0 are:</p>
 
 <bitfield-table>
@@ -823,19 +870,27 @@ obtain a safe copy of the data.</p>
 <p>Note: the register numbers for this call have changed from
 earlier versions of the DCI, this change being made in an attempt
 to standardise register usage as far as possible.</p>
-</category>
+</use>
+</swi-definition>
 
-<category title="Filter">
-<p><b>SWI (dib_swibase + 5)</b></p>
-<p>On entry: R0 = flags (see below)</p>
-<p>R1 = unit number</p>
-<p>R2 = frame type</p>
-<p>R3 = address level (for write)</p>
-<p>R4 = error level (for write)</p>
-<p>R5 = private word pointer</p>
-<p>R6 = address of handler routine for received frames</p>
-<p>On exit: All registers are preserved.</p>
-<p>Use: This SWI is the mechanism by which protocol modules inform
+
+<swi-definition name="DCIDriver_Filter" offset="05"
+                description="Register a request for network frames">
+<entry>
+    <register-use number='0'>Flags</register-use>
+    <register-use number='1'>Unit number</register-use>
+    <register-use number='2'>Frame type</register-use>
+    <register-use number='3'>Address level (for write)</register-use>
+    <register-use number='4'>Error level (for write)</register-use>
+    <register-use number='5'>Private word pointer</register-use>
+    <register-use number='6'>Address of handler routine for received frames</register-use>
+</entry>
+<exit>
+    <register-use number='0-9' state='reserved'/>
+</exit>
+
+<use>
+<p>This SWI is the mechanism by which protocol modules inform
 device drivers which Ethernet frame types they would like to be
 passed. A full description of this interface is provided in section
 6.2.</p>
@@ -874,18 +929,27 @@ flags is explained in section 8.3.</p>
     <item>A frame type is already claimed. If a protocol module receives this error from a device driver, it can use Service_DCIFrameTypeFree to learn when the frame type is again free for claiming.</item>
     <item>An attempt is made to free a frame type which has not been previously claimed by the protocol module.</item>
 </list>
-</category>
+</use>
+<related>
+    <reference type='swi' name='DCIDriver_MulticastRequest'/>
+</related>
+</swi-definition>
 
-<category title="Stats">
-<p><b>SWI (dib _swibase + 6)</b></p>
-<p>On entry: r0 = flags (see below)</p>
-<p>r1 = unit number</p>
-<p>r2 = pointer to buffer for holding results</p>
-<p>On exit: All registers are preserved.</p>
-<p>Use: This SWI is the mechanism by which device drivers return
-statistics they have gathered while running. A full</p>
-<p>description of these statistics, including the structure copied
-into the the addressed by r2 is provided in section 7.</p>
+
+<swi-definition name="DCIDriver_Stats" offset="06"
+                description="Register a request for network frames">
+<entry>
+    <register-use number='0'>Flags</register-use>
+    <register-use number='1'>Unit number</register-use>
+    <register-use number='2'>Pointer to buffer for holding results</register-use>
+</entry>
+<exit>
+    <register-use number='0-9' state='reserved'/>
+</exit>
+
+<use>
+<p>This SWI is the mechanism by which device drivers return
+statistics they have gathered while running. A full description of these statistics, including the structure copied into the the addressed by r2 is provided in section 7.</p>
 <p>The flag bits within r0 are:</p>
 
 <bitfield-table>
@@ -899,21 +963,30 @@ gathered.</bit>
 the full statistics structure, i.e. at least 100 bytes long; the
 driver is free to copy that many bytes into the buffer without
 thought for the consequences if the buffer is too small.</p>
-</category>
 
-<category title="MulticastRequest">
-<p><b>SWI (dib_swibase + 7)</b></p>
-<p>On entry: R0 = flags (see below)</p>
-<p>R1 = unit number</p>
-<p>R2 = frame type</p>
-<p>R3 = (byte aligned) pointer to multicast hardware (MAC)
-address</p>
-<p>R4 = (word aligned) pointer to multicast logical address (eg
-pointer to IP address for frame type 0x800)</p>
-<p>R5 = private word pointer</p>
-<p>R6 = address of handler routine for received frames</p>
-<p>On exit: All registers are preserved.</p>
-<p>Use: This SWI is the mechanism by which protocol modules specify
+</use>
+</swi-definition>
+
+
+<swi-definition name="DCIDriver_MulticastRequest" offset="07"
+                description="Manage multicast addresses received by the driver">
+<entry>
+    <register-use number='0'>Flags</register-use>
+    <register-use number='1'>Unit number</register-use>
+    <register-use number='2'>Frame type</register-use>
+    <register-use number='3'>(byte aligned) pointer to multicast hardware (MAC)
+address</register-use>
+    <register-use number='4'>(word aligned) pointer to multicast logical address (eg
+pointer to IP address for frame type 0x800)</register-use>
+    <register-use number='5'>private word pointer</register-use>
+    <register-use number='6'>address of handler routine for received frames</register-use>
+</entry>
+<exit>
+    <register-use number='0-9' state='reserved'/>
+</exit>
+
+<use>
+<p>This SWI is the mechanism by which protocol modules specify
 which destination multicast addresses they wish to receive.</p>
 <p>The flag bits within R0 are:</p>
 
@@ -969,7 +1042,12 @@ address before passing a received frame to it.</p>
 <p>This SWI provides no function for filters with an address level
 other than ADDRLVL_MULTICAST, and if called for such a filter
 should return EINVAL.</p>
-</category>
+</use>
+<related>
+    <reference type='swi' name='DCIDriver_Filter'/>
+</related>
+</swi-definition>
+
 </subsection>
 </section>
 
@@ -1022,10 +1100,10 @@ implementation, so DCI 4 caters for the scheme shown in figure
 
 <p>Note: It cannot be protocol modules for two reasons:</p>
 <list>
-    <item><p>1. Protocol modules are frame type specific, whereas the
+    <item><p>Protocol modules are frame type specific, whereas the
 standard services which an IEEE 802.2 implementor must provide are
 frame type independent.</p></item>
-    <item><p>2. The software that implements the IEEE 802.2 layer will be
+    <item><p>The software that implements the IEEE 802.2 layer will be
 expected to filter frame types, and pass them along to protocol
 modules; therefore, obviously, this software cannot be a standard
 protocol module itself.</p></item>

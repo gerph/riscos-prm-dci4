@@ -50,7 +50,7 @@
 <localdb:definition-names type="vector" singular="Vector"  prefix="Vector " />
 <localdb:definition-names type="command"                   prefix="*" />
 
-<xsl:output method="xhtml" indent="no"/>
+<xsl:output method="xml" indent="no"/>
 
 <xsl:variable name="title-to-id-src">ABCDEFGHIJKLMNOPQRSTUVWXYZ ,$:()-*?</xsl:variable>
 <xsl:variable name="title-to-id-map">abcdefghijklmnopqrstuvwxyz_-_-</xsl:variable>
