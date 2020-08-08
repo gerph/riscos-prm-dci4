@@ -622,7 +622,27 @@ type: the type of the code which is described, which may be one of :
 The code element is usually represented in the PRMs by typewriter text.
 This element describes a section of code which can be used to provide
 a particular function either as an example or as a means of describing
-file formats. This element is recommended for example code sections.
+file formats. This element is recommended for example code sections
+for single-line or simple examples.
+
+
+Element:    extended-example
+Attributes: type
+Contains:   <text>*
+
+type: the type of the code which is described, which may be one of :
+          c - C code
+          basic - BASIC code
+          asm - assembler code
+          format - a file format
+          pseudo - pseudo code in no particular language
+
+The extended-example element is usually represented in the PRMs by a block
+of typewriter text which may be a code fragment.
+This element describes a section of code which can be used to provide
+a particular function either as an example or as a means of describing
+file formats. This element is recommended for example code sections
+for mulit-line examples, where pre-formatted text is expected.
 
 
 Element:    sysvar

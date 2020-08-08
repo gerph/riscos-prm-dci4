@@ -284,6 +284,8 @@
 <!-- An 'extended example' is one which the entire section is the
      example - I'm not at all sure that it's sane -->
 <!ELEMENT extended-example (#PCDATA | %parameters; | %inline; | %link;)*>
+<!ATTLIST extended-example
+        type (unknown | pseudo | c | basic | asm | format) "unknown">
 
 <!-- Code sections describe something which is used to control or to
      provide some level of description about features within the system.

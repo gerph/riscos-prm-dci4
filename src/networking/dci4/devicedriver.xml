@@ -7,7 +7,7 @@
 <section title="Overview">
 </section>
 
-<section title="History">
+<section title="1 History">
 <p><b>22 Jul 1994</b> Revision A --- Initial draft revision, passed
 round for comment.</p>
 <p><b>12 Aug 1994</b> Revision B --- Incorporated reviewers'
@@ -121,10 +121,16 @@ driver modules in the RISC OS networking system.</p>
 <p>This new version is needed to overcome deficiencies/errors in
 the existing interface. The specific points it aims to address
 are:</p>
+
+<list type='unordered'>
+<item>
 <p>Full support for multiple protocol modules in a single system:
 older versions of the DCI notionally provided this support, but
 there were implicit features of the design which made support for
 more than one protocol module at any one time difficult.</p>
+</item>
+
+<item>
 <p>Support for multicast and promiscuous frame reception.
 Promiscuous reception is when an Ethernet interface receives
 <i>all</i> frames, regardless of their destination address;
@@ -138,9 +144,14 @@ defines multicasting as "A technique that allows copies of a single
 destinations . . . . broadcast is a special form of multicast in
 which the subset of machines to receive a copy of a [frame]
 consists of the entire set."</p>
+</item>
+
+<item>
 <p>The need for improved data transfer rates compared to previous
 DCI versions, and the formal adoption of techniques already used to
 improve data throughput.</p>
+</item>
+</list>
 
 <category title="Backwards compatabilty">
 <p>The radical changes and new features being introduced with this
@@ -150,19 +161,24 @@ compatibility impossible. With this lack of compatibility, care has
 been taken to ensure that there is no overlap between DCI 4
 compliant modules, and other modules loaded on the same machine
 that implement earlier versions of the DCI, specifically:</p>
-<p>1. In both old and new DCI versions, it is the responsibility of
+
+<list type='ordered'>
+    <item><p>In both old and new DCI versions, it is the responsibility of
 the protocol module to initialise the interface between itself and
 a device driver after either actively or passively learning of the
 device driver's presence; DCI 4 has replaced the active
 (Service_FindNetworkDriver) and passive
 (Service_NetworkDriverStatus) service calls used by protocol
 modules with Service_EnumerateNetworkDrivers and
-Service_DCIDriverStatus respectively.</p>
-<p>2. To prevent old device drivers getting confused by
+Service_DCIDriverStatus respectively.</p></item>
+
+    <item><p>To prevent old device drivers getting confused by
 Service_ProtocolStatus, which no longer provides a sensible (as far
 as old DCI versions are concerned) value in r2, this service call
 has been made obsolete, and has been replaced by
-Service_DCIProtocolStatus.</p>
+Service_DCIProtocolStatus.</p></item>
+</list>
+
 </category>
 </subsection>
 
@@ -189,7 +205,7 @@ fields, device drivers should maintain a single, static, Driver
 Information Block for each interface it controls. In this way,
 protocol modules need only compare the <i>address</i> of Driver
 Information Blocks to identify an interface.</p>
-<p>This scheme means that any use of the rmtidy RISC OS command
+<p>This scheme means that any use of the <command>*RMTidy</command> RISC OS command
 will kill any network stack on the machine --- this is not a great
 problem, since anyone who uses rmtidy in a modern RISC OS system is
 asking for all the trouble that they are about to receive. However,
@@ -204,18 +220,22 @@ uniquely identify an interface, i.e. dib_name &amp; dib_unit.</p>
 
 <subsection title="3.3 Device Driver considerations">
 <p>Important points for device driver writers to note are:</p>
-<p>1. The DCI interface is optimised in various ways for Ethernet
-device drivers, specifically</p>
-<p>a) Physical network addresses are 48-bit quantities.</p>
-<p>b) Protocol modules identify the physical network frames they
-wish to receive by the type of the frame.</p>
+<list type="ordered">
+    <item><p>The DCI interface is optimised in various ways for Ethernet
+device drivers, specifically:</p>
+        <list type="ordered">
+            <item><p>Physical network addresses are 48-bit quantities.</p></item>
+            <item><p>Protocol modules identify the physical network frames they
+wish to receive by the type of the frame.</p></item>
+        </list>
 <p>(For example, the Internet module claims frame types 0x800 (IP),
 0x806 (ARP), and 0x8035 (RevARP). This is a 16-bit value
 transmitted as part of the Ethernet header.)</p>
 <p>Drivers for other types of network hardware will need to emulate
 an Ethernet driver at this interface by mapping "virtual Ethernet"
 values onto the real values meaningful to the network hardware.</p>
-<p>2. At startup, driver modules must set the variable
+</item>
+    <item><p>At startup, driver modules must set the variable
 Inet$EtherType to the textual name of the controlled physical
 interface (e.g. "en", "ea"), with a suffix of `0'. This is for
 backwards compatibility with versions of Acorn's TCP/ IP Protocol
@@ -225,6 +245,8 @@ page 4 for a description of Driver Information Blocks). Note that
 this field variable reflects the <i>last</i> driver initialised,
 i.e. a driver will always set this field, regardless of whether or
 not it has been set previously.</p>
+</item>
+</list>
 </subsection>
 </section>
 
@@ -232,14 +254,20 @@ not it has been set previously.</p>
 <p>As explained in the section on backwards compatibility ( Section
 3), the service calls defined in earlier versions of the DCI are
 all now obsolete. To summarise, these calls are</p>
-<p>1. Service_ProtocolStatus</p>
-<p>2. Service_FindNetworkDriver</p>
-<p>3. Service_NetworkDriverStatus</p>
+<list type='ordered'>
+    <item><p>Service_ProtocolStatus</p></item>
+    <item><p>Service_FindNetworkDriver</p></item>
+    <item><p>Service_NetworkDriverStatus</p></item>
+</list>
+
 <p>The new service calls defined in DCI 4 are</p>
-<p>1. Service_EnumerateNetworkDrivers (service call 0x9b).</p>
-<p>2. Service_DCIDriverStatus (service call 0x9d).</p>
-<p>3. Service_DCIFrameTypeFree (service call 0x9e).</p>
-<p>4. Service_DCIProtocolStatus (service call 0x9f).</p>
+<list type='ordered'>
+    <item><p>Service_EnumerateNetworkDrivers (service call 0x9b).</p></item>
+    <item><p>Service_DCIDriverStatus (service call 0x9d).</p></item>
+    <item><p>Service_DCIFrameTypeFree (service call 0x9e).</p></item>
+    <item><p>Service_DCIProtocolStatus (service call 0x9f).</p></item>
+</list>
+
 <p>Note that the old, unnamed, service call 0x41200, which was
 never part of any formal DCI specification, but which used</p>
 <p>to be issued during finalisation of the Internet module, has now
@@ -254,14 +282,17 @@ of a slot is overloaded with a minor device number; the
 interpretation of this minor device number is device driver
 dependent.</p>
 <p>Using C, a slot can be expressed as</p>
-<p>struct slot</p>
-<p>{</p>
-<p>unsigned int slotid:8,</p>
-<p>minor:8,</p>
-<p>pcmciaslot:5, /* must be zero if not a</p>
-<p>* PCMCIA virtual slot */</p>
-<p>mbz:11; /* must be zero */</p>
-<p>}</p>
+
+<extended-example type='c'>
+struct slot
+{
+    unsigned int slotid:8,
+    minor:8,
+    pcmciaslot:5, /* must be zero if not a PCMCIA virtual slot */
+    mbz:11; /* must be zero */
+}
+</extended-example>
+
 <p>In this, and all other C code fragments, the standard Norcroft
 RISC OS compiler is assumed --- with this example, this means that
 bitfields start at the least significant end of a word, i.e.
@@ -279,14 +310,17 @@ from 0--8 with the introduction of the latest Acorn machines, there
 are also a number of "virtual" slots, i.e. network interfaces which
 don't use hardware in an expansion card slot. The list of physical
 and virtual slots can be summarised as</p>
-<p>0--7 Physical expansion card slots</p>
 
-<p>8 Risc PC network position</p>
-<p>16--31 PCI slots</p>
-<p>128 Parallel port</p>
-<p>129 Serial port (e.g. PPP)</p>
-<p>130 Econet socket</p>
-<p>131 PCMCIA cards</p>
+<value-table>
+    <value number="0-7">Physical expansion card slots</value>
+    <value number="8">Risc PC network position</value>
+    <value number="16-31">PCI slots</value>
+    <value number="128">Parallel port</value>
+    <value number="129">Serial port (e.g. PPP)</value>
+    <value number="130">Econet socket</value>
+    <value number="131">PCMCIA cards</value>
+</value-table>
+
 <p>Note:- there is only one PCMCIA virtual slot, this one virtual
 slot refers to PCMCIA hardware which may contain more than one
 physical PCMCIA slot; the pcmciaslot field within the slot number
@@ -296,41 +330,41 @@ PCMCIA slots.</p>
 <category title="Driver Information Blocks">
 <p>Device drivers identify themselves via a Driver Information
 Block, which can be expressed in C syntax as</p>
-<p>struct dib</p>
-<p>{</p>
-<p>unsigned int dib_swibase;</p>
-<p>char *dib_name;</p>
-<p>unsigned int dib_unit;</p>
-<p>unsigned char *dib_address;</p>
-<p>char *dib_module;</p>
-<p>char *dib_location;</p>
-<p>struct slot dib_slot;</p>
-<p>unsigned int dib_inquire;</p>
-<p>};</p>
+
+<extended-example type='c'>
+struct dib
+{
+    unsigned int dib_swibase;
+    char *dib_name;
+    unsigned int dib_unit;
+    unsigned char *dib_address;
+    char *dib_module;
+    char *dib_location;
+    struct slot dib_slot;
+    unsigned int dib_inquire;
+};
+</extended-example>
+
 <p>The fields within this structure are:</p>
-<p><b>dib_swibase</b> The base of the device driver's allocated SWI
-chunk.</p>
-<p><b>dib_name</b> A pointer to a short textual name unique to the
-driver (e.g. "en", "ppp"), and a terminating NULL.</p>
-<p><b>dib_unit</b> The unit number.</p>
-<p><b>dib_address</b> A pointer to a 6-byte character array which
-contains the hardware address of the interface.</p>
-<p><b>dib_module</b> A pointer to a string containing the title of
-the driver module (e.g. "Ether3").</p>
-<p><b>dib_location</b> A pointer to a string which attempts to
-describe the physical location of the interface. A typical string
-would be somewhere between 8 and 40 characters long and would be of
-the form "Network Expansion Slot", or "Expansion Slot 0, port #1"
-etc..</p>
-<p><b>dib_slot</b> The slot number for this unit.</p>
-<p><b>dib_inquire</b> A copy of the flags returned from the Inquire
-SWI (section 5.3).</p>
+
+<offset-table head-name='Field'>
+    <offset number='0' name='dib_swibase'>The base of the device driver's allocated SWIchunk.</offset>
+    <offset number='4' name='dib_name'>A pointer to a short textual name unique to the driver (e.g. "en", "ppp"), and a terminating NULL.</offset>
+    <offset number='8' name='dib_unit'>The unit number.</offset>
+    <offset number='12' name='dib_address'>A pointer to a 6-byte character array which contains the hardware address of the interface.</offset>
+    <offset number='16' name='dib_module'>A pointer to a string containing the title of the driver module (e.g. "Ether3").</offset>
+    <offset number='20' name='dib_location'>A pointer to a string which attempts to describe the physical location of the interface. A typical string would be somewhere between 8 and 40 characters long and would be of the form "Network Expansion Slot", or "Expansion Slot 0, port #1" etc..</offset>
+    <offset number='24' name='dib_slot'>The slot number for this unit.</offset>
+    <offset number='28' name='dib_inquire'>A copy of the flags returned from the Inquire SWI (section 5.3).</offset>
+</offset-table>
+
 <p>Note that there is a subtle, but important, distinction between
 this definition of a Driver Information Block and its definition in
 previous versions of the DCI: the new definition has one Driver
 Information Block per <i>unit</i> , rather than one per device
 driver; if a device driver controls several units, then it must
 provide one struct dib per unit.</p>
+
 <p><b>Units:</b> a single device driver may control more than one
 physical network interface, either by driving multiple network
 cards, or by driving multiple interfaces on a single card. The
@@ -348,17 +382,22 @@ still appear in the enumerated list of device drivers.</p>
 <p>The results from the Service_EnumerateNetworkDrivers service
 call are chained together into a linked list of Driver Information
 Blocks. The C structure used for this linked list is</p>
-<p>struct chaindib</p>
-<p>{</p>
-<p>struct chaindib *chd_next;</p>
-<p>struct dib *chd_dib;</p>
-<p>};</p>
-<p>Just in case the fields within this structure are not
-self-evident, they are:</p>
-<p><b>chd_next</b> A pointer to the next entry in the linked list.
-The last entry in the list contains a NULL pointer.</p>
-<p><b>chd_dib</b> A pointer to the Driver Information Block for
-this entry in the linked list.</p>
+
+<extended-example type='c'>
+struct chaindib
+{
+    struct chaindib *chd_next;
+    struct dib *chd_dib;
+};
+</extended-example>
+
+<p>Just in case the fields within this structure are not self-evident, they are:</p>
+
+<offset-table head-name="Field">
+    <offset number='0' name='chd_next'>A pointer to the next entry in the linked list. The last entry in the list contains a NULL pointer.</offset>
+    <offset number='4' name='chd_dib'>A pointer to the Driver Information Block for this entry in the linked list.</offset>
+</offset-table>
+
 <p><b>Protocol Information Blocks</b></p>
 <p>In much the same way that device drivers are identified by their
 Driver Information Block, older versions of the DCI used to contain
@@ -486,10 +525,12 @@ service call. If necessary, device drivers may enable interrupts
 while processing the service call, but they should return with the
 interrupt state preserved.</p>
 <p>Device drivers must never claim this service call.</p>
+</category>
+
 <p>Note: as already mentioned in section 4, the old, unnamed,
 service call 0x41200 will not be issued by DCI 4 compliant versions
 of the Internet module when it is terminating.</p>
-</category>
+
 </subsection>
 
 <subsection title="4.3 Device Driver Initialisation">
@@ -513,24 +554,29 @@ then issue the service call from within this callback handler.</p>
 <section title="5 Device Driver SWIs">
 <p>All network device drivers must provide a SWI call interface
 which protocol modules can use to</p>
-<p>- send control commands</p>
-<p>- pass data</p>
-<p>- obtain information</p>
+<list>
+    <item><p>send control commands</p></item>
+    <item><p>pass data</p></item>
+    <item><p>obtain information</p></item>
+</list>
 <p>to/from a device driver. Obviously, each device driver will have
 its own, unique, SWI chunk, so a protocol module must use the
 dib_swibase field from the Driver Information Block (see section
 4.1) to determine the base of a driver's SWI chunk.</p>
 <p>The SWI calls that a device driver must supply (and their
 offsets) are</p>
-<p><b>Offset SWI name</b></p>
-<p>0 DCIVersion</p>
-<p>1 Inquire</p>
-<p>2 GetNetworkMTU</p>
-<p>3 SetNetworkMTU</p>
-<p>4 Transmit</p>
-<p>5 Filter</p>
-<p>6 Stats</p>
-<p>7 MulticastRequest</p>
+
+<value-table head-number='SWI offset' head-value='SWI name'>
+    <value number='0'>DCIVersion</value>
+    <value number='1'>Inquire</value>
+    <value number='2'>GetNetworkMTU</value>
+    <value number='3'>SetNetworkMTU</value>
+    <value number='4'>Transmit</value>
+    <value number='5'>Filter</value>
+    <value number='6'>Stats</value>
+    <value number='7'>MulticastRequest</value>
+</value-table>
+
 <p><b>Re-entrancy</b></p>
 <p>All device driver SWIs are potentially re-entrant, i.e. the
 protocol modules are not expected to take any explicit action to
@@ -557,8 +603,8 @@ to an error block. Apart from the unavoidable corruption of R0, all
 other registers which are declared as being preserved by the SWI
 are still preserved, even when an error is returned.</p>
 <p><b>Error numbers</b> usually equate to Unix error numbers, as
-defined in the standard header file "errno.h"; these numbers</p>
-<p>are always less than 128, and are converted into offsets within
+defined in the standard header file "errno.h"; these numbers
+are always less than 128, and are converted into offsets within
 the standard error block that has been defined for DCI 4 and
 Internet. This error block starts at &amp;20E00, for example, the
 error EINVAL (invalid argument, defined as 22, &amp;16) would be
@@ -575,21 +621,42 @@ circumstances in which these errors may be returned. This is not
 meant to be an exhaustive list, merely to cover all the errors
 explicitly mentioned in this document, plus some other common
 faults.</p>
-<p><b>SWI Name Unix Error Error Number Circumstances</b></p>
-<p>(Any) EINVAL 0x20e16 Incorrect flags word in r0</p>
-<p>ENXIO 0x20e06 Invalid unit number supplied</p>
-<p>SetNetworkMTU ENOTTY 0x20e19 Illegal op for device.</p>
-<p>Transmit - 0x20e86 Transmission is blocked.</p>
-<p>ENETDOWN 0x20e32 Network hardware is down.</p>
-<p>EMSGSIZE 0x20e28 Frame length &gt; network MTU.</p>
-<p>ENOBUFS 0x20e37 Not enough mbufs available.</p>
-<p>Filter - 0x20e87 Frame type already claimed.</p>
-<p>EINVAL 0x20e16 Trying to claim illegal frame type</p>
-<p>EINVAL 0x20e16 Trying to release a non-existent claim.</p>
-<p>EPERM 0x20e01 Trying to free another protocol's claim.</p>
-<p>MulticastRequest</p>
-<p>EINVAL 0x20e16 Trying to claim illegal frame type</p>
-<p>EINVAL 0x20e16 Trying to release a non-existent claim.</p>
+
+<list>
+    <item><p>Any SWI:</p>
+        <p><value-table head-number='Error number' head-name='Unix error'>
+            <value name='EINVAL' number='&hex;20E16'>Incorrect flags word in r0</value>
+            <value name='ENXIO' number='&hex;20E06'>Invalid unit number supplied</value>
+        </value-table></p>
+    </item>
+    <item><p>SetNetworkMTU:</p>
+        <p><value-table head-number='Error number' head-name='Unix error'>
+            <value name='ENOTTY' number='&hex;20E19'>Illegal op for device</value>
+        </value-table></p>
+    </item>
+    <item><p>Transmit:</p>
+        <value-table head-number='Error number' head-name='Unix error'>
+            <value name='' number='&hex;20E86'>Transmission is blocked</value>
+            <value name='ENETDOWN' number='&hex;20E32'>Network hardware is down.</value>
+            <value name='EMSGSIZE' number='&hex;20E28'>Frame length &gt; network MTU.</value>
+            <value name='ENOBUFS' number='&hex;20E37'>Not enough mbufs available.</value>
+        </value-table>
+    </item>
+    <item><p>Filter</p>
+        <p><value-table head-number='Error number' head-name='Unix error'>
+            <value name='' number='&hex;20E87'>Frame type already claimed</value>
+            <value name='EINVAL' number='&hex;20E16'>Trying to claim illegal frame type</value>
+            <value name='EINVAL' number='&hex;20E16'>Trying to release a non-existent claim.</value>
+            <value name='EPERM' number='&hex;20E01'>Trying to free another protocol's claim.</value>
+        </value-table></p>
+    </item>
+    <item><p>MulticastRequest:</p>
+        <p><value-table head-number='Error number' head-name='Unix error'>
+            <value name='EINVAL' number='&hex;20E16'>Trying to claim illegal frame type</value>
+            <value name='EINVAL' number='&hex;20E16'>Trying to release a non-existent claim.</value>
+        </value-table></p>
+    </item>
+</list>
 </category>
 </subsection>
 
@@ -601,46 +668,50 @@ compatibility 3.1) mean that <i>all</i> SWIs, even DCIVersion can
 be altered without worrying about the impact on non-DCI 4 modules
 within a machine.</p>
 <p>The major changes made for DCI 4 are:</p>
-<p>1. All SWIs now use R0 as a flag word: this provides an easy
+
+<list type='ordered'>
+<item><p>All SWIs now use R0 as a flag word: this provides an easy
 route to alter SWI functionality in any future versions of the DCI
 that prove to be necessary. All bits of this flag word should be
-set to zero, except where explicitly stated otherwise.</p>
-<p>2. Several new SWIs have been added, i.e.</p>
-<p><b>- SetNetWorkMTU</b></p>
-<p><b>- Inquire</b></p>
-<p><b>- Filter</b></p>
-<p><b>- Stats</b></p>
-<p><b>- MulticastRequest</b> (as of DCI 4.04)</p>
-<p>3. SWI NetworkMTU has been renamed to GetNetworkMTU, to
-differentiate it from the new SWI SetNetworkMTU.</p>
-<p>4. SWI NetworkIfSend has been renamed to Transmit, mainly
-because it is less of a mouthful.</p>
-<p>5. Some old SWIs have been deleted (see below).</p>
-<p>6. Offsets of SWIs within a driver's SWI chunk have been changed
+set to zero, except where explicitly stated otherwise.</p></item>
+
+<item><p>Several new SWIs have been added, i.e.</p>
+    <p>
+    <list>
+        <item><p>SetNetworkMTU</p></item>
+        <item><p>Inquire</p></item>
+        <item><p>Filter</p></item>
+        <item><p>Stats</p></item>
+        <item><p>MulticastRequest (as of DCI 4.04)</p></item>
+    </list>
+    </p>
+</item>
+<item><p>SWI NetworkMTU has been renamed to GetNetworkMTU, to
+differentiate it from the new SWI SetNetworkMTU.</p></item>
+<item><p>SWI NetworkIfSend has been renamed to Transmit, mainly
+because it is less of a mouthful.</p></item>
+<item><p>Some old SWIs have been deleted (see below).</p></item>
+<item><p>Offsets of SWIs within a driver's SWI chunk have been changed
 to fill in the gaps left by the deleted SWIs; for example,
 DCIVersion has been moved from offset 4 to the more logical offset
-of 0.</p>
-<p><b>Deleted SWI Details</b></p>
+of 0.</p></item>
+</list>
+
+<category title="Deleted SWI Details">
 <p>As mentioned above, some of the SWIs from earlier versions of
 the DCI have been removed from DCI 4. These SWIs are:</p>
-<p>NetworkIfStart --- The decision on whether network hardware
-should be enabled lies with the device driver, not with a protocol
-module (consider the situation where one protocol module believes
-that</p>
-<p>the hardware should be enabled, while a different module is of
-the opinion that it should be disabled).</p>
+<value-table head-number='SWI name'>
+<value number='NetworkIfStart'><p>The decision on whether network hardware should be enabled lies with the device driver, not with a protocol module (consider the situation where one protocol module believes that the hardware should be enabled, while a different module is of the opinion that it should be disabled).</p>
 <p>As far as protocol modules are concerned, they can only
 reasonably expect the hardware to be enabled when they have
 declared an interest in one or more frame types; if they have no
 declared interests, then whether the hardware is enabled or not is
-of no significance to them.</p>
-<p>NetworkIfUp --- this SWI has been removed for the same reasons
-as NetWorkIfStart (q.v.).</p>
-<p>NetworkIfDown --- this SWI has been removed for the same reasons
-as NetWorkIfStart (q.v.).</p>
-<p>TxEventRequired --- DCI 4 no longer uses events to communicate
-between device drivers and protocol modules, therefore this SWI has
-become redundant.</p>
+of no significance to them.</p></value>
+<value number='NetworkIfUp'>this SWI has been removed for the same reasons as NetWorkIfStart (q.v.).</value>
+<value number='NetworkIfDown'>this SWI has been removed for the same reasons as NetWorkIfStart (q.v.).</value>
+<value number='TxEventRequired'>DCI 4 no longer uses events to communicate between device drivers and protocol modules, therefore this SWI has become redundant.</value>
+</value-table>
+</category>
 </subsection>
 
 <subsection title="5.3 SWI Descriptions">
@@ -664,22 +735,25 @@ version, i.e. 1 or 2 (as opposed to 100 or 200).</p>
 <p>All other registers are preserved.</p>
 <p>Use: This SWI is used to ascertain the characteristics of a
 device driver. The flag bits within r2 are:</p>
-<p>Bit 0: Multicast reception is supported</p>
-<p>Bit 1: Promiscuous reception is supported</p>
-<p>Bit 2: Interface receives its own transmitted packets</p>
-<p>Bit 3: Station number required.</p>
-<p>Bit 4: Interface can receive erroneous packets</p>
-<p>Bit 5: Interface has a hardware address</p>
-<p>Bit 6: Driver can alter interface's hardware address</p>
-<p>Bit 7: Interface is a point to point link</p>
-<p>Bit 8: Driver supplies standard statistics</p>
-<p>Bit 9: Driver supplies extended statistics</p>
-<p>Bit 10: This is a virtual interface</p>
-<p>Bit 11: This virtual interface is software based</p>
-<p>Bit 12: This interface can selectively receive multicast packets
-(ie SWI MulticastRequest available)</p>
-<p>Bit 13: This interface can IP checksum frames</p>
-<p>Bits 14--31: Reserved, must be zero.</p>
+
+<bitfield-table>
+    <bit number='0'>Multicast reception is supported</bit>
+    <bit number='1'>Promiscuous reception is supported</bit>
+    <bit number='2'>Interface receives its own transmitted packets</bit>
+    <bit number='3'>Station number required.</bit>
+    <bit number='4'>Interface can receive erroneous packets</bit>
+    <bit number='5'>Interface has a hardware address</bit>
+    <bit number='6'>Driver can alter interface's hardware address</bit>
+    <bit number='7'>Interface is a point to point link</bit>
+    <bit number='8'>Driver supplies standard statistics</bit>
+    <bit number='9'>Driver supplies extended statistics</bit>
+    <bit number='10'>This is a virtual interface</bit>
+    <bit number='11'>This virtual interface is software based</bit>
+    <bit number='12'>This interface can selectively receive multicast packets (ie SWI MulticastRequest is available)</bit>
+    <bit number='13'>This interface can IP checksum frames</bit>
+    <bit number='14-31'>Reserved, must be zero.</bit>
+</bitfield-table>
+
 <p>Most of these flags are self-explanatory; "Station number
 required" (bit 3) is used by AUN software to find out whether the
 underlying network requires a fixed "pseudo-Econet" station number
@@ -717,11 +791,14 @@ the unit specified in r0. Ethernet has a fixed MTU of 1500 bytes,
 other hardware layers (e.g. PPP) may have a variable MTU.</p>
 <p>Note: this SWI has changed with respect to earlier versions of
 the DCI, in as much as</p>
-<p>1. There is now the standard flags word in r0.</p>
-<p>2. A unit number is now passed in r1.</p>
-<p>3. Results are returned in r2.</p>
-<p>4. A default return (r2 = 0), implying Ethernet MTU is no longer
-supported.</p>
+
+<list type='ordered'>
+    <item>There is now the standard flags word in r0.</item>
+    <item>A unit number is now passed in r1.</item>
+    <item>Results are returned in r2.</item>
+    <item>A default return (r2 = 0), implying Ethernet MTU is no longer supported.</item>
+</list>
+
 </category>
 
 <category title="SetNetworkMTU">
@@ -761,14 +838,17 @@ concerned.</p>
 should queue the new request if possible, otherwise return an</p>
 <p>error indicating that transmission is blocked.</p>
 <p>The flag bits within r0 are:</p>
-<p>Bit 0: 0 --- Use interface's own hardware address.</p>
 
-<p>1 --- Use address given by r5 for source hardware address.</p>
-<p>Bit 1: 0 --- Device driver assumes ownership of memory
-resources</p>
+<bitfield-table>
+    <bit number='0' state='clear'>Use interface's own hardware address.</bit>
+    <bit number='0' state='set'>Use address given by r5 for source hardware address.</bit>
 
-<p>1 --- Protocol module retains ownership of memory resources</p>
-<p>Bits 2--31: Reserved, must be zero.</p>
+    <bit number='1' state='clear'>Device driver assumes ownership of memory resources</bit>
+    <bit number='1' state='set'>Protocol module retains ownership of memory resources</bit>
+
+    <bit number='2-31' state='reserved'/>
+</bitfield-table>
+
 <p>Regardless of who initially allocated the memory resources (i.e.
 mbuf chains) passed in r3, it is the new owner of these resources
 (i.e. the device driver if r0, bit1 = 0; the protocol module if r0,
@@ -805,24 +885,23 @@ device drivers which Ethernet frame types they would like to be
 passed. A full description of this interface is provided in section
 6.2.</p>
 <p>The flag bits within R0 are:</p>
-<p>Bit 0: 0 --- Claim a frame type.</p>
 
-<p>1 --- Release a previous claim on the frame type.</p>
-<p>Bit 1: 0 --- Device drivers can pass unsafe mbuf chains to the
-receive handler</p>
-
-<p>1 --- Device drivers should ensure_safe mbuf chains before
-passing them to the receive handler.</p>
-<p>Bit 2: 0 --- The protocol module wants all multicast frames (if
-indicated by R3)</p>
-
-<p>1 --- The protocol module will ask for specific multicast
-frames.</p>
-<p>Bit 3: 0 --- IP checksum not required</p>
-
-<p>1 --- Device driver should place the IP checksum of received
-frames into the RxHdr.</p>
-<p>Bits 4--31: Reserved, must be zero.</p>
+<bitfield-table>
+    <bit number='0' state='clear'>Claim a frame type.</bit>
+    <bit number='0' state='set'>Release a previous claim on the frame type.</bit>
+    <bit number='1' state='clear'>Device drivers can pass unsafe mbuf chains to the
+receive handler</bit>
+    <bit number='1' state='set'>Device drivers should ensure_safe mbuf chains before
+passing them to the receive handler.</bit>
+    <bit number='2' state='clear'>The protocol module wants all multicast frames (if
+indicated by R3)</bit>
+    <bit number='2' state='set'>The protocol module will ask for specific multicast
+frames.</bit>
+    <bit number='3' state='clear'>IP checksum not required</bit>
+    <bit number='3' state='set'>Device driver should place the IP checksum of received
+frames into the RxHdr.</bit>
+    <bit number='4-31' state='reserved'/>
+</bitfield-table>
 <p>The private word pointer passed in R5 is the address of the
 protcol module's private word, which itself contains the address of
 the module's workspace.</p>
@@ -835,13 +914,11 @@ frame handler.</p>
 <p>The concept of safe and unsafe data, as used in bit 1 of the
 flags is explained in section 8.3.</p>
 <p>This SWI should return an error when:</p>
-<p>- An illegal frame type is claimed.</p>
-<p>- A frame type is already claimed. If a protocol module receives
-this error from a device driver, it can use
-Service_DCIFrameTypeFree to learn when the frame type is again free
-for claiming.</p>
-<p>- An attempt is made to free a frame type which has not been
-previously claimed by the protocol module.</p>
+<list>
+    <item>An illegal frame type is claimed.</item>
+    <item>A frame type is already claimed. If a protocol module receives this error from a device driver, it can use Service_DCIFrameTypeFree to learn when the frame type is again free for claiming.</item>
+    <item>An attempt is made to free a frame type which has not been previously claimed by the protocol module.</item>
+</list>
 </category>
 
 <category title="Stats">
@@ -855,16 +932,21 @@ statistics they have gathered while running. A full</p>
 <p>description of these statistics, including the structure copied
 into the the addressed by r2 is provided in section 7.</p>
 <p>The flag bits within r0 are:</p>
-<p>Bit 0: 0 --- Return an indication of which statistics are
-gathered.</p>
 
-<p>1 --- Return the statistics themselves.</p>
-<p>Bits 1--31: Reserved, must be zero.</p>
+<bitfield-table>
+    <bit number='0' state='clear'>Return an indication of which statistics are
+gathered.</bit>
+    <bit number='0' state='set'>Return the statistics themselves.</bit>
+    <bit number='1-31' state='reserved'/>
+</bitfield-table>
+
 <p>The buffer addressed by r2 <i>must</i> be large enough to hold
 the full statistics structure, i.e. at least 100 bytes long; the
 driver is free to copy that many bytes into the buffer without
 thought for the consequences if the buffer is too small.</p>
-<p><b>MulticastRequest</b></p>
+</category>
+
+<category title="MulticastRequest">
 <p><b>SWI (dib_swibase + 7)</b></p>
 <p>On entry: R0 = flags (see below)</p>
 <p>R1 = unit number</p>
@@ -879,16 +961,19 @@ pointer to IP address for frame type 0x800)</p>
 <p>Use: This SWI is the mechanism by which protocol modules specify
 which destination multicast addresses they wish to receive.</p>
 <p>The flag bits within R0 are:</p>
-<p>Bit 0: 0 --- Request a multicast address</p>
 
-<p>1 --- Release a multicast address</p>
-<p>Bit 1: 0 --- Requesting/releasing specific multicast address (as
-specified by R3,R4)</p>
+<bitfield-table>
+    <bit number="0" state='clear'>Request a multicast address</bit>
+    <bit number="0" state='set'>Release a multicast address</bit>
 
-<p>1 --- Requesting/releasing all multicast addresses (R3 and R4
+    <bit number="1" state='clear'>Requesting/releasing specific multicast address (as
+specified by R3,R4)</bit>
+    <bit number="1" state='set'>Requesting/releasing all multicast addresses (R3 and R4
 irrelevant) - these operations supersede specific multicast address
-operations (see state diagram below)</p>
-<p>Bits 2--31: Reserved, must be zero.</p>
+operations (see state diagram below)</bit>
+    <bit number='2-31' state='reserved'/>
+</bitfield-table>
+
 <p>If a protocol module calls the Filter SWI with bit 2 of R0
 clear, then it will receive all multicast frames (if the address
 level is multicast or promiscuous). If, however, it sets bit 2 of
@@ -937,10 +1022,13 @@ should return EINVAL.</p>
 <p>One of the major changes between DCI 4 and earlier DCI versions
 is the scheme used for handling received frames. The main changes
 introduced with this version are:</p>
-<p>1. Support for multicast and promiscuous frames.</p>
-<p>2. Improved handling of IEEE 802.3 format frames.</p>
-<p>3. Protocol modules are informed of received frames with a
-direct call into a handler routine, rather than via an event.</p>
+
+<list type='ordered'>
+    <item>Support for multicast and promiscuous frames.</item>
+    <item>Improved handling of IEEE 802.3 format frames.</item>
+    <item>Protocol modules are informed of received frames with a direct call into a handler routine, rather than via an event.</item>
+</list>
+
 <p>The principle of operation is that protocol modules register an
 interest in one or more frame types with a device driver, defining
 various filtering parameters in the process. When a device driver
@@ -976,15 +1064,21 @@ responsibility of any specific protocol module, and it would be
 inefficient to make each device driver responsible for the
 implementation, so DCI 4 caters for the scheme shown in figure
 1.</p>
-<p>(Note: It cannot be protocol modules for two reasons:</p>
-<p>1. Protocol modules are frame type specific, whereas the
+
+<p>Note: It cannot be protocol modules for two reasons:</p>
+<list>
+    <item><p>1. Protocol modules are frame type specific, whereas the
 standard services which an IEEE 802.2 implementor must provide are
-frame type independent.</p>
-<p>2. The software that implements the IEEE 802.2 layer will be
+frame type independent.</p></item>
+    <item><p>2. The software that implements the IEEE 802.2 layer will be
 expected to filter frame types, and pass them along to protocol
 modules; therefore, obviously, this software cannot be a standard
-protocol module itself.</p>
+protocol module itself.</p></item>
+</list>
+
 <p>Figure 1: Filtering Ethernet 2.0 and IEEE 802.3 class frames</p>
+<fixme>Missing diagram</fixme>
+
 <p>In this scheme, device drivers can differentiate between the two
 frame classes, and, furthermore, can distinguish Ethernet 2.0 frame
 types. However, no effort is made to ascertain frame types for IEEE
@@ -1000,21 +1094,28 @@ types.</p>
 number of criteria which a received frame must match before being
 passed by the device driver to the protocol module; these criteria
 are</p>
-<p>- Frame type</p>
-<p>- Address level</p>
-<p>- Error level</p>
+
+<list>
+    <item>Frame type</item>
+    <item>Address level</item>
+    <item>Error level</item>
+</list>
+
 <p>Only one protocol module is allowed to claim any given frame
 type, and when claimed, that frame type is <i>never</i> passed to
 any other protocol module. For example, if one protocol module has
 claimed a frame type with an address filter of specifically
 addressed packets only, then a second protocol module:</p>
-<p>1. cannot claim the same frame type with an address level of
-promiscuous.</p>
-<p>2. <i>can</i> claim all frame types not specifically registered,
+
+<list>
+    <item><p>cannot claim the same frame type with an address level of
+promiscuous.</p></item>
+    <item><p><i>can</i> claim all frame types not specifically registered,
 with (e.g.) an address level of multicast, but will <i>not</i> be
 passed any broadcast frames of the type claimed by the first
 protocol module (which will not receive the frame either, because
-the address level will filter out broadcast packets).</p>
+the address level will filter out broadcast packets).</p></item>
+</list>
 
 <category title="Frame Type">
 <p>DCI 4 splits the 32-bit frame type into two 16-bit subfields ---
@@ -1023,10 +1124,14 @@ lo-order 16 bits provide the exact frame type (where
 significant).</p>
 <p>Expressed in C format, the class/level subfield can take the
 following values:</p>
-<p>#define FRMLVL_E2SPECIFIC 0x0001</p>
-<p>#define FRMLVL_E2SINK 0x0002</p>
-<p>#define FRMLVL_E2MONITOR 0x0003</p>
-<p>#define FRMLVL_IEEE 0x0004</p>
+
+<extended-example type='c'>
+#define FRMLVL_E2SPECIFIC 0x0001
+#define FRMLVL_E2SINK 0x0002
+#define FRMLVL_E2MONITOR 0x0003
+#define FRMLVL_IEEE 0x0004
+</extended-example>
+
 <p>All other values for this subfield are illegal --- any attempt
 to use them in a <b>Filter SWI</b> should generate an error;
 similarly, if the hi-order subfield of the frame type is
@@ -1034,45 +1139,45 @@ FRMLVL_E2SPECIFIC, then the lo-order subfield can take any value
 from 0x0000 -- 0xffff, otherwise it must be set to 0x0000, and any
 other value passed to Filter should be treated as an error.</p>
 <p>The precise meanings of the class/level subfield values are:</p>
-<p><b>Specific:</b> this is the standard frame level filter --- the
-protocol module is only passed Ethernet 2.0 frames whose type match
-that given in the lo-order, frame type subfield.</p>
-<p><b>Sink:</b> pass all Ethernet 2.0 frames that are not
-explicitly claimed by any protocol module.</p>
-<p><b>Monitor:</b> pass <i>all</i> Ethernet 2.0 frames to the
-protocol module.</p>
+
+<value-table head-name='Level'>
+    <value number='1' name='Specific'>this is the standard frame level filter --- the protocol module is only passed Ethernet 2.0 frames whose type match that given in the lo-order, frame type subfield.</value>
+    <value number='2' name='Sink'>pass all Ethernet 2.0 frames that are not explicitly claimed by any protocol module.</value>
+    <value number='3' name='Monitor'>pass <i>all</i> Ethernet 2.0 frames to the protocol module.</value>
+</value-table>
+
 <p>For Ethernet 2.0 frames, the table below gives a summary of what
 frame levels are allowed on new claims, given the highest level of
 filtering currently active (monitor is considered higher than sink,
 and both of these levels are considered higher than normal)</p>
-<p>Highest Current Level New Levels Allowed</p>
-<p>--------------------------- ----------------------------</p>
-<p>(Nothing) Normal, Sink, Monitor</p>
-<p>Normal Normal, Sink</p>
-<p>Sink Normal</p>
-<p>Monitor (nothing)</p>
+
+<value-table head-number='Highest Current Level' head-value='New Levels Allowed'>
+    <value number='(Nothing)'>Normal, Sink, Monitor</value>
+    <value number='Normal'>Normal, Sink</value>
+    <value number='Sink'>Normal</value>
+    <value number='Monitor'>(Nothing)</value>
+</value-table>
 </category>
 
 <category title="Address Level">
 <p>The four levels of address level filtering can be expressed in C
 as</p>
-<p>#define ADDRLVL_SPECIFIC 0</p>
-<p>#define ADDRLVL_NORMAL 1</p>
-<p>#define ADDRLVL_MULTICAST 2</p>
-<p>#define ADDRLVL_PROMISCUOUS 3</p>
+
+<extended-example type='c'>
+#define ADDRLVL_SPECIFIC 0
+#define ADDRLVL_NORMAL 1
+#define ADDRLVL_MULTICAST 2
+#define ADDRLVL_PROMISCUOUS 3
+</extended-example>
+
 <p>These levels are:</p>
-<p><b>Specific:</b> only pass frames addressed to the interface's
-specific hardware address.</p>
-<p><b>Normal</b>: only pass frames addressed to the interface's
-specific hardware address, and broadcast frames.</p>
-<p><b>Multicast:</b> pass all specifically addressed, broadcast and
-multicast frames. If bit 2 of R0 was set on entry to the DCI Filter
-SWI, and the DCI Inquire SWI returns with bit 12 set, then the
-driver should attempt to filter multicast frames -- see the DCI
-MulticastRequest SWI for details. Otherwise, all multicast frames
-will be passed.</p>
-<p><b>Promiscuous:</b> pass all frames of the appropriate frame
-type, with no address matching at all.</p>
+<value-table head-name='Level'>
+    <value number='0' name='Specific'>only pass frames addressed to the interface's specific hardware address.</value>
+    <value number='1' name='Normal'>only pass frames addressed to the interface's specific hardware address, and broadcast frames.</value>
+    <value number='2' name='Multicast'>pass all specifically addressed, broadcast and multicast frames. If bit 2 of R0 was set on entry to the DCI Filter SWI, and the DCI Inquire SWI returns with bit 12 set, then the driver should attempt to filter multicast frames -- see the DCI MulticastRequest SWI for details. Otherwise, all multicast frames will be passed.</value>
+    <value number='3' name='Promiscuous'>pass all frames of the appropriate frame type, with no address matching at all.</value>
+</value-table>
+
 <p>Most Ethernet controllers can perform this address filtering at
 a hardware level, but, obviously, the hardware needs to be
 configured to the loosest level of filtering requested by any
@@ -1086,12 +1191,19 @@ multicast frames.</p>
 <category title="Error Level">
 <p>A device driver should provide two levels of error filtering, in
 C these are</p>
-<p>#define ERRLVL_NO_ERRORS 0</p>
-<p>#define ERRLVL_ERRORS 1</p>
+
+<extended-example type='c'>
+#define ERRLVL_NO_ERRORS 0
+#define ERRLVL_ERRORS 1
+</extended-example>
+
 <p>These levels are:</p>
-<p><b>No errors:</b> only pass frames that are received error
-free.</p>
-<p><b>Errors:</b> pass all frames, regardless of error state.</p>
+
+<value-table head-name='Field'>
+    <value number='0' name='ERRLVL_NO_ERRORS'>only pass frames that are received error free.</value>
+    <value number='1' name='ERRLVL_ERRORS'>pass all frames, regardless of error state.</value>
+</value-table>
+
 </category>
 </subsection>
 
@@ -1100,17 +1212,20 @@ free.</p>
 is the method used to notify protocol modules of the arrival of
 frames in which they have registered an interest. The main features
 of these receive handlers are</p>
-<p>1. Device drivers call a direct entry point within the protocol
+
+<list type='ordered'>
+<item><p>Device drivers call a direct entry point within the protocol
 module (earlier DCI versions used a receive event). The address of
 this direct entry point is passed to the device driver at the same
-time the frame type is claimed via the Filter SWI .</p>
-<p>2. A device driver can pass several received frames to the
+time the frame type is claimed via the Filter SWI .</p></item>
+<item><p>A device driver can pass several received frames to the
 protocol module with one call to the receive handler, rather than
-having to call the protocol module once per frame.</p>
-<p>3. The protocol module becomes the new owner of all mbufs passed
+having to call the protocol module once per frame.</p></item>
+<item><p>The protocol module becomes the new owner of all mbufs passed
 to its receive handler by device drivers: it is the protocol module
 that is responsible for freeing all resources once they are no
-longer needed.</p>
+longer needed.</p></item>
+</list>
 
 <category title="Handler Details">
 <p>On entry:</p>
@@ -1127,16 +1242,20 @@ enabled by the received frame handler.</p>
 frames are given in the section below.</p>
 <p>Each received frame has a header which can be described in terms
 of the following C structure:</p>
-<p>struct rx_hdr</p>
-<p>{</p>
-<p>void *rx_ptr;</p>
-<p>unsigned int rx_tag;</p>
-<p>unsigned char rx_src_addr[6], _spad[2];</p>
-<p>unsigned char rx_dst_addr[6], _dpad[2];</p>
-<p>unsigned int rx_frame_type;</p>
-<p>unsigned int rx_error_level;</p>
-<p>unsigned int rx_cksum;</p>
-<p>}</p>
+
+<extended-example type='c'>
+struct rx_hdr
+{
+    void *rx_ptr;
+    unsigned int rx_tag;
+    unsigned char rx_src_addr[6], _spad[2];
+    unsigned char rx_dst_addr[6], _dpad[2];
+    unsigned int rx_frame_type;
+    unsigned int rx_error_level;
+    unsigned int rx_cksum;
+}
+</extended-example>
+
 <p>The fields in this structure are:</p>
 <p><b>rx _ptr</b> This field is for internal use by the receive
 handler, its value is undefined upon entry.</p>
@@ -1213,78 +1332,78 @@ these (remembering that the whole set is a valid subset). An
 independent set of statistics is maintained for each unit that the
 driver controls.</p>
 <p>The <b>Stats SWI</b> serves two purposes:</p>
-<p>1. It identifies which statistics the driver gathers for a
-particular unit.</p>
-<p>2. It allows reading of the gathered statistics.</p>
-<p><b>7.2 Data Structures</b></p>
+<list type='ordered'>
+    <item><p>1. It identifies which statistics the driver gathers for a
+particular unit.</p></item>
+    <item><p>2. It allows reading of the gathered statistics.</p></item>
+</list>
+</subsection>
+
+<subsection title="7.2 Data Structures">
 <p>The statistics structure is written in C code as:</p>
-<p>struct stats</p>
-<p>{* general information</p>
-<p>*/</p>
-<p>unsigned char st_interface_type;</p>
-<p>unsigned char st_link_status;</p>
-<p>unsigned char st_link_polarity;</p>
-<p>unsigned char st_blank1;</p>
-<p>unsigned long st_link_failures;</p>
-<p>unsigned long st_network_collisions;</p>
-<p>/*</p>
-<p>* transmit statistics</p>
-<p>*/</p>
-<p>unsigned long st_collisions;</p>
-<p>unsigned long st_excess_collisions;</p>
-<p>unsigned long st_heartbeat_failures;</p>
-<p>unsigned long st_not_listening;</p>
-<p>unsigned long st_net_error;</p>
-<p>unsigned long st_tx_frames;</p>
-<p>unsigned long st_tx_bytes;</p>
-<p>unsigned long st_tx_general_errors;</p>
-<p>unsigned char st_last_dest_addr[8];</p>
-<p>/*</p>
-<p>* receive statistics</p>
-<p>*/</p>
-<p>unsigned long st_crc_failures;</p>
-<p>unsigned long st_frame_alignment_errors;</p>
-<p>unsigned long st_dropped_frames;</p>
-<p>unsigned long st_runt_frames;</p>
-<p>unsigned long st_overlong_frames;</p>
-<p>unsigned long st_jabbers;</p>
-<p>unsigned long st_late_events;</p>
-<p>unsigned long st_unwanted_frames;</p>
-<p>unsigned long st_rx_frames;</p>
-<p>unsigned long st_rx_bytes;</p>
-<p>unsigned long st_rx_general_errors;</p>
-<p>unsigned char st_last_src_addr[8];</p>
-<p>};</p>
+
+<extended-example type='c'>
+struct stats
+{
+    /* general information */
+    unsigned char st_interface_type;
+    unsigned char st_link_status;
+    unsigned char st_link_polarity;
+    unsigned char st_blank1;
+    unsigned long st_link_failures;
+    unsigned long st_network_collisions;
+
+    /* transmit statistics */
+    unsigned long st_collisions;
+    unsigned long st_excess_collisions;
+    unsigned long st_heartbeat_failures;
+    unsigned long st_not_listening;
+    unsigned long st_net_error;
+    unsigned long st_tx_frames;
+    unsigned long st_tx_bytes;
+    unsigned long st_tx_general_errors;
+    unsigned char st_last_dest_addr[8];
+
+    /* receive statistics */
+    unsigned long st_crc_failures;
+    unsigned long st_frame_alignment_errors;
+    unsigned long st_dropped_frames;
+    unsigned long st_runt_frames;
+    unsigned long st_overlong_frames;
+    unsigned long st_jabbers;
+    unsigned long st_late_events;
+    unsigned long st_unwanted_frames;
+    unsigned long st_rx_frames;
+    unsigned long st_rx_bytes;
+    unsigned long st_rx_general_errors;
+    unsigned char st_last_src_addr[8];
+};
+</extended-example>
+
 <p>The fields within this structure are:</p>
 <p><b>st _interface _type</b> A single byte coding the specific
 hardware interface type. Values so far defined are:</p>
-<p>Code Interface type</p>
 
-<p>1 10-base5</p>
+<value-table head-number='Code' head-value='Interface type'>
+    <value number='1'>10-base5</value>
+    <value number='2'>10-base2</value>
+    <value number='3'>10-baseT</value>
+    <value number='4'>Combination 10-base5 / 10-base2</value>
+    <value number='5'>Combination 10-base2 / 10-baseT</value>
+    <value number='6'>Reduced Squelch 10-baseT</value>
+    <value number='7'>Acorn Econet</value>
+    <value number='8'>Serial line</value>
+    <value number='9'>Parallel port</value>
+    <value number='10'>Combination 10-base5 / 10-base2 / 10-baseT</value>
+    <value number='11'>10-baseFX</value>
+    <value number='12'>100-baseTX</value>
+    <value number='13'>100-baseVG</value>
+    <value number='14'>100-baseT4</value>
+    <value number='15'>100-baseFX</value>
+    <value number='16'>ATM 25.6</value>
+    <value number='17'>ATM 155</value>
+</value-table>
 
-<p>2 10-base2</p>
-
-<p>3 10-baseT</p>
-
-<p>4 Combination 10-base5 / 10-base2</p>
-
-<p>5 Combination 10-base2 / 10-baseT</p>
-
-<p>6 Reduced Squelch 10-baseT</p>
-
-<p>7 Acorn Econet</p>
-
-<p>8 Serial line</p>
-
-<p>9 Parallel port</p>
-<p>10 Combination 10-base5 / 10-base2 / 10-baseT</p>
-<p>11 10-baseFX</p>
-<p>12 100-baseTX</p>
-<p>13 100-baseVG</p>
-<p>14 100-baseT4</p>
-<p>15 100-baseFX</p>
-<p>16 ATM 25.6</p>
-<p>17 ATM 155</p>
 <p>Note that the use of 'combination' types is deprecated in favour
 of returning a specific value reflecting the interface's current
 configuration.</p>
@@ -1354,7 +1473,9 @@ interface from which a frame was received.</p>
 --- even if a driver subsequently decides that no protocol wants a
 given frame, that frame still appears in the relevant receive
 statistics (i.e. st_rx_bytes, st_last_src_addr etc.).</p>
-<p><b>7.3 Statistics</b></p>
+</subsection>
+
+<subsection title="7.3 Statistics">
 <p>The basic interface for reading statistics from a driver is the
 Stats SWI, outlined in section 5.3 There are two different forms of
 this SWI, selected by bit 0 of r0 --- the first form is used to
@@ -1406,11 +1527,13 @@ versions.</p>
 DCI is performed with mbufs. DCI 4 also uses mbuf based packet
 storage, but there are some differences. These differences are for
 the following reasons:</p>
-<p>1. Correct design oversights in previous versions of the
-DCI.</p>
-<p>2. Provide a more modular, and upgradeable, system.</p>
-<p>3. Offer single mbuf arbiter with optimised routines available
-to all DCI4 components.</p>
+
+<list type='ordered'>
+    <item><p>1. Correct design oversights in previous versions of the DCI.</p></item>
+    <item><p>2. Provide a more modular, and upgradeable, system.</p></item>
+    <item><p>3. Offer single mbuf arbiter with optimised routines available to all DCI4 components.</p></item>
+</list>
+
 <p>The memory manager, the arbiter module, is central to the DCI4
 mbuf scheme. It performs most of the low level work associated with
 mbufs, as well as relieving both protocol and client modules of
@@ -1428,22 +1551,24 @@ inter-operation of assembler and APCS code (such as that generated
 by the NorCroft C compiler), and roughly obey APCS. A list of
 entry/exit characteristics follows (using APCS register naming
 convention):</p>
-<p>1. a1 always points at an mbctl structure for all direct entry
-calls</p>
-<p>2. the processor must be in supervisor mode</p>
-<p>3. a1--a4 are the only parameter registers</p>
-<p>4. a2--a4 and ip are corrupted by the call</p>
-<p>5. a1 is either the call result or corrupted</p>
-<p>6. other registers preserved by call</p>
-<p>7. the processor flags are preserved by the call</p>
-<p>8. no V set error convention (incompatible with APCS)</p>
-<p>9. in general, an error results in a1=0 on exit</p>
-<p>10. IRQ state preserved across call</p>
-<p>11. IRQs may be disabled during calls</p>
-<p>12. IRQs may be enabled during calls ONLY if specifically
-documented</p>
-<p>13. FIQs assumed enabled on entry</p>
-<p>14. FIQs preserved across calls</p>
+
+<list type='ordered'>
+    <item><p>1. a1 always points at an mbctl structure for all direct entry calls</p></item>
+    <item><p>2. the processor must be in supervisor mode</p></item>
+    <item><p>3. a1--a4 are the only parameter registers</p></item>
+    <item><p>4. a2--a4 and ip are corrupted by the call</p></item>
+    <item><p>5. a1 is either the call result or corrupted</p></item>
+    <item><p>6. other registers preserved by call</p></item>
+    <item><p>7. the processor flags are preserved by the call</p></item>
+    <item><p>8. no V set error convention (incompatible with APCS)</p></item>
+    <item><p>9. in general, an error results in a1=0 on exit</p></item>
+    <item><p>10. IRQ state preserved across call</p></item>
+    <item><p>11. IRQs may be disabled during calls</p></item>
+    <item><p>12. IRQs may be enabled during calls ONLY if specifically documented</p></item>
+    <item><p>13. FIQs assumed enabled on entry</p></item>
+    <item><p>14. FIQs preserved across calls</p></item>
+</list>
+
 <p>Currently, no direct entry point routine will enable interrupts
 if they are disabled on entry.</p>
 <p>The header file mbuf.h provides some macros to manage
@@ -1468,23 +1593,24 @@ are enough differences in the new structure to render it
 incompatible with the macros defined in the traditional versions of
 mbuf.h.</p>
 <p>The new definition of an mbuf is shown below:</p>
-<p>typedef struct mbuf</p>
-<p>{</p>
-<p>struct mbuf *m_next; /* next mbuf in chain */</p>
-<p>struct mbuf *m_list; /* next mbuf in list (clients only) */</p>
-<p>ptrdiff_t m_off; /* current offset to data from</p>
-<p>* mbuf itself */</p>
-<p>size_t m_len; /* current byte count */</p>
-<p>const ptrdiff_t m_inioff; /* original offset to data from</p>
-<p>* mbuf itself */</p>
-<p>const size_t m_inilen; /* original byte count (for</p>
-<p>* underlying data) */</p>
-<p>unsigned char m_type; /* client use only */</p>
-<p>const unsigned char m_sys1; /* mbuf manager use only */</p>
-<p>const unsigned char m_sys2; /* mbuf manager use only */</p>
-<p>unsigned char m_flags /* client use only */</p>
-<p>struct pkthdr m_pkthdr; /* client use only */</p>
-<p>} dci4_mbuf;</p>
+
+<extended-example type='c'>
+typedef struct mbuf
+{
+    struct mbuf *m_next; /* next mbuf in chain */
+    struct mbuf *m_list; /* next mbuf in list (clients only) */
+    ptrdiff_t m_off; /* current offset to data from mbuf itself */
+    size_t m_len; /* current byte count */
+    const ptrdiff_t m_inioff; /* original offset to data from mbuf itself */
+    const size_t m_inilen; /* original byte count (for underlying data) */
+    unsigned char m_type; /* client use only */
+    const unsigned char m_sys1; /* mbuf manager use only */
+    const unsigned char m_sys2; /* mbuf manager use only */
+    unsigned char m_flags /* client use only */
+    struct pkthdr m_pkthdr; /* client use only */
+} dci4_mbuf;
+</extended-example>
+
 <p>The MLEN macro value is no longer directly applicable --- each
 mbuf must have its maximum size checked individually. Likewise,
 reseting m_off now requires examining the <b>m_inioff</b> field of
@@ -1509,146 +1635,175 @@ responsibility to free the mbuf chain (unless it is transferred to
 another component, although this is unlikely).</p>
 <p>The other crucial structure in DCI 4 memory management is
 <b>mbctl:</b></p>
-<p>typedef struct mbctl</p>
-<p>{reserved for mbuf manager use in establishing context */</p>
-<p>int opaque; /* mbuf manager use only */</p>
-<p>/* Client initialises before session is established */</p>
-<p>size_t mbcsize; /* size of mbctl structure from</p>
-<p>* client */</p>
-<p>unsigned int mbcvers; /* client version of mbuf manager</p>
-<p>* spec */</p>
-<p>unsigned long flags; /* */</p>
-<p>size_t advminubs; /* Advisory desired minimum</p>
-<p>* underlying block size */</p>
-<p>size_t advmaxubs; /* Advisory desired maximum</p>
-<p>* underlying block size */</p>
-<p>size_t mincontig; /* client required min</p>
-<p>* ensure_contig value */</p>
-<p>unsigned long spare1; /* Must be set to zero on</p>
-<p>* initialisation */</p>
-<p>/* Mbuf manager initialises during session establishment */</p>
-<p>size_t minubs; /* Minimum underlying block size */</p>
-<p>size_t maxubs; /* Maximum underlying block size */</p>
-<p>size_t maxcontig; /* Maximum contiguify block size */</p>
-<p>unsigned long spare2; /* Reserved for future use */</p>
-<p>/* Allocation routines */</p>
-<p>struct mbuf * /* MBC_DEFAULT */</p>
-<p>(* alloc)</p>
-<p>(struct mbctl *, size_t bytes, void *ptr);</p>
-<p>struct mbuf * /* Parameter driven */</p>
-<p>(* alloc_g)</p>
-<p>(struct mbctl *, size_t bytes, void *ptr, unsigned long
-flags);</p>
-<p>struct mbuf * /* MBC_UNSAFE */</p>
-<p>(* alloc_u)</p>
-<p>(struct mbctl *, size_t bytes, void *ptr);</p>
-<p>struct mbuf * /* MBC_SINGLE */</p>
-<p>(* alloc_s)</p>
-<p>(struct mbctl *, size_t bytes, void *ptr);</p>
-<p>struct mbuf * /* MBC_CLEAR */</p>
-<p>(* alloc_c)</p>
-<p>(struct mbctl *, size_t bytes, void *ptr);</p>
-<p>/* Ensuring routines */</p>
-<p>struct mbuf *</p>
-<p>(* ensure_safe)</p>
-<p>(struct mbctl *, struct mbuf *mp);</p>
-<p>struct mbuf *</p>
-<p>(* ensure_contig)</p>
-<p>(struct mbctl *, struct mbuf *mp, size_t bytes);</p>
-<p>/* Freeing routines */</p>
-<p>void</p>
-<p>(* free)</p>
-<p>(struct mbctl *, struct mbuf *mp);</p>
-<p>void</p>
-<p>(* freem)</p>
-<p>(struct mbctl *, struct mbuf *mp);</p>
-<p>void</p>
-<p>(* dtom_free)</p>
-<p>(struct mbctl *, struct mbuf *mp);</p>
-<p>void</p>
-<p>(* dtom_freem)</p>
-<p>(struct mbctl *, struct mbuf *mp);</p>
-<p>/* Support routines */</p>
-<p>struct mbuf * /* No ownership transfer though */</p>
-<p>(* dtom)</p>
-<p>(struct mbctl *, void *ptr);</p>
-<p>int /* Client retains mp ownership */</p>
-<p>(* any_unsafe)</p>
-<p>(struct mbctl *, struct mbuf *mp);</p>
-<p>int /* Client retains mp ownership */</p>
-<p>(* this_unsafe)</p>
-<p>(struct mbctl *, struct mbuf *mp);</p>
-<p>size_t /* Client retains mp ownership */</p>
-<p>(* count_bytes)</p>
-<p>(struct mbctl *, struct mbuf *mp);</p>
-<p>struct mbuf * /* Client retains old, new ownership */</p>
-<p>(* cat)</p>
-<p>(struct mbctl *, struct mbuf *old, struct mbuf *new);</p>
-<p>struct mbuf * /* Client retains mp ownership */</p>
-<p>(* trim)</p>
-<p>(struct mbctl *, struct mbuf *mp, int bytes, void *ptr);</p>
-<p>struct mbuf * /* Client retains mp ownership */</p>
-<p>(* copy)</p>
-<p>(struct mbctl *, struct mbuf *mp, size_t off, size_t len);</p>
-<p>struct mbuf * /* Client retains mp ownership */</p>
-<p>(* copy_p)</p>
-<p>(struct mbctl *, struct mbuf *mp, size_t off, size_t len);</p>
-<p>struct mbuf * /* Client retains mp ownership */</p>
-<p>(* copy_u)</p>
-<p>(struct mbctl *, struct mbuf *mp, size_t off, size_t len);</p>
-<p>struct mbuf * /* Client retains mp ownership */</p>
-<p>(* import)</p>
-<p>(struct mbctl *, struct mbuf *mp, size_t bytes, void *ptr);</p>
-<p>struct mbuf * /* Client retains mp ownership */</p>
-<p>(* export)</p>
-<p>(struct mbctl *, struct mbuf *mp, size_t bytes, void *ptr);</p>
-<p>} dci4_mbctl;</p>
-<p>end{verbatim }</p>
+
+<fixme>This structure has been corrupted</fixme>
+<extended-example type='c'>
+typedef struct mbctl
+{
+    reserved for mbuf manager use in establishing context */
+    int opaque; /* mbuf manager use only */
+
+    /* Client initialises before session is established */
+    size_t mbcsize; /* size of mbctl structure from client */
+    unsigned int mbcvers; /* client version of mbuf manager* spec */
+    unsigned long flags; /* */
+    size_t advminubs; /* Advisory desired minimum underlying block size */
+    size_t advmaxubs; /* Advisory desired maximum underlying block size */
+    size_t mincontig; /* client required min ensure_contig value */
+    unsigned long spare1; /* Must be set to zero on initialisation */
+
+    /* Mbuf manager initialises during session establishment */
+    size_t minubs; /* Minimum underlying block size */
+    size_t maxubs; /* Maximum underlying block size */
+    size_t maxcontig; /* Maximum contiguify block size */
+    unsigned long spare2; /* Reserved for future use */
+
+    /* Allocation routines */
+    struct mbuf * /* MBC_DEFAULT */
+    (* alloc)
+    (struct mbctl *, size_t bytes, void *ptr);
+
+    struct mbuf * /* Parameter driven */
+    (* alloc_g)
+    (struct mbctl *, size_t bytes, void *ptr, unsigned long flags);
+
+    struct mbuf * /* MBC_UNSAFE */
+    (* alloc_u)
+    (struct mbctl *, size_t bytes, void *ptr);
+
+    struct mbuf * /* MBC_SINGLE */
+    (* alloc_s)
+    (struct mbctl *, size_t bytes, void *ptr);
+
+    struct mbuf * /* MBC_CLEAR */
+    (* alloc_c)
+    (struct mbctl *, size_t bytes, void *ptr);
+
+    /* Ensuring routines */
+    struct mbuf *
+    (* ensure_safe)
+    (struct mbctl *, struct mbuf *mp);
+
+    struct mbuf *
+    (* ensure_contig)
+    (struct mbctl *, struct mbuf *mp, size_t bytes);
+
+    /* Freeing routines */
+    void
+    (* free)
+    (struct mbctl *, struct mbuf *mp);
+
+    void
+    (* freem)
+    (struct mbctl *, struct mbuf *mp);
+
+    void
+    (* dtom_free)
+    (struct mbctl *, struct mbuf *mp);
+
+    void
+    (* dtom_freem)
+    (struct mbctl *, struct mbuf *mp);
+
+    /* Support routines */
+    struct mbuf * /* No ownership transfer though */
+    (* dtom)
+    (struct mbctl *, void *ptr);
+
+    int /* Client retains mp ownership */
+    (* any_unsafe)
+    (struct mbctl *, struct mbuf *mp);
+
+    int /* Client retains mp ownership */
+    (* this_unsafe)
+    (struct mbctl *, struct mbuf *mp);
+
+    size_t /* Client retains mp ownership */
+    (* count_bytes)
+    (struct mbctl *, struct mbuf *mp);
+
+    struct mbuf * /* Client retains old, new ownership */
+    (* cat)
+    (struct mbctl *, struct mbuf *old, struct mbuf *new);
+
+    struct mbuf * /* Client retains mp ownership */
+    (* trim)
+    (struct mbctl *, struct mbuf *mp, int bytes, void *ptr);
+
+    struct mbuf * /* Client retains mp ownership */
+    (* copy)
+    (struct mbctl *, struct mbuf *mp, size_t off, size_t len);
+
+    struct mbuf * /* Client retains mp ownership */
+    (* copy_p)
+    (struct mbctl *, struct mbuf *mp, size_t off, size_t len);
+
+    struct mbuf * /* Client retains mp ownership */
+    (* copy_u)
+    (struct mbctl *, struct mbuf *mp, size_t off, size_t len);
+
+    struct mbuf * /* Client retains mp ownership */
+    (* import)
+    (struct mbctl *, struct mbuf *mp, size_t bytes, void *ptr);
+
+    struct mbuf * /* Client retains mp ownership */
+    (* export)
+    (struct mbctl *, struct mbuf *mp, size_t bytes, void *ptr);
+} dci4_mbctl;
+</extended-example>
+
 <p>Some of the fields the client initialises are present to permit
 future versions of the memory manager to tune themselves as tightly
 as possible to the setup they are asked to support.</p>
 <p>Note that dtom is no longer a macro. Don't worry --- it's
 efficient assembler, and it works with all sizes of mbuf the memory
 manager cares to use.</p>
-<p><b>Using the memory manager module</b></p>
+</category>
+
+<category title="Using the memory manager module">
 <p>Basic use of the memory manager is performed as follows</p>
-<p>1. module loads and looks for memory manager</p>
-<p>2. if memory manager is absent, module goes into a pre-active
-state, awaiting the arrival of the memory manager</p>
-<p>3. once the memory manager is present, a "session" is opened
-with it</p>
-<p>4. the device driver/protocol may now become active if it is
-pre-active (this might involve delaying arrival service</p>
-<p>calls until now)</p>
-<p>5. the device driver/protocol uses direct entry points to
-communicate with the memory manager</p>
-<p>6. the device driver/protocol is about to die --- it first
-closes the open session with the memory manager</p>
-<p>7. the device driver/protocol can now die</p>
+<list type='ordered'>
+    <item>1. module loads and looks for memory manager</item>
+    <item>2. if memory manager is absent, module goes into a pre-active state, awaiting the arrival of the memory manager</item>
+    <item>3. once the memory manager is present, a "session" is opened with it</item>
+    <item>4. the device driver/protocol may now become active if it is pre-active (this might involve delaying arrival service calls until now)</item>
+    <item>5. the device driver/protocol uses direct entry points to communicate with the memory manager</item>
+    <item>6. the device driver/protocol is about to die --- it first closes the open session with the memory manager</item>
+    <item>7. the device driver/protocol can now die</item>
+</list>
+
 <p>Initialisation with the memory manager is performed with code
 something like:</p>
-<p>static _kernel_oserror *open_mbuf_manager_session(void)</p>
-<p>{</p>
-<p>_kernel_swi_regs r ;</p>
-<p>memset(&amp;mbctl, 0, sizeof(struct mbctl));</p>
-<p>mbctl.mbcsize = sizeof(struct mbctl);</p>
-<p>mbctl.mbcvers = MBUF_MANAGER_VERSION;</p>
-<p>mbctl.flags = 0;</p>
-<p>mbctl.advminubs = 0;</p>
-<p>mbctl.advmaxubs = 0;</p>
-<p>mbctl.mincontig = 0;</p>
-<p>mbctl.spare1 = 0;</p>
-<p>r.r[0] = (int) &amp;mbctl;</p>
-<p>return(_kernel_swi(XOS_Bit Mbuf_OpenSession, &amp;r,
-&amp;r));</p>
-<p>}</p>
-<p>Finalisation is performed with code something like:</p>
-<p>static _kernel_oserror *close_mbuf_manager_session(void)</p>
-<p>{r ;</p>
-<p>r.r[0] = (int) &amp;mbctl;</p>
-<p>return(_kernel_swi(XOS_Bit Mbuf_CloseSession, &amp;r,
-&amp;r));</p>
-<p>}</p>
+
+<extended-example type='c'>
+static _kernel_oserror *open_mbuf_manager_session(void)
+{
+    _kernel_swi_regs r ;
+    memset(&amp;mbctl, 0, sizeof(struct mbctl));
+    mbctl.mbcsize = sizeof(struct mbctl);
+    mbctl.mbcvers = MBUF_MANAGER_VERSION;
+    mbctl.flags = 0;
+    mbctl.advminubs = 0;
+    mbctl.advmaxubs = 0;
+    mbctl.mincontig = 0;
+    mbctl.spare1 = 0;
+    r.r[0] = (int) &amp;mbctl;
+    return(_kernel_swi(XOS_Bit Mbuf_OpenSession, &amp;r, &amp;r));
+}
+</extended-example>
+
+Finalisation is performed with code something like:
+
+<fixme>This example is corrupted</fixme>
+<extended-example type='c'>
+static _kernel_oserror *close_mbuf_manager_session(void)
+{
+    r ;
+    r.r[0] = (int) &amp;mbctl;
+    return(_kernel_swi(XOS_Bit Mbuf_CloseSession, &amp;r, &amp;r));
+}
+</extended-example>
+
 <p>A quick summary of the available direct entry point
 routines:</p>
 <p><b>alloc</b>: standard allocator. Can import data, but cannot

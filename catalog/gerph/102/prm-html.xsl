@@ -1420,11 +1420,13 @@
 
 <!-- notice that we do some complex matching here to ensure that we put
      the set and clear bit values in what appears to be a sub-table,
-     thus preventing the double use of the bit heading -->
+     thus preventing the double use of the bit number in the heading -->
 <xsl:template match="bit">
-<xsl:variable name="lastelement" select="preceding-sibling::bit[last()]" />
+<!-- Note: preceding-sibling returns nodes going backward from the current node -->
+<xsl:variable name="lastelement" select="preceding-sibling::bit[1]" />
 <xsl:if test="not( ($lastelement/@number = @number) and
                    ($lastelement/@state != '') )">
+ <!-- We only want to process the first of any sets of rows -->
  <tr>
   <td valign="top" align="right"><xsl:value-of select="@number"/></td>
   <xsl:if test="count(../*/@name)>0">
@@ -2135,6 +2137,11 @@
 
 <!-- Long example -->
 <xsl:template match="extended-example">
+<xsl:if test="@type='unknown'">
+ <xsl:message>Code type 'unknown' should not be used at :
+  <xsl:call-template name="describeposition" />.</xsl:message>
+</xsl:if>
+
 <pre>
 <xsl:apply-templates />
 </pre>
