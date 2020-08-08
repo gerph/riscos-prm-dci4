@@ -57,21 +57,25 @@ TEMP_DIR = </xsl:text>
 <xsl:apply-templates select="//page" mode="targets"/>
 <xsl:apply-templates select="//help" mode="targets"/>
 <xsl:apply-templates select="//page" mode="header-targets"/>
+<xsl:apply-templates select="//page" mode="sourcexml-targets"/>
 <xsl:text>&#10;&#10;</xsl:text>
 <xsl:apply-templates select="//page"/>
 <xsl:apply-templates select="//help"/>
 <xsl:apply-templates select="//page" mode="header-build"/>
+<xsl:apply-templates select="//page" mode="sourcexml-build"/>
 <xsl:text>&#10;</xsl:text>
 <xsl:text>&#10;</xsl:text>
 <xsl:text>validate: &#10;</xsl:text>
 <xsl:apply-templates select="//page" mode="validate"/>
 <xsl:text>&#10;</xsl:text>
 <xsl:text>&#10;</xsl:text>
-<xsl:text>clean: clean-headers clean-html clean-help clean-images&#10;</xsl:text>
+<xsl:text>clean: clean-headers clean-html clean-sourcexml clean-help clean-images&#10;</xsl:text>
 <xsl:text>clean-help: &#10;</xsl:text>
 <xsl:apply-templates select="//help" mode="clean"/>
 <xsl:text>clean-headers: &#10;</xsl:text>
 <xsl:apply-templates select="//page" mode="header-clean"/>
+<xsl:text>clean-sourcexml: &#10;</xsl:text>
+<xsl:apply-templates select="//page" mode="sourcexml-clean"/>
 <xsl:text>clean-html: &#10;</xsl:text>
 <xsl:apply-templates select="//page" mode="clean"/>
 <xsl:text>&indent;-&remove; &tempdir;&dirsep;index-swis.xml&#10;</xsl:text>
@@ -292,6 +296,65 @@ clean-images:
 
 </xsl:if>
 </xsl:template>
+
+<!-- Source XML generation -->
+<xsl:template match="page" mode="sourcexml-targets">
+<xsl:if test="@href != ''">
+ <xsl:text>&indent;</xsl:text>
+ <xsl:text>&outputdir;&dirsep;</xsl:text>
+ <xsl:apply-templates mode="dir" select=".."/>
+ <xsl:value-of select="@href"/>
+ <xsl:text>&escaped_extsep;xml</xsl:text>
+ <xsl:text> \&#10;</xsl:text>
+</xsl:if>
+</xsl:template>
+
+<xsl:template match="page" mode="sourcexml-clean">
+<xsl:if test="@href != ''">
+ <xsl:text>&indent;</xsl:text>
+ <xsl:text>-@&remove; &outputdir;&dirsep;</xsl:text>
+ <xsl:apply-templates mode="dir" select=".."/>
+ <xsl:value-of select="@href"/>
+ <xsl:text>&extsep;xml</xsl:text>
+ <xsl:text>&#10;</xsl:text>
+ <xsl:text>&indent;</xsl:text>
+ <xsl:text>-@&removedir; &outputdir;&dirsep;</xsl:text>
+ <xsl:apply-templates mode="dir" select=".."/>
+ <xsl:text>&#10;</xsl:text>
+</xsl:if>
+</xsl:template>
+
+<xsl:template match="page" mode="sourcexml-build">
+<xsl:if test="@href != ''">
+ <xsl:variable name="dir">
+  <xsl:apply-templates mode="dir" select=".."/>
+  <xsl:value-of select="@href"/>
+ </xsl:variable>
+ <xsl:variable name="uri">
+  <xsl:apply-templates mode="uri" select=".."/>
+  <xsl:value-of select="@href"/>
+ </xsl:variable>
+
+ <!-- build rule -->
+ <xsl:text>&outputdir;&dirsep;</xsl:text>
+ <xsl:value-of select="$dir" /><xsl:text>&escaped_extsep;xml</xsl:text>
+ <xsl:text>: </xsl:text>
+ <xsl:text>&inputdir;&dirsep;</xsl:text>
+ <xsl:value-of select="$dir" /><xsl:text>&escaped_extsep;xml</xsl:text>
+ <xsl:text>&#10;</xsl:text>
+
+ <xsl:text>&indent;</xsl:text>
+ <xsl:text>cp </xsl:text>
+ <xsl:text>&inputdir;&dirsep;</xsl:text>
+ <xsl:value-of select="$uri" /><xsl:text>.xml</xsl:text>
+ <xsl:text> </xsl:text>
+ <xsl:text>&outputdir;&dirsep;</xsl:text>
+ <xsl:value-of select="$uri" /><xsl:text>.xml</xsl:text>
+ <xsl:text>&#10;</xsl:text>
+
+</xsl:if>
+</xsl:template>
+
 
 
 <!-- PAGE generation -->
