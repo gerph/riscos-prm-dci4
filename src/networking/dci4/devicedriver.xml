@@ -3,109 +3,12 @@
                             "http://www.movspclr.co.uk/dtd/102/prm.dtd">
 
 <riscos-prm>
-<chapter title="Device Drivers">
+<chapter title="Network Device Drivers">
 <section title="Overview">
 </section>
 
 <section title="1 History">
-<p><b>22 Jul 1994</b> Revision A --- Initial draft revision, passed
-round for comment.</p>
-<p><b>12 Aug 1994</b> Revision B --- Incorporated reviewers'
-comments. Added specification of mbuf manager module.</p>
-<p><b>16 Aug 1994</b> Revision C --- Description of mbuf manager
-module tidied up and clarified.</p>
-<p><b>09 Nov 1994</b> Revision D --- Large number of changes
-introduced following formal review, and feedback from external
-reviewers. Main areas of change are:</p>
-<p>Device drivers can now be identified by the <i>address</i> of
-their Driver Information Block. A new subsection has been added to
-the introduction to explain this feature.</p>
-<p>The concept of a protocol handle has been removed.</p>
-<p>Register usage for service calls has been changed.</p>
-<p>Service calls Service_ProtocolDying, Service_FindNetworkDriver,
-and Service_NetworkDriverStatus are now obsolete.</p>
-<p>The new service calls
-Service_DCIProtocolDying,&nbsp;Service_DCIDriverStatus and
-Service_DCIFrameTypeFree have been added.</p>
-<p>All SWI calls now have a flags register. The gaps in the SWI
-chunk from earlier versions of the DCI have been closed.</p>
-<p>The <b>Filter SW</b>I has been heavily reworked:</p>
-<p>- Frame type, and frame level have been merged into a single
-register; register numbers have been shuffled to fill</p>
-<p>the gap left by frame level.</p>
-<p>- The read flag has been removed --- it is no longer possible
-toread current filter levels.</p>
-<p>- Releasing a filter is now achieved via a flag bit, rather than
-by specifying a frame level of FRMLVL_NONE.</p>
-<p>- The ensure safe flag bit has been added.</p>
-<p>IEEE 802.3 frames are more complicated than originally thought,
-the concept of frame type for these frames has been extensively
-revised.</p>
-<p>The rx_frame_type field in struct rx_hdr now only contains the
-last 2 bytes of the MAC header.</p>
-<p>A completely new memory manager has been designed.</p>
-<p>The dib_swibase field has been moved to the top of a&nbsp;struct
-dib.</p>
-<p>Unsafe data are no longer flagged to the Transmit SWI.</p>
-<p>Added a small section on SWI re-entrancy, and re-enabling
-interrupts.</p>
-<p>Added new sections on acceptance tests, and on development
-test&nbsp;strategies.</p>
-<p><b>03 Feb 1995</b> Revision E --- Corrected some typos, then
-made some alterations and additions:</p>
-<p>DCIProtocolDying has been renamed to Service_DCIProtocolStatus,
-and its register usage changed; the official DCI version is now
-4.01.</p>
-<p>Added a section on returning errors from SWI calls which defines
-some standard error numbers.</p>
-<p>Added the new SWI Stats.</p>
-<p>Created a whole new section describing the standard statistics
-interface.</p>
-<p>Added a couple of lines (in a new miscellanea section) about
-network card self-tests.</p>
-<p><b>14 Mar 1995</b> Revision F --- A few more changes:</p>
-<p>Added a paragraph to the description of Service_DCIDriverStatus
-to define (by cross-reference) the format of the supported DCI
-version.</p>
-<p>Service_DCIFrameTypeFree has been changed to reflect the changes
-made to the Filter SWI for revision D, i.e. frame type and frame
-level have been merged into a single 32-bit register, <b>r2</b>;
-parameters that were in registers <b>r4</b> &amp; <b>r5</b> have been
-moved into <b>r3</b> &amp; <b>r4</b> respectively.</p>
-<p>This is now DCI version 4.02.</p>
-<p>Corrected some typos.</p>
-<p>Table of standardised errors (hopefully) made more explicit by
-adding a column detailing all the error numbers.</p>
-<p>Added a paragraph to the statistics section clarifying when
-statistics are gathered (i.e. for <i>all</i> frames).</p>
-<p>Added some new members to struct stats:</p>
-<p>st_tx_general_errors</p>
-<p>st_unwanted_frames</p>
-<p>st_rx_general_errors</p>
-<p>Added codes 9 &amp; 10 for st_interface_type field in struct stats.
-structure.</p>
-<p>Removed field st_net_error from struct stats --- it has been
-made redundant by new field st_tx_general_errors.</p>
-<p>Field st_link_status in struct stats made into a bitfield.</p>
-<p><b>10 Apr 1995</b> Revision G --- A couple more changes:</p>
-<p>The definition of a Driver Information Block has been extended
-to include a copy of the Inquiry flags.</p>
-<p>This is now version 4.03 of the DCI.</p>
-<p>Added a couple of entry points missing from struct mbctl (copy_p
-and copy_u).</p>
-<p><b>5 Sep 1995</b> Revision 1.00 --- Wrote a new subsection on
-virtual interfaces, and added virtual interface flag bits to the
-Inquire SWI</p>
-<p><b>14 Apr 1997</b> Revision 1.01 --- SWI MulticastRequest added.
-This is now version 4.04 of the DCI.</p>
-<p>Fixed some formatting errors in the Impression version of the
-specification.</p>
-<p><b>14 Apr 1998</b> Revision 1.02 - Added extra flag bits for
-100MB Ethernet.</p>
-<p><b>16 Sep 1998</b> Issue 2 released on ECO 4112 - no change from
-version 1.02</p>
-<p><b>26 Aug 1999</b> Issue 3 --- IP checksumming facility added.
-This is now version 4.05 of the DCI.</p>
+    <p>See 'Document information' at the end of this document.</p>
 </section>
 
 <section title="2 Unresolved Questions">
@@ -490,7 +393,7 @@ then claim the service call by setting r1 to 0.</p>
 levels available are explained fully in section 6.2.</p>
 </category>
 
-<category title="Service _DCIProtocolStatus">
+<category title="Service_DCIProtocolStatus">
 <p>Service Call 0x9f</p>
 <p>On entry: r0 = Protocol module's private word pointer</p>
 <p>r1 = 0x9f (reason code)</p>
@@ -1927,7 +1830,86 @@ these flags should also be set.</p>
  </disclaimer>
 
  <history>
-  <revision number="X" date="08 Aug 2020" author="CJF" title="Issue X" />
+    <revision number='A' date='22 Jul 1994' title='Initial draft revision, passed round for comment'/>
+    <revision number='B' date='12 Aug 1994' title="Incorporated reviewers' comments. Added specification of mbuf manager module"/>
+    <revision number='C' date='16 Aug 1994' title='Description of mbuf manager module tidied up and clarified'/>
+    <revision number='D' date='09 Nov 1994' title='Large number of changes introduced following formal review, and feedback from external reviewers'>
+        <change>Device drivers can now be identified by the <i>address</i> of their Driver Information Block. A new subsection has been added to the introduction to explain this feature.</change>
+        <change>The concept of a protocol handle has been removed.</change>
+        <change>Register usage for service calls has been changed.</change>
+        <change>Service calls Service_ProtocolDying, Service_FindNetworkDriver, and Service_NetworkDriverStatus are now obsolete.</change>
+        <change>The new service calls Service_DCIProtocolDying,&nbsp;Service_DCIDriverStatus and Service_DCIFrameTypeFree have been added.</change>
+        <change>All SWI calls now have a flags register. The gaps in the SWI chunk from earlier versions of the DCI have been closed.</change>
+        <change>The Filter SWI has been heavily reworked:
+            <list>
+                <item>Frame type, and frame level have been merged into a single register; register numbers have been shuffled to fill the gap left by frame level.</item>
+                <item>The read flag has been removed - it is no longer possible to read current filter levels.</item>
+                <item>Releasing a filter is now achieved via a flag bit, rather than by specifying a frame level of FRMLVL_NONE.</item>
+                <item>The ensure safe flag bit has been added.</item>
+            </list>
+        </change>
+        <change>IEEE 802.3 frames are more complicated than originally thought, the concept of frame type for these frames has been extensively revised.</change>
+        <change>The rx_frame_type field in struct rx_hdr now only contains the last 2 bytes of the MAC header.</change>
+        <change>A completely new memory manager has been designed.</change>
+        <change>The dib_swibase field has been moved to the top of a&nbsp;struct dib.</change>
+        <change>Unsafe data are no longer flagged to the Transmit SWI.</change>
+        <change>Added a small section on SWI re-entrancy, and re-enabling interrupts.</change>
+        <change>Added new sections on acceptance tests, and on development test&nbsp;strategies.</change>
+    </revision>
+
+    <revision number='E' date='03 Feb 1995' title='DCI version 4.01'>
+        <change>The official DCI version is now 4.01.</change>
+        <change>Corrected some typos, then made some alterations and additions</change>
+        <change>DCIProtocolDying has been renamed to Service_DCIProtocolStatus, and its register usage changed.</change>
+        <change>Added a section on returning errors from SWI calls which defines some standard error numbers.</change>
+        <change>Added the new SWI Stats.</change>
+        <change>Created a whole new section describing the standard statistics interface.</change>
+        <change>Added a couple of lines (in a new miscellanea section) about network card self-tests.</change>
+    </revision>
+
+    <revision number='F' date='14 Mar 1995' title='DCI version 4.02'>
+        <change>This is now DCI version 4.02.</change>
+        <change>Added a paragraph to the description of Service_DCIDriverStatus to define (by cross-reference) the format of the supported DCI version.</change>
+        <change>Service_DCIFrameTypeFree has been changed to reflect the changes made to the Filter SWI for revision D, i.e. frame type and frame level have been merged into a single 32-bit register, <b>r2</b>; parameters that were in registers <b>r4</b> &amp; <b>r5</b> have been moved into <b>r3</b> &amp; <b>r4</b> respectively.</change>
+        <change>Corrected some typos.</change>
+        <change>Table of standardised errors (hopefully) made more explicit by adding a column detailing all the error numbers.</change>
+        <change>Added a paragraph to the statistics section clarifying when statistics are gathered (i.e. for <i>all</i> frames).</change>
+        <change>Added some new members to struct stats: st_tx_general_errors, st_unwanted_frames, st_rx_general_errors</change>
+        <change>Added codes 9 &amp; 10 for st_interface_type field in struct stats structure.</change>
+        <change>Removed field st_net_error from struct stats --- it has been made redundant by new field st_tx_general_errors.</change>
+        <change>Field st_link_status in struct stats made into a bitfield.</change>
+    </revision>
+
+    <revision number='G' date='10 Apr 1995' title='DCI version 4.03'>
+        <change>This is now version 4.03 of the DCI.</change>
+        <change>The definition of a Driver Information Block has been extended to include a copy of the Inquiry flags.</change>
+        <change>Added a couple of entry points missing from struct mbctl (copy_p and copy_u).</change>
+    </revision>
+
+    <revision number='1.00' date='5 Sep 1995'>
+        <change>Wrote a new subsection on virtual interfaces, and added virtual interface flag bits to the Inquire SWI</change>
+    </revision>
+
+    <revision number='1.01' date='14 Apr 1997' title='DCI version 4.04'>
+        <change>This is now version 4.04 of the DCI.</change>
+        <change>SWI MulticastRequest added.</change>
+        <change>Fixed some formatting errors in the Impression version of the specification.</change>
+    </revision>
+
+    <revision number='1.02' date='14 Apr 1998'>
+        <change>Added extra flag bits for 100MB Ethernet.</change>
+    </revision>
+    <revision number='1.02' date='16 Sep 1998' title="Issue 2 released on ECO 4112">
+        <change>no change from version 1.02</change>
+    </revision>
+    <revision number='1.03' date='26 Aug 1999' title='DCI version 4.05'>
+        <change>IP checksumming facility added.</change>
+        <change>This is now version 4.05 of the DCI.</change>
+    </revision>
+
+    <revision number="1.04CJF" date="08 Aug 2020" author="CJF" title="Restructure as PRM-in-XML">
+        <change>Exported from Impression, and converted to PRM-in-XML structured format</change>
+    </revision>
  </history>
 </meta>
 
