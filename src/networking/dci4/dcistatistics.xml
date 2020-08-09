@@ -110,29 +110,12 @@ typically attempts to group statistics into ranges of the same volatility.
 </section>
 
 <section title="Enumerating suppliers">
+<p>The list of available suppliers is determined with a single service
+call, <reference type='service' name='StatisticEnumerate'/>.</p>
 
 <p>
- - the Service_StatisticEnumerate Service Call:
-====================================================================
-</p>
-
-<p>The list of available suppliers is determined with a single service
-call: Service_StatisticEnumerate.
-
-    Entry
-
-        r0  Zero
-        r1  Service_StatisticEnumerate (0xa1)
-
-    Exit
-
-        r0  NULL terminated head of linked list of structures
-        r1  Service_StatisticEnumerate (0xa1)
-</p>
-
-
-<p>Each supplier allocates a small structure from the RMA, initializes it and
-links it into the linked list whose head is pointed to by r0.  Whether the
+Each supplier allocates a small structure from the RMA, initializes it and
+links it into the linked list whose head is pointed to by R0.  Whether the
 supplier adds an entry at the head or tail of the list does not matter.  If a
 gatherer requires any specific order, then it should explicitly sort the
 suppliers list itself.  A gatherer should not cache SWI values across
@@ -140,6 +123,7 @@ invocations of suppliers, as a module might choose a dynamic SWI numbering
 scheme if it offers multiple effective suppliers.
 </p>
 
+<category title='Statistics Provider Structure'>
 <p>In C, this structure is defined as follows:
 </p>
 
@@ -162,113 +146,115 @@ typedef struct spctl
 </extended-example>
 </p>
 
-
-<p>struct spctl *next:  This field is used to construct the linked list of
+<p>
+<offset-table>
+    <offset number='0' name='next'>This field is used to construct the linked list of
 suppliers for the enumeration operation.  A value of zero indicates the end
-of the list.
-</p>
+of the list.</offset>
 
-<p>unsigned int i_version:  The DCI4 Statistic Interface version that the
-supplier is implemented against.
-</p>
+    <offset number='4' name='i_version'>The DCI4 Statistic Interface version that the
+supplier is implemented against.</offset>
 
-<p>unsigned long features:  A bitset of flags defining optional aspects of a
-supplier.  Values are detailed elsewhere.
-</p>
+    <offset number='8' name='features'>A bitset of flags defining optional aspects of a
+supplier.  Values are detailed elsewhere. <fixme> Detail them here, where it's relevant </fixme></offset>
 
-<p>unsigned int swinumber:  The SWI number through which all other communication
-with the supplier is performed.
-</p>
+    <offset number='12' name='swinumber'>The SWI number through which all other communication
+with the supplier is performed.</offset>
 
-<p>unsigned int max_stat:  The highest statistic number, inclusive, that the
+    <offset number='16' name='max_stat'>The highest statistic number, inclusive, that the
 supplier provides.  This implies a supplier must always supply at least one
-statistic.
-</p>
+statistic.</offset>
 
-<p>unsigned int type:  This field is available to provide some classification of
+    <offset number='20' name='type'><p>This field is available to provide some classification of
 suppliers.  It is the only centrally administered resource in this
 specification, and its use is optional.  The currently defined values are as
-follows:
-</p>
+follows:</p>
 
-<p>
-<value-table>
-    <value name='SPT_GENERAL_SUPPLIER' number='0'>Use this if no other suitable type</value>
-    <value name='SPT_NETWORK_PROTOCOL' number='1'>A DCI4 protocol module</value>
-    <value name='SPT_NETWORK_DRIVER' number='2'>A DCI4 device driver module</value>
-    <value name='SPT_MBUF_MANAGER' number='3'>The DCI4 mbuf manager module</value>
-</value-table>
-</p>
+        <p>
+        <value-table>
+            <value name='SPT_GENERAL_SUPPLIER' number='0'>Use this if no other suitable type</value>
+            <value name='SPT_NETWORK_PROTOCOL' number='1'>A DCI4 protocol module</value>
+            <value name='SPT_NETWORK_DRIVER' number='2'>A DCI4 device driver module</value>
+            <value name='SPT_MBUF_MANAGER' number='3'>The DCI4 mbuf manager module</value>
+        </value-table>
+        </p>
+    </offset>
 
-<p>unsigned int s_version:  This is the version number of the supplier module
+    <offset number='24' name='s_version'>This is the version number of the supplier module
 itself (as opposed to the version number of an interface it conforms to).  It
-is provided for the convenience of the user.
-</p>
+is provided for the convenience of the user.</offset>
 
-<p>char *module:  This is the supplier's module title (as opposed to its help
-string).
-</p>
+    <offset number='28' name='module'>This is the supplier's module title (as opposed to its help string).</offset>
 
-<p>char *title:  This is a short descriptive string to identify the supplier to
+    <offset number='32' name='title'>This is a short descriptive string to identify the supplier to
 the user.  The gatherer only contracts to print at least the first twenty
-characters of this string.
-</p>
+characters of this string.</offset>
 
-<p>char *description:  This is a longer description of the supplier that should
+    <offset number='36' name='description'>This is a longer description of the supplier that should
 convey it's purpose to the user.  The gatherer only contracts to print at
-least the first fifty characters of this string.
-</p>
+least the first fifty characters of this string.</offset>
 
-<p>unsigned char reset[8]:  This 8 byte field is initialised with a unique value
+    <offset number='40' name='reset'>This 8 byte field is initialised with a unique value
 each time the supplier is initialised.  It permits the gatherer to spot a
 supplier that has just re-initialised.  The time and date at which the
 supplier initialises are recommended values to write here.  The gatherer
 performs an 8 byte equality test and otherwise assumes no further format
-information about these bytes.
+information about these bytes.</offset>
+</offset-table>
 </p>
-
+</category>
 
 <p>When a gatherer has finished interacting with a supplier, it should free the
-allocated structure back into the RMA.
+allocated structures back into the RMA.
 </p>
 </section>
 
 
-<section title="Communicating with a supplier through its SWI number">
+<section title='Services'>
+<service-definition name="StatisticEnumerate"
+                    number="A1"
+                    description="Enumerate providers of extended DCI statistics"
+                    >
+<entry>
+<register-use number="0">Pointer to the head of the enumeration chain</register-use>
+<register-use number="1">Reason code (&hex;A1)</register-use>
+</entry>
+<exit>
+<register-use number="0">New pointer to the head of the enumeration chain containing all the statistic providers</register-use>
+</exit>
 
-<p>Apart from the enumeration phase, all communication with a supplier is
-performed through the single SWI number obtained during the enumeration
-phase.  The action performed by this "statistic SWI" is controlled by r0 on
-entry, which contains an action code.  The defined action codes are:
+<use>
+<p>
+This service call is used to enumerate the statistic providers which are currently
+active. Each supplier should allocate a block in the RMA containing the
+<reference type='category' name='Statistics Provider Structure'/> and
+fill in the details of its provider. It should then update the
+<variable>next</variable> pointer to point to the supplied head of the chain, and
+return the new pointer in R1. It must not claim the service.
 </p>
 
 <p>
-    SA_DESCRIBE     0
-    SA_READ         1
+    Statistics gatherers will use this information to decide what to display, and call
+    the supplied SWI number as appropriate. Initially the statistics provider will
+    supply the pointer in R0 as 0 when the service is issued.
 </p>
+</use>
+</service-definition>
+</section>
 
 
-<p>SA_DESCRIBE obtains descriptions of statistics, whilst SA_READ obtains the
+
+<section title="Describing and obtaining statistics">
+
+<p>Apart from the enumeration phase, all communication with a supplier is
+performed through the single SWI number obtained during the enumeration
+phase (described as <reference type='swi' name='StatisticsProvider_Statistics'/>).</p>
+
+<p>SA_DESCRIBE (0) obtains descriptions of statistics, whilst SA_READ (1) obtains the
 actual values of statistics.  It is necessary for first obtain the
 description of a statistic before reading it, as the description is the only
 way the gatherer can obtain the size of the statistic value and know how much
 buffer space to allocate.
-</p>
-
-<p>The register usage for both SA_DESCRIBE and SA_READ is very similar:
-
-    Entry
-
-        r0      SA_DESCRIBE or SA_READ
-        r1      First statistic, inclusive
-        r2      Last statistic, inclusive
-        r3      First byte of buffer in memory
-        r4      Number of bytes in buffer
-
-    Exit
-
-        r5      Number of statistics processed
-        r6      Number of bytes of buffer used
 </p>
 
 <p>In essence, both these actions enumerate information about a range of
@@ -286,6 +272,7 @@ aligned in memory.
 </p>
 
 
+<category title='Statistic Description Structure'>
 <p>Each statistic is described with a fixed sized buffer, described in C as
 follows:
 </p>
@@ -308,119 +295,163 @@ typedef struct stdesc
 </p>
 
 
-<p>unsigned int type:  This defines the type of statistic.  Possible values are:
-</p>
-
-
 <p>
- <value-table>
- <value name='ST_UNUSED' number='0'>
-    <p>ST_UNUSED is used by a supplier to reserve a statistic number.  Such a
-    statistic always has a value occupying zero bytes, and hence can always be
-    enumerated, no matter how many bytes are left in the called supplied buffer.
-    A statistic with a type of ST_UNUSED should always be skipped over when
-    printing and enumerating - none of the fields beyond the type and size fields
-    are valid for unused statistics.
-    </p>
- </value>
- <value name='ST_BOOLEAN' number='1'>
-    <p>ST_BOOLEAN values are single bit boolean values.  A variety of different
-    presentation methods may be selected by the supplier in order to maximise
-    coherence between the description and the presentation of a boolean value.
-    Only the least significant bit of a boolean type has a defined value.
-    </p>
- </value>
- <value name='ST_STRING' number='2'>
-    <p>ST_STRING values are string values.  Currently, strings are defined using a
-    zero byte as a terminator character {future versions may well introduce
-    counted length strings as well).  A supplier is required to be able to place
-    an upper length value on all strings so that sufficient space may be
-    allocated within the caller supplied buffer for the SA_READ operation.
-    </p>
- </value>
- <value name='ST_INTEGER8' number='3'>
-    <p>ST_INTEGER8 is an 8-bit (byte) quantity.</p>
- </value>
- <value name='ST_INTEGER16' number='4'>
-    <p>ST_INTEGER8 is an 16-bit (half-word) quantity.</p>
- </value>
- <value name='ST_INTEGER32' number='5'>
-    <p>ST_INTEGER8 is an 32-bit (word) quantity.</p>
- </value>
- <value name='ST_INTEGER64' number='6'>
-    <p>ST_INTEGER8 is an 64-bit (double-word) quantity.</p>
- </value>
- <value name='ST_ADDRESS' number='7'>
-    <p>ST_ADDRESS values are addresses given in a protocol-specific format. A
-    variety of different forms of address are possible. The presentation formats
-    available for this type are presently undefined. This type of statistic is
-    only supported by 1.01 of the DCI statistics format.
-    </p>
- </value>
- <value name='ST_TIME' number='8'>
-    <p>ST_TIME values are time values given in a variety of formats. The
-    presentation methods presented allow for times to be specified in a number
-    of ways. This type of statistic is only supported by 1.01 of the DCI
-    statistics format.
-    </p>
- </value>
-</value-table>
-</p>
+    <offset-table>
+        <offset number='0' name='type'><p>This defines the type of statistic.  Possible values are:</p>
+             <p>
+             <value-table>
+             <value name='ST_UNUSED' number='0'>
+                <p>ST_UNUSED is used by a supplier to reserve a statistic number.  Such a
+                statistic always has a value occupying zero bytes, and hence can always be
+                enumerated, no matter how many bytes are left in the called supplied buffer.
+                A statistic with a type of ST_UNUSED should always be skipped over when
+                printing and enumerating - none of the fields beyond the type and size fields
+                are valid for unused statistics.
+                </p>
+             </value>
+             <value name='ST_BOOLEAN' number='1'>
+                <p>ST_BOOLEAN values are single bit boolean values.  A variety of different
+                presentation methods may be selected by the supplier in order to maximise
+                coherence between the description and the presentation of a boolean value.
+                Only the least significant bit of a boolean type has a defined value.
+                </p>
+             </value>
+             <value name='ST_STRING' number='2'>
+                <p>ST_STRING values are string values.  Currently, strings are defined using a
+                zero byte as a terminator character {future versions may well introduce
+                counted length strings as well).  A supplier is required to be able to place
+                an upper length value on all strings so that sufficient space may be
+                allocated within the caller supplied buffer for the SA_READ operation.
+                </p>
+             </value>
+             <value name='ST_INTEGER8' number='3'>
+                <p>ST_INTEGER8 is an 8-bit (byte) quantity.</p>
+             </value>
+             <value name='ST_INTEGER16' number='4'>
+                <p>ST_INTEGER8 is an 16-bit (half-word) quantity.</p>
+             </value>
+             <value name='ST_INTEGER32' number='5'>
+                <p>ST_INTEGER8 is an 32-bit (word) quantity.</p>
+             </value>
+             <value name='ST_INTEGER64' number='6'>
+                <p>ST_INTEGER8 is an 64-bit (double-word) quantity.</p>
+             </value>
+             <value name='ST_ADDRESS' number='7'>
+                <p>ST_ADDRESS values are addresses given in a protocol-specific format. A
+                variety of different forms of address are possible. The presentation formats
+                available for this type are presently undefined. This type of statistic is
+                only supported by 1.01 of the DCI statistics format.
+                </p>
+             </value>
+             <value name='ST_TIME' number='8'>
+                <p>ST_TIME values are time values given in a variety of formats. The
+                presentation methods presented allow for times to be specified in a number
+                of ways. This type of statistic is only supported by 1.01 of the DCI
+                statistics format.
+                </p>
+             </value>
+            </value-table>
+            </p>
+        </offset>
 
+        <offset number='4' name='format'><p>This field contains a value indicating the format of
+            the value.  The range of values is specific to each type (all the integer
+            types share a common set of formats and presentations for convenience).
+            Depending upon the type in question, this value may be an enumeration, a
+            bitset of flags or a combination of both (none of the currently defined
+            formats mix enumeration and flag bitsets).
+            <fixme> Document the formats </fixme>
+            </p></offset>
 
+        <offset number='8' name='presentation'><p>This field dictates how the supplier would like
+            the value to be presented.  A gatherer may choose to ignore this value, but
+            only at the risk of presenting the user with incoherent information.
+            <fixme> Document the values! </fixme>
+            </p></offset>
 
-
-
-
-
-<p>unsigned int format:  this field contains a value indicating the format of
-the value.  The range of values is specific to each type (all the integer
-types share a common set of formats and presentations for convenience).
-Depending upon the type in question, this value may be an enumeration, a
-bitset of flags or a combination of both (none of the currently defined
-formats mix enumeration and flag bitsets).
-</p>
-
-<p>unsigned int presentation:  this field dictates how the supplier would like
-the value to be presented.  A gatherer may choose to ignore this value, but
-only at the risk of presenting the user with incoherent information.
-</p>
-
-<p>unsigned int size:  this is the number of bytes the statistic wishes reserved
+        <offset number='12' name='size'>This is the number of bytes the statistic wishes reserved
 in the buffer for an SA_READ operation.  It is always a multiple of four
-bytes.  It is sometimes larger than the actual value necessary.
-</p>
+bytes.  It is sometimes larger than the actual value necessary.</offset>
 
-<p>unsigned int volatility:  this field indicates how volatile a statistic is.
-The three possible values are:
+        <offset number='16' name='volatility'>
+            <p>This field indicates how volatile a statistic is. The three possible values are:</p>
 
-<value-table head-name='Name'>
- <value name='SV_STATIC' number='0'>Constant per invocation</value>
- <value name='SV_VARIABLE' number='1'>Unlikely to have changed in 5 minutes</value>
- <value name='SV_VOLATILE' number='2'>Can change very rapidly</value>
-</value-table>
-</p>
+            <p>
+            <value-table head-name='Name'>
+             <value name='SV_STATIC' number='0'>Constant per invocation</value>
+             <value name='SV_VARIABLE' number='1'>Unlikely to have changed in 5 minutes</value>
+             <value name='SV_VOLATILE' number='2'>Can change very rapidly</value>
+            </value-table>
+            </p>
+        </offset>
 
-<p>char *name:  This fields points at the name of the statistic.  It is a short
+        <offset number='20' name='name'>This fields points at the name of the statistic.  It is a short
 descriptive string that the gatherer contracts to display at least the first
 twenty characters of.  The string itself is static, zero byte terminated and
-contained with the supplier module.
-</p>
+contained with the supplier module.</offset>
 
-<p>unsigned int name_tag:  This value, together with the information contained
+        <offset number='24' name='name_tag'>
+<p>This value, together with the information contained
 in the dci4_spctl structure and a ISV/IHV supplied data file permit the
 gatherer to obtain a description of a statistic.  The precise mechanism has
-yet to be determined.
-</p>
+yet to be determined. Must be zero.
+</p></offset>
 
-<p>unsigned int spare: This field is reserved for future use and will be zero.
+        <offset number='28' name='spare'>This field is reserved for future use and must be zero.</offset>
+</offset-table>
 </p>
+</category>
+
 </section>
 
 
+<section title="SWI calls">
+<swi-definition name='StatisticsProvider_Statistics'
+                offset='0' offset-base='StatisticsProvider'
+                description='Obtain statistics from a statistics provider'>
+<entry>
+    <register-use number='0'>SA_DESCRIBE (0) or SA_READ (1) depending on the operation required</register-use>
+    <register-use number='1'>First statistic, inclusive</register-use>
+    <register-use number='2'>Last statistic, inclusive</register-use>
+    <register-use number='3'>First byte of buffer in memory</register-use>
+    <register-use number='4'>Number of bytes in buffer</register-use>
+</entry>
+<entry>
+    <register-use number='0-4' state='preserved'/>
+    <register-use number='5'>Number of statistics processed</register-use>
+    <register-use number='6'>Number of bytes of buffer used</register-use>
+</entry>
 
+<use>
+<p>
+    This SWI is used to obtain a description of the statistics provided
+    by a supplier, or the actual values of those statitics. It is expected
+    that it be called at least twice, once to read the descriptions of
+    the statistics, and then future times to read the values of those
+    statistics.
+</p>
 
+<p>
+    When the operation requested is SA_DESCRIBE (0), the statistics buffer supplied in
+    R1 should be filled with structures as described in <reference type='category' name='Statistic Description Structure'/>.
+</p>
 
+<p>
+    When the operation requested is SA_READ (1), the statistics buffer supplied in
+    R1 should be filled with the values corresponding to those that would be described
+    if SA_DESCRIBE (0) had been requested. Each statistics has a length as defined by
+    the <reference type='category' name='Statistic Description Structure'/>.
+</p>
+
+<p>
+    If the buffer is filled before all statistics are written, the SWI should exit
+    with as much data as would fit into the buffer written and appropriate values in
+    R5 and R6 on exit. Statistics gatherers may recognise this condition and provide
+    extended buffers.
+</p>
+</use>
+</swi-definition>
+</section>
 
 
 
