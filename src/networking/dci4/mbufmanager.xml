@@ -7,32 +7,7 @@
 <section title="Overview">
 </section>
 
-<section title="Contents">
-<p>0 History and outstanding</p>
-<p>1 Conventions</p>
-<p>2 Basics of operation</p>
-<p>3 MBufManager goals</p>
-<p>4 The mbuf structure and its uses</p>
-<p>5 Unsafe data</p>
-<p>6 MBufManager sessions</p>
-<p>7 Allocation routines</p>
-<p>8 The allocation phase</p>
-<p>9 The clearing phase</p>
-<p>10 The copying phase</p>
-<p>11 Freeing mbufs</p>
-<p>12 Support and ensuring routines</p>
-<p>13 SWI entry points</p>
-<p>14 Service calls</p>
-<p>15 The life and death of an MBufManager</p>
-<p>16 Glossary</p>
-<p>17 Appendix - DCI4 MBufManager client interface contract</p>
-<p>Appendix - Supplementary clarifications</p>
-
-</section>
-
-<section title="0 History and outstanding">
-
-<subsection title="Currently outstanding">
+<section title="0 Currently outstanding">
 <p>C is acceptable as an illustrative language but is not ideally
 suited to a definition language. Language neutral versions of all
 structures, etc, need producing. Not all macros contained within
@@ -42,7 +17,6 @@ is readily determinable from this specification.</p>
 data.</p>
 <p>The dci4 client interface contract appendix needs tightening
 up.</p>
-</subsection>
 </section>
 
 <section title="1 Conventions">
