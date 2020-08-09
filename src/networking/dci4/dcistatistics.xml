@@ -5,45 +5,6 @@
 <riscos-prm>
 <chapter title="DCI Statistics">
 
-<section title="History">
-
-<p>
-Issue 1 - 23rd September 1994. Borris
-
-Tried to get the basic ideas into a coherent document.
-</p>
-
-<p>
-Issue 2 - 25th September 1994. Borris
-
-Changed precise details of register updating on return from some
-of the swi operations.
-</p>
-
-<p>
-Issue 3 - October 1994. Borris
-
-Listened to feedback from reviewers. Adjust underlying model
-and streamlined most aspects. Added details of suggested scheme
-for atomic sampling. This issue not widely distributed.
-</p>
-
-<p>
-Issue 4 - 7th November 1994. Borris
-
-Tided up and checked consistency with reference header file. Added
-correct service call number. Added comments about effective suppliers
-and dynamic SWI number possibilities. name_tag as being outstanding
-added.
-</p>
-
-<p>
-Issue 5 - 28th April 2003. Gerph
-
-Added ST_TIME and ST_ADDRESS types.
-</p>
-</section>
-
 <section title="Currently Outstanding">
 
 <p>
@@ -52,6 +13,7 @@ This will eventually provide a link through to some text from an IHV/ISV
 supplied data file. This will be resolved before production code is
 issued.
 </p>
+
 </section>
 
 <section title="Contents">
@@ -420,9 +382,11 @@ bytes.  It is sometimes larger than the actual value necessary.
 <p>unsigned int volatility:  this field indicates how volatile a statistic is.
 The three possible values are:
 
-    #define SV_STATIC           0       /* Constant per invocation */
-    #define SV_VARIABLE         1       /* Unlikely to have changed in 5 minutes */
-    #define SV_VOLATILE         2       /* Can change very rapidly */
+<value-table head-name='Name'>
+ <value name='SV_STATIC' number='0'>Constant per invocation</value>
+ <value name='SV_VARIABLE' number='1'>Unlikely to have changed in 5 minutes</value>
+ <value name='SV_VOLATILE' number='2'>Can change very rapidly</value>
+</value-table>
 </p>
 
 <p>char *name:  This fields points at the name of the statistic.  It is a short
@@ -477,23 +441,26 @@ swapping of these two pointer values.
 </p>
 
 <p>The overall structure suggested is as follows:
+</p>
 
+<p>
+<extended-example type='pseudo'>
+start thread of control (ie SWI)
 
-    start thread of control (ie SWI)
+    enter mutex (eg disable interrupts)
 
-        enter mutex (eg disable interrupts)
+        temp := buffer pointer 1
+        buffer pointer 1 := buffer pointer 2
+        buffer pointer 2 := temp
 
-            temp := buffer pointer 1
-            buffer pointer 1 := buffer pointer 2
-            buffer pointer 2 := temp
+    exit mutex (and ensure interrupts enabled)
 
-        exit mutex (and ensure interrupts enabled)
+    add values from buffer pointer 2 into the accumulated values
 
-        add values from buffer pointer 2 into the accumulated values
+    zero the memory described by buffer pointer 2
 
-        zero the memory described by buffer pointer 2
-
-    end thread of control (ie SWI)
+end thread of control (ie SWI)
+</extended-example>
 </p>
 
 
@@ -537,7 +504,7 @@ then it might not correctly cater for the addition or removal of interfaces.
  <disclaimer>
 
 <p>
-    Copyright (C) 1994 ANT Limited., PO BOX 300, Cambridge, England.
+Copyright (C) 1994 ANT Limited., PO BOX 300, Cambridge, England.
 All rights reserved.<br/>
 </p>
 
@@ -573,7 +540,36 @@ NOT INTENDED FOR USE IN LIFE CRITICAL APPLICATIONS.
  </disclaimer>
 
  <history>
-  <revision number="X" date="08 Aug 2020" author="Gerph" title="Issue X" />
+  <revision number="1" date="23 Sep 1994" author="Borris">
+    <change>Tried to get the basic ideas into a coherent document.</change>
+  </revision>
+
+  <revision number="2" date="25 Sep 1994" author="Borris">
+    <change>Changed precise details of register updating on return from some of the swi operations.</change>
+  </revision>
+
+  <revision number="3" date="Oct 1994" author="Borris">
+    <change>Listened to feedback from reviewers.</change>
+    <change>Adjust underlying model and streamlined most aspects.</change>
+    <change>Added details of suggested scheme for atomic sampling.</change>
+    <change>This issue not widely distributed.</change>
+  </revision>
+
+  <revision number="4" date="7 Nov 1994" author="Borris">
+    <change>Tided up and checked consistency with reference header file.</change>
+    <change>Added correct service call number.</change>
+    <change>Added comments about effective suppliers and dynamic SWI number possibilities.</change>
+    <change>name_tag as being outstanding added.</change>
+  </revision>
+
+  <revision number="5" date="28 April 2003" author="Gerph">
+    <change>Added ST_TIME and ST_ADDRESS types.</change>
+  </revision>
+
+  <revision number="X" date="08 Aug 2020" author="Gerph" title="Restructure as PRM-in-XML">
+    <change>Exported from Impression, and converted to PRM-in-XML structured format.</change>
+  </revision>
+
  </history>
 </meta>
 
