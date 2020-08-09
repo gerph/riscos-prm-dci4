@@ -30,8 +30,8 @@ single generic display program to cope with all compliant modules.
             <item>No essential central information that needs frequent updating</item>
             <item>Information is for presentation to humans primarily</item>
             <item>Atomic operations without any latching mechanisms</item>
-            <item>Well behaved with multiple gatherers</item>
-            <item>Well behaved if a supplier unexpectedly disappears</item>
+            <item>Well-behaved with multiple gatherers</item>
+            <item>Well-behaved if a supplier unexpectedly disappears</item>
             <item>Virtually stateless communication</item>
         </list>
         </p>
@@ -68,7 +68,7 @@ suppliers than gatherers in a system.
 A gatherer, typically upon user invocation, enumerates the available
 suppliers, enumerates the statistics supplied by each supplier and then
 presents this information to the user.  More dynamic presentation is also
-possible.  A supplier is passive (other than it's normal operations), whilst
+possible.  A supplier is passive (other than its normal operations), whilst
 the gatherer actively seeks out the information to be presented.
 </p>
 
@@ -82,7 +82,7 @@ number is used for all stages of operation apart from enumeration itself.
 </p>
 
 <p>Each statistic has a number of different pieces of information associated
-with it, forming it's description, and a value.  The description provides the
+with it, forming its description, and a value.  The description provides the
 necessary information to access and manipulate the value, including the
 number of bytes of storage required for the value, it's type, format and
 desired presentation.  The data types supported are boolean, integer and
@@ -222,7 +222,7 @@ first statistic and proceeds in steps of one and stops once the last
 statistic has been processed.  Output is placed into the buffer supplied.  If
 this buffer is not big enough for the requested range of statistics, then
 processing will stop when it is no longer possible to write all the necessary
-information for a statistic (ie if the buffer supplied is not big enough, the
+information for a statistic (i.e. if the buffer supplied is not big enough, the
 number of unused bytes will be less than the size of a statistic
 description).  Return values of the number of statistics processed and the
 number of bytes of the buffer used are returned.  The buffer must be word
