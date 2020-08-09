@@ -4,7 +4,526 @@
 
 <riscos-prm>
 <chapter title="DCI Statistics">
-<section title="Overview">
+
+<section title="History">
+
+<p>
+Issue 1 - 23rd September 1994. Borris
+
+Tried to get the basic ideas into a coherent document.
+</p>
+
+<p>
+Issue 2 - 25th September 1994. Borris
+
+Changed precise details of register updating on return from some
+of the swi operations.
+</p>
+
+<p>
+Issue 3 - October 1994. Borris
+
+Listened to feedback from reviewers. Adjust underlying model
+and streamlined most aspects. Added details of suggested scheme
+for atomic sampling. This issue not widely distributed.
+</p>
+
+<p>
+Issue 4 - 7th November 1994. Borris
+
+Tided up and checked consistency with reference header file. Added
+correct service call number. Added comments about effective suppliers
+and dynamic SWI number possibilities. name_tag as being outstanding
+added.
+</p>
+
+<p>
+Issue 5 - 28th April 2003. Gerph
+
+Added ST_TIME and ST_ADDRESS types.
+</p>
+</section>
+
+<section title="Currently Outstanding">
+
+<p>
+The name_tag field of the statistic structure has not yet been defined.
+This will eventually provide a link through to some text from an IHV/ISV
+supplied data file. This will be resolved before production code is
+issued.
+</p>
+</section>
+
+<section title="Contents">
+
+<p>
+    Introduction
+    Plus points
+    Minus points
+    Basics of operation
+    Enumerating suppliers - the Service_StatisticEnumerate Service Call
+    Communicating with a supplier through its SWI number:
+    Ping pong atomicity
+    Additional notes
+</p>
+
+</section>
+
+
+<section title="Introduction">
+
+<p>The maintenance of statistics such as "packets transmitted" for a network
+interface can greatly assist the system administrator (or user) in a variety
+of circumstances.
+</p>
+
+<p>Traditionally, support for such statistics gathering has been irregular and
+generally limited to direct screen printing.  This specification provides a
+more controlled method of presenting statistics to the user, and permits a
+single generic display program to cope with all compliant modules.
+</p>
+
+<p>The following characterise the intentions of this interface specification:
+</p>
+
+<subsection title="Plus points">
+
+<p>
+* Simplicity of implementation
+* Single generic statistics display program
+* No essential central information that needs frequent updating
+* Information is for presentation to humans primarily
+* Atomic operations without any latching mechanisms
+* Well behaved with multiple gatherers
+* Well behaved if a supplier unexpectedly disappears
+* Virtually stateless communication
+
+</p>
+</subsection>
+
+<subsection title="Minus points">
+
+<p>
+* Not re-entrant - callbacks or user mode code only
+* Restrictive string model
+* Polled interface, rather than event driven
+* Only simple flat structure to statistics
+* Only really suitable for human display
+</p>
+
+</subsection>
+
+</section>
+
+
+
+<section title="Basics of operation">
+
+<p>A piece of software that wishes to offer statistics is termed a "supplier".
+A piece of software that obtains statistics from a supplier and presents them
+to the user is termed a "gatherer", and the operation it performs is often
+referred to as "enumerating the statistics".  There are typically more
+suppliers than gatherers in a system.
+</p>
+
+<p>As part of its normal operations, a supplier maintains a set of statistics.
+A gatherer, typically upon user invocation, enumerates the available
+suppliers, enumerates the statistics supplied by each supplier and then
+presents this information to the user.  More dynamic presentation is also
+possible.  A supplier is passive (other than it's normal operations), whilst
+the gatherer actively seeks out the information to be presented.
+</p>
+
+<p>The first stage of enumeration (determining what suppliers are present) is
+performed with a service call, and the second stage (determining what
+statistics are available and their values) is performed through a SWI whose
+SWI number is obtained during the first stage of enumeration.  This SWI
+number is used for all stages of operation apart from enumeration itself.
+</p>
+
+<p>Each statistic has a number of different pieces of information associated
+with it, forming it's description, and a value.  The description provides the
+necessary information to access and manipulate the value, including the
+number of bytes of storage required for the value, it's type, format and
+desired presentation.  The data types supported are boolean, integer and
+string.  An unused data type also provides for padding.
+</p>
+
+<p>Descriptions and statistics are read in ranges from a lower statistic number
+to an upper statistic number, inclusive.  The first statistic of any supplier
+is zero.  The highest statistic number of a supplier is obtained when the SWI
+number for a supplier is obtained.  A range is always processed atomically by
+the supplier, ensuring consistent values and presentation to a gatherer when so
+required.  A supplier indicates the volatility of its statistics and
+typically attempts to group statistics into ranges of the same volatility.
+</p>
+
+</section>
+
+<section title="Enumerating suppliers">
+
+<p>
+ - the Service_StatisticEnumerate Service Call:
+====================================================================
+</p>
+
+<p>The list of available suppliers is determined with a single service
+call: Service_StatisticEnumerate.
+
+    Entry
+
+        r0  Zero
+        r1  Service_StatisticEnumerate (0xa1)
+
+    Exit
+
+        r0  NULL terminated head of linked list of structures
+        r1  Service_StatisticEnumerate (0xa1)
+</p>
+
+
+<p>Each supplier allocates a small structure from the RMA, initializes it and
+links it into the linked list whose head is pointed to by r0.  Whether the
+supplier adds an entry at the head or tail of the list does not matter.  If a
+gatherer requires any specific order, then it should explicitly sort the
+suppliers list itself.  A gatherer should not cache SWI values across
+invocations of suppliers, as a module might choose a dynamic SWI numbering
+scheme if it offers multiple effective suppliers.
+</p>
+
+<p>In C, this structure is defined as follows:
+
+    typedef struct spctl
+    {
+        struct spctl       *next;           /* Next structure in list */
+        unsigned int        i_version;      /* Interface version */
+        unsigned long       features;       /* Combination of SF_ values */
+        unsigned int        swinumber;      /* The SWI SA_DESCRIBE/SA_READ use */
+        unsigned int        max_stat;       /* Highest stat number (inclusive) */
+        unsigned int        type;           /* Acorn assigned supplier type */
+        unsigned int        s_version;      /* Supplier version */
+        char               *module;         /* Module name (short one) */
+        char               *title;          /* Title string - short */
+        char               *description;    /* Descriptive string - long */
+        unsigned char       reset[8];       /* Unique for each invocation */
+    } dci4_spctl;
+</p>
+
+
+<p>struct spctl *next:  This field is used to construct the linked list of
+suppliers for the enumeration operation.  A value of zero indicates the end
+of the list.
+</p>
+
+<p>unsigned int i_version:  The DCI4 Statistic Interface version that the
+supplier is implemented against.
+</p>
+
+<p>unsigned long features:  A bitset of flags defining optional aspects of a
+supplier.  Values are detailed elsewhere.
+</p>
+
+<p>unsigned int swinumber:  The SWI number through which all other communication
+with the supplier is performed.
+</p>
+
+<p>unsigned int max_stat:  The highest statistic number, inclusive, that the
+supplier provides.  This implies a supplier must always supply at least one
+statistic.
+</p>
+
+<p>unsigned int type:  This field is available to provide some classification of
+suppliers.  It is the only centrally administered resource in this
+specification, and its use is optional.  The currently defined values are as
+follows (expressed in C):
+</p>
+
+<p>
+    #define SPT_GENERAL_SUPPLIER 0   /* Use this if no other suitable type */
+    #define SPT_NETWORK_PROTOCOL 1   /* A DCI4 protocol module */
+    #define SPT_NETWORK_DRIVER   2   /* A DCI4 device driver module */
+    #define SPT_MBUF_MANAGER     3   /* The DCI4 mbuf manager module */
+</p>
+
+<p>unsigned int s_version:  This is the version number of the supplier module
+itself (as opposed to the version number of an interface it conforms to).  It
+is provided for the convenience of the user.
+</p>
+
+<p>char *module:  This is the supplier's module title (as opposed to its help
+string).
+</p>
+
+<p>char *title:  This is a short descriptive string to identify the supplier to
+the user.  The gatherer only contracts to print at least the first twenty
+characters of this string.
+</p>
+
+<p>char *description:  This is a longer description of the supplier that should
+convey it's purpose to the user.  The gatherer only contracts to print at
+least the first fifty characters of this string.
+</p>
+
+<p>unsigned char reset[8]:  This 8 byte field is initialised with a unique value
+each time the supplier is initialised.  It permits the gatherer to spot a
+supplier that has just re-initialised.  The time and date at which the
+supplier initialises are recommended values to write here.  The gatherer
+performs an 8 byte equality test and otherwise assumes no further format
+information about these bytes.
+</p>
+
+
+<p>When a gatherer has finished interacting with a supplier, it should free the
+allocated structure back into the RMA.
+</p>
+</section>
+
+
+<section title="Communicating with a supplier through its SWI number">
+
+<p>Apart from the enumeration phase, all communication with a supplier is
+performed through the single SWI number obtained during the enumeration
+phase.  The action performed by this "statistic SWI" is controlled by r0 on
+entry, which contains an action code.  The defined action codes are:
+</p>
+
+<p>
+    SA_DESCRIBE     0
+    SA_READ         1
+</p>
+
+
+<p>SA_DESCRIBE obtains descriptions of statistics, whilst SA_READ obtains the
+actual values of statistics.  It is necessary for first obtain the
+description of a statistic before reading it, as the description is the only
+way the gatherer can obtain the size of the statistic value and know how much
+buffer space to allocate.
+</p>
+
+<p>The register usage for both SA_DESCRIBE and SA_READ is very similar:
+
+    Entry
+
+        r0      SA_DESCRIBE or SA_READ
+        r1      First statistic, inclusive
+        r2      Last statistic, inclusive
+        r3      First byte of buffer in memory
+        r4      Number of bytes in buffer
+
+    Exit
+
+        r5      Number of statistics processed
+        r6      Number of bytes of buffer used
+</p>
+
+<p>In essence, both these actions enumerate information about a range of
+statistics into the buffer supplied.  This is performed atomically, where
+necessary, by the supplier.  In both cases, the operation starts from the
+first statistic and proceeds in steps of one and stops once the last
+statistic has been processed.  Output is placed into the buffer supplied.  If
+this buffer is not big enough for the requested range of statistics, then
+processing will stop when it is no longer possible to write all the necessary
+information for a statistic (ie if the buffer supplied is not big enough, the
+number of unused bytes will be less than the size of a statistic
+description).  Return values of the number of statistics processed and the
+number of bytes of the buffer used are returned.  The buffer must be word
+aligned in memory.
+</p>
+
+
+<p>Each statistic is described with a fixed sized buffer, described in C as
+follows:
+
+    typedef struct stdesc
+    {
+        unsigned int            type;           /* ST_ series */
+        unsigned int            format;         /* SxF_ series */
+        unsigned int            presentation;   /* SxP_ series */
+        unsigned int            size;           /* Measured in bytes */
+        unsigned int            volatility;     /* SV_ series */
+        char                   *name;           /* String is static */
+        unsigned int            name_tag;       /* See specification */
+        unsigned int            spare;          /* Unused. Always zero */
+    } dci4_stdesc;
+</p>
+
+
+<p>unsigned int type:  This defines the type of statistic.  Possible values are:
+
+    #define ST_UNUSED           0
+    #define ST_BOOLEAN          1
+    #define ST_STRING           2
+    #define ST_INTEGER8         3
+    #define ST_INTEGER16        4
+    #define ST_INTEGER32        5
+    #define ST_INTEGER64        6
+    #define ST_ADDRESS          7
+    #define ST_TIME             8
+</p>
+
+<p>ST_UNUSED is used by a supplier to reserve a statistic number.  Such a
+statistic always has a value occupying zero bytes, and hence can always be
+enumerated, no matter how many bytes are left in the called supplied buffer.
+A statistic with a type of ST_UNUSED should always be skipped over when
+printing and enumerating - none of the fields beyond the type and size fields
+are valid for unused statistics.
+</p>
+
+<p>ST_BOOLEAN values are single bit boolean values.  A variety of different
+presentation methods may be selected by the supplier in order to maximise
+coherence between the description and the presentation of a boolean value.
+Only the least significant bit of a boolean type has a defined value.
+</p>
+
+<p>ST_STRING values are string values.  Currently, strings are defined using a
+zero byte as a terminator character {future versions may well introduce
+counted length strings as well).  A supplier is required to be able to place
+an upper length value on all strings so that sufficient space may be
+allocated within the caller supplied buffer for the SA_READ operation.
+</p>
+
+<p>ST_INTEGERx values are all integer values.  A variety of different sized
+integers are supported to suit different requirements.  A flexible set of
+presentation methods is supported.
+</p>
+
+<p>ST_ADDRESS values are addresses given in a protocol-specific format. A
+variety of different forms of address are possible. The presentation formats
+available for this type are presently undefined. This type of statistic is
+only supported by 1.01 of the DCI statistics format.
+</p>
+
+<p>ST_TIME values are time values given in a variety of formats. The
+presentation methods presented allow for times to be specified in a number
+of ways. This type of statistic is only supported by 1.01 of the DCI
+statistics format.
+</p>
+
+<p>unsigned int format:  this field contains a value indicating the format of
+the value.  The range of values is specific to each type (all the integer
+types share a common set of formats and presentations for convenience).
+Depending upon the type in question, this value may be an enumeration, a
+bitset of flags or a combination of both (none of the currently defined
+formats mix enumeration and flag bitsets).
+</p>
+
+<p>unsigned int presentation:  this field dictates how the supplier would like
+the value to be presented.  A gatherer may choose to ignore this value, but
+only at the risk of presenting the user with incoherent information.
+</p>
+
+<p>unsigned int size:  this is the number of bytes the statistic wishes reserved
+in the buffer for an SA_READ operation.  It is always a multiple of four
+bytes.  It is sometimes larger than the actual value necessary.
+</p>
+
+<p>unsigned int volatility:  this field indicates how volatile a statistic is.
+The three possible values are:
+
+    #define SV_STATIC           0       /* Constant per invocation */
+    #define SV_VARIABLE         1       /* Unlikely to have changed in 5 minutes */
+    #define SV_VOLATILE         2       /* Can change very rapidly */
+</p>
+
+<p>char *name:  This fields points at the name of the statistic.  It is a short
+descriptive string that the gatherer contracts to display at least the first
+twenty characters of.  The string itself is static, zero byte terminated and
+contained with the supplier module.
+</p>
+
+<p>unsigned int name_tag:  This value, together with the information contained
+in the dci4_spctl structure and a ISV/IHV supplied data file permit the
+gatherer to obtain a description of a statistic.  The precise mechanism has
+yet to be determined.
+</p>
+
+<p>unsigned int spare: This field is reserved for future use and will be zero.
+</p>
+</section>
+
+
+
+
+
+
+
+
+<section title="Ping pong atomicity">
+
+<p>The supplier is required to perform each read request atomically.  This means
+a gatherer can rely upon a read operation producing consistent statistics,
+but it cannot be certain quite when in time these statistics apply to:  in
+some cases, statistics are virtually always out of date by the time the
+gatherer obtains and uses them.
+</p>
+
+<p>The simplistic approach to ensuring an atomic read operation is to perform
+the entire action with interrupts disabled.  This, however, has an
+undesirable effect on interrupt latency for suppliers with many or complex
+statistics and is not recommended.
+</p>
+
+<p>The suggested method is a three buffer scheme.  One buffer holds the
+accumulated statistics, the second holds the increments (deltas) being
+generated "live", and the third is either entirely full of zero values, or
+there is an active read operation in progress and it holds a previous set of
+increments that are currently being added (merged) into the accumulated
+values.
+</p>
+
+<p>Two pointers are maintained.  One for the "live" buffer and the other for the
+"merge" buffer.  The operation that is necessary to perform atomically is the
+swapping of these two pointer values.
+</p>
+
+<p>The overall structure suggested is as follows:
+
+
+    start thread of control (ie SWI)
+
+        enter mutex (eg disable interrupts)
+
+            temp := buffer pointer 1
+            buffer pointer 1 := buffer pointer 2
+            buffer pointer 2 := temp
+
+        exit mutex (and ensure interrupts enabled)
+
+        add values from buffer pointer 2 into the accumulated values
+
+        zero the memory described by buffer pointer 2
+
+    end thread of control (ie SWI)
+</p>
+
+
+<p>This maximises the usefulness of the non re-entrancy requirement and requires
+ONLY the swapping of the buffer pointers to be performed atomically.  All
+other operations can proceed with interrupts enabled.  This minimal critical
+region is the prime motivation behind this scheme.
+</p>
+
+</section>
+
+
+
+<section title="Additional notes">
+
+<p>
+    Some applications of the statistic interface will require a single RISC OS
+module to behave as multiple suppliers.  For example, a device driver module
+that controls multiple interfaces might well wish to provide an overall set
+of statistics, and then an instance of a set of statistics per interface
+controlled.  A separate SWI number is required for each 'effective supplier'.
+This is not normally a problem, as very few modules approach the limit of the
+64 separate SWIs allocated.  Gatherers are expected to obtain SWI numbers
+through the enumeration method supplied, and should be capable of handling
+dynamic SWI number assignment.  For example, a device driver may choose SWIs
+63, 62 and 61 for units 0, 1 and 2, respectively.  If a gatherer were to
+attempt to 'cache' these SWI numbers across invocations of the device driver,
+then it might not correctly cater for the addition or removal of interfaces.
+</p>
+
 </section>
 
 </chapter>
@@ -16,7 +535,41 @@
   <email name="Charles Ferguson" address="gerph@gerph.org" />
  </maintainer>
  <disclaimer>
-    <p>Insert disclaimer here, once, we've worked out what it should be.</p>
+
+<p>
+    Copyright (C) 1994 ANT Limited., PO BOX 300, Cambridge, England.
+All rights reserved.<br/>
+</p>
+
+<p>
+Redistribution and use in source code and executable binary forms are
+permitted provided that: (1) source distributions retain this entire
+copyright notice and comment, and (2) distributions including
+executable binaries contain the following acknowledgement:
+</p>
+
+<p>
+``This product includes software developed by ANT Limited and its
+contributors.  Copyright (C) ANT Limited 1994.''
+</p>
+
+<p>
+and also in the documentation and other materials provided with the
+distribution and in all advertising materials mentioning features or
+use of this software. Neither the name of ANT Limited nor the names of
+its contributors may be used to endorse or promote products derived
+from this software without specific prior written permission.
+</p>
+
+<p>
+THIS SOFTWARE IS PROVIDED ``AS IS'' AND WITHOUT ANY EXPRESS OR IMPLIED
+WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+</p>
+
+<p>
+NOT INTENDED FOR USE IN LIFE CRITICAL APPLICATIONS.
+</p>
  </disclaimer>
 
  <history>
