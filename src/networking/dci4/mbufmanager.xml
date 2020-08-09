@@ -7,30 +7,7 @@
 <section title="Overview">
 </section>
 
-<section title="License">
-<p>Copyright (C) 1994 ANT Limited., PO BOX 300, Cambridge, England.
-All rights reserved.</p>
-<p>Redistribution and use in source code and executable binary
-forms are permitted provided that: (1) source distributions retain
-this entire copyright notice and comment, and (2) distributions
-including executable binaries contain the following
-acknowledgement:</p>
-<p>"This product includes software developed by ANT Limited and its
-contributors. Copyright (C) ANT Limited 1994."</p>
-<p>and also in the documentation and other materials provided with
-the distribution and in all advertising materials mentioning
-features or use of this software. Neither the name of ANT Limited
-nor the names of its contributors may be used to endorse or promote
-products derived from this software without specific prior written
-permission.</p>
-<p>THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR
-IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
-WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
-PURPOSER. NOT INTENDED FOR USE IN LIFE CRITICAL APPLICATIONS.</p>
-</section>
-
 <section title="Contents">
-
 <p>0 History and outstanding</p>
 <p>1 Conventions</p>
 <p>2 Basics of operation</p>
@@ -54,71 +31,6 @@ PURPOSER. NOT INTENDED FOR USE IN LIFE CRITICAL APPLICATIONS.</p>
 </section>
 
 <section title="0 History and outstanding">
-<p>0.01 Issue 1. 14th September 1994. Borris</p>
-<p>A draft specification containing most necessary details and only
-a few contradictions.</p>
-<p>0.01 Issue 2. 15th September 1994. Borris</p>
-<p>An internally coherent document that specifies something that
-can useful be implemented. A example "mbuf.h" header file
-illustrates how C clients might be started. This file also contains
-a set of wrappers to make interfacing existing traditional mbuf
-source code easier (such as the internet source code).</p>
-<p>0.02 Issue 1. 21st September 1994. Borris</p>
-<p>All safe mbufs are now dtom'able.</p>
-<p>Better specified direct entry point register conventions.
-Basically, these entry points are now suitable for APCS routines -
-a2-a4 trashed on exit and maybe a1.</p>
-<p>Rewrote the description of allocation to remove abiguities and
-increase understandability.</p>
-<p>Added a table summarising owner transfer for the direct entry
-points.</p>
-<p>0.02 Issue 2. ? September 1994. Borris</p>
-<p>Minor corrections. Stricter definitions for most of the support
-routines.</p>
-<p>Fixed duplicate maxcontig field definition in mbctl.</p>
-<p>0.99 Issue 1 ? Borris</p>
-<p>Removed the restriction that the copying phase of an allocation
-only occurred if there was a data import to be performed (ie ptr !=
-NULL).</p>
-<p>Rename maxcontig_c to mincontig and maxcontig_m to maxcontig in
-struct mbctl.</p>
-<p>mbctl.trim returns the mbuf chain it was given for
-convenience.</p>
-<p>m_type field is initialised to the value one for each mbuf
-allocated. [this has subsequently been taken out again - see
-below]</p>
-<p>Clarified m_list field after allocation.</p>
-<p>1.00 Issue 1, 14 November 1994, Borris</p>
-<p>Service_MbufManagerStatus (0xa2) defined and added.</p>
-<p>MBC_USERMODE flag for getting user mode direct entry points
-added.</p>
-<p>Details added in the OpenSession SWI documentation.</p>
-<p>Added section on life and death of an mbuf manager to detail
-startup interactions (the mmintro document that provides an
-introduction of DCI2 to DCI4 mbuf usage has also been expanded
-similarly).</p>
-<p>Definitions for MBC_DONTWAIT and MBC_DTOMABLE added, although
-these flags are not currently used (they probably will be one day,
-though).</p>
-<p>Reduce currently outstanding section correspondingly.</p>
-<p>Extended legal stuff at head of document.</p>
-<p>m_type from allocation is undefined - device drivers are
-expected to initialise it before supplying received data to
-protocols though. Field means nothing when data moves from protocol
-to device driver.</p>
-<p>m_copy variants called m_copy_p (preserve m_type information)
-and m_copy_u (make an unsafe copy) have been added and changes to
-reflect this made to header files and structure definitions.</p>
-<p>Added MT_HEADER and MT_DATA related comments to the DCI4
-protocol/device driver interface contract section.</p>
-<p>Corrections to dci4 protocol/client contract summary table.</p>
-<p>1.00 Issue 2, November 1994, Borris</p>
-<p>Removed comment about ensure_contig being able to do its job at
-the tail end of an mbuf chain as well as the head. Added comment
-about unsafe mbufs not being suitable for ensure_contig to operate
-on.</p>
-<p>1.01 Issue 3, April 1997, KBracey</p>
-<p>Added information about m_pkthdr and m_flags fields.</p>
 
 <subsection title="Currently outstanding">
 <p>C is acceptable as an illustrative language but is not ideally
@@ -1601,11 +1513,81 @@ at present.</p>
   <email name="Charles Ferguson" address="gerph@gerph.org" />
  </maintainer>
  <disclaimer>
-    <p>Insert disclaimer here, once, we've worked out what it should be.</p>
+<p>Copyright (C) 1994 ANT Limited., PO BOX 300, Cambridge, England.
+All rights reserved.</p>
+<p>Redistribution and use in source code and executable binary
+forms are permitted provided that:</p>
+<p>(1) source distributions retain this entire copyright notice and comment,
+and (2) distributions including executable binaries contain the following
+acknowledgement:</p>
+<p>"This product includes software developed by ANT Limited and its
+contributors. Copyright (C) ANT Limited 1994."</p>
+<p>and also in the documentation and other materials provided with
+the distribution and in all advertising materials mentioning
+features or use of this software. Neither the name of ANT Limited
+nor the names of its contributors may be used to endorse or promote
+products derived from this software without specific prior written
+permission.</p>
+<p>THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR
+IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+PURPOSER. NOT INTENDED FOR USE IN LIFE CRITICAL APPLICATIONS.</p>
  </disclaimer>
 
  <history>
-  <revision number="X" date="08 Aug 2020" author="Gerph" title="Issue X" />
+  <revision number="0.01 Issue 1" date="14 Sep 1994" author="Borris">
+    <change>A draft specification containing most necessary details and only a few contradictions.</change>
+  </revision>
+
+  <revision number="0.01 Issue 2" date="15 Sep 1994" author="Borris">
+    <change>An internally coherent document that specifies something that can useful be implemented. A example "mbuf.h" header file illustrates how C clients might be started. This file also contains a set of wrappers to make interfacing existing traditional mbuf source code easier (such as the internet source code).</change>
+  </revision>
+
+  <revision number="0.02 Issue 1" date="21 Sep 1994" author="Borris">
+    <change>All safe mbufs are now dtom'able.</change>
+    <change>Better specified direct entry point register conventions. Basically, these entry points are now suitable for APCS routines - a2-a4 trashed on exit and maybe a1.</change>
+    <change>Rewrote the description of allocation to remove abiguities and increase understandability.</change>
+    <change>Added a table summarising owner transfer for the direct entry points.</change>
+  </revision>
+
+  <revision number="0.02 Issue 2" date="Sep 1994" author="Borris">
+    <change>Minor corrections. Stricter definitions for most of the support routines.</change>
+    <change>Fixed duplicate maxcontig field definition in mbctl.</change>
+  </revision>
+
+  <revision number="0.99 Issue 1" date="1994" author="Borris">
+    <change>Removed the restriction that the copying phase of an allocation only occurred if there was a data import to be performed (ie ptr != NULL).</change>
+    <change>Rename maxcontig_c to mincontig and maxcontig_m to maxcontig in struct mbctl.</change>
+    <change>mbctl.trim returns the mbuf chain it was given for convenience.</change>
+    <change>m_type field is initialised to the value one for each mbuf allocated. [this has subsequently been taken out again - see below]</change>
+    <change>Clarified m_list field after allocation.</change>
+  </revision>
+
+  <revision number="1.00 Issue 1" date="14 Nov 1994" author="Borris">
+    <change>Service_MbufManagerStatus (0xa2) defined and added.</change>
+    <change>MBC_USERMODE flag for getting user mode direct entry points added.</change>
+    <change>Details added in the OpenSession SWI documentation.</change>
+    <change>Added section on life and death of an mbuf manager to detail startup interactions (the mmintro document that provides an introduction of DCI2 to DCI4 mbuf usage has also been expanded similarly).</change>
+    <change>Definitions for MBC_DONTWAIT and MBC_DTOMABLE added, although these flags are not currently used (they probably will be one day, though).</change>
+    <change>Reduce currently outstanding section correspondingly.</change>
+    <change>Extended legal stuff at head of document.</change>
+    <change>m_type from allocation is undefined - device drivers are expected to initialise it before supplying received data to protocols though. Field means nothing when data moves from protocol to device driver.</change>
+    <change>m_copy variants called m_copy_p (preserve m_type information) and m_copy_u (make an unsafe copy) have been added and changes to reflect this made to header files and structure definitions.</change>
+    <change>Added MT_HEADER and MT_DATA related comments to the DCI4 protocol/device driver interface contract section.</change>
+    <change>Corrections to dci4 protocol/client contract summary table.</change>
+  </revision>
+
+  <revision number="1.00 Issue 2" date="Nov 1994" author="Borris">
+    <change>Removed comment about ensure_contig being able to do its job at the tail end of an mbuf chain as well as the head. Added comment about unsafe mbufs not being suitable for ensure_contig to operate on.</change>
+  </revision>
+
+  <revision number="1.01 Issue 3" date="Apr 1997" author="KBracey">
+    <change>Added information about m_pkthdr and m_flags fields.</change>
+  </revision>
+
+  <revision number="X" date="08 Aug 2020" author="Gerph" title="Restructure as PRM-in-XML">
+    <change>Formatting changes have been made to use structured data formats, with tables of structures in addition to the C structure definitions.</change>
+  </revision>
  </history>
 </meta>
 
