@@ -148,7 +148,7 @@ of the list.</offset>
 supplier is implemented against.</offset>
 
     <offset number='8' name='features'>A bitset of flags defining optional aspects of a
-supplier.  Values are detailed elsewhere. <fixme> Detail them here, where it's relevant </fixme></offset>
+supplier. No features are currently defined and the the value must be set to 0.</offset>
 
     <offset number='12' name='swinumber'>The SWI number through which all other communication
 with the supplier is performed.</offset>
@@ -314,14 +314,13 @@ typedef struct stdesc
             types share a common set of formats and presentations for convenience).
             Depending upon the type in question, this value may be an enumeration, a
             bitset of flags or a combination of both (none of the currently defined
-            formats mix enumeration and flag bitsets).
-            <fixme> Document the formats </fixme>
+            formats mix enumeration and flag bitsets). See below for the meanings of the formats,
             </p></offset>
 
         <offset number='8' name='presentation'><p>This field dictates how the supplier would like
             the value to be presented.  A gatherer may choose to ignore this value, but
             only at the risk of presenting the user with incoherent information.
-            <fixme> Document the values! </fixme>
+            See below for the meaning of the presentations.
             </p></offset>
 
         <offset number='12' name='size'>This is the number of bytes the statistic wishes reserved
@@ -355,6 +354,88 @@ yet to be determined. Must be zero.
         <offset number='28' name='spare'>This field is reserved for future use and must be zero.</offset>
 </offset-table>
 </p>
+
+<p>
+The format and presentation vary with the statistic types.
+</p>
+<p>
+<value-table head-number='Statistic type' head-name='Name' head-value='Format and presentation'>
+    <value number='0' name='ST_UNUSED'>There is no format or presentation defined for the ST_UNUSED type.</value>
+
+    <value number='1' name='ST_BOOLEAN'>
+        <p>Format:</p>
+        <p><value-table>
+                <value name='SBF_NORMAL' number='0'>The value supplied is 0 if boolean 'false' and any other value for boolean 'true'.</value>
+                <value name='SBF_INVERTED' number='1'>The boolean state is inverted, 0 if boolean 'true' and any other value for boolean 'false'.</value>
+        </value-table></p>
+        <p>Presentation:</p>
+        <p><value-table>
+                <value name='SBP_ON_OFF' number='0'>The strings 'on' and 'off' will be used.</value>
+                <value name='SBP_YES_NO' number='1'>The strings 'yes' and 'no' will be used.</value>
+                <value name='SBP_TRUE_FALSE' number='2'>The strings 'true' and 'false' will be used.</value>
+                <value name='SBP_ALWAYS_NEVER' number='3'>The strings 'always' and 'never' will be used.</value>
+                <value name='SBP_ONE_ZERO' number='4'>The strings '1' and '0' will be used.</value>
+        </value-table></p>
+    </value>
+
+    <value number='2' name='ST_STRING'>
+        <p>Format:</p>
+        <p><value-table>
+                <value name='SSF_ZEROTERM' number='0'>This is the only defined format, indicating that the string is zero-terminated.</value>
+        </value-table></p>
+        <p>Presentation:</p>
+        <p><value-table>
+                <value name='SSP_LITERAL' number='0'>The string should be presented as supplied.</value>
+        </value-table></p>
+    </value>
+
+    <value number='3-6' name='ST_INTEGER#'>
+        <p>Format:</p>
+        <p><bitfield-table>
+                <bit name='SIF_UNSIGNED' number='0' state='set'>The value is unsigned</bit>
+                <bit name='SIF_UNSIGNED' number='0' state='clear'>The value is signed</bit>
+                <bit name='SIF_BIGENDIAN' number='1' state='set'>The value is supplied as big-endian</bit>
+                <bit name='SIF_BIGENDIAN' number='1' state='clear'>The value is supplied as little-endian</bit>
+                <bit number='2-31' state='reserved'/>
+        </bitfield-table></p>
+        <p>Presentation:</p>
+        <p><value-table>
+                <value name='SIP_HEXADECIMAL' number='0'>The value should be presented as a hexadecimal number.</value>
+                <value name='SIP_DECIMAL' number='1'>The value should be presented as a decimal number.</value>
+                <value name='SIP_DOTTED' number='2'>The value should be presented separating every octet with a '.' character. This was intended for use for addresses; it has been superseded by the ST_ADDRESS type.</value>
+        </value-table></p>
+    </value>
+
+    <value number='7' name='ST_ADDRESS'>
+        <p>Format:</p>
+        <p><value-table>
+                <value name='SAF_ETHERNET' number='0'>The value is a 6 byte MAC address.</value>
+                <value name='SAF_IP' number='1'>The value is a 4 byte IP address.</value>
+                <value name='SAF_ECONET' number='2'>The value is a 2 byte (net.station) address.</value>
+        </value-table></p>
+        <p>Presentation:</p>
+        <p><value-table>
+                <value name='SAP_NORMAL' number='0'>There is only this presentation type.</value>
+        </value-table></p>
+    </value>
+
+    <value number='7' name='ST_TIME'>
+        <p>Format:</p>
+        <p><value-table>
+                <value name='STF_5BYTE' number='0'>The value is a standard 5 bytes format (8 bytes, top 3 bytes ignored), measured in centiseconds since 00:00 1st January 1900.</value>
+                <value name='STF_CTIME' number='1'>The value is a C time() value, measured in seconds since 00:00 1st January 1970.</value>
+                <value name='STF_MONOTONIC' number='2'>The value is a centisecond value, used by OS_ReadMonotonicTime, measured in seconds since the system started.</value>
+        </value-table></p>
+        <p>Presentation:</p>
+        <p><value-table>
+                <value name='STP_ABSOLUTE' number='0'>The values are absolute and should be presented as time values from their reference base.</value>
+                <value name='STP_RELATIVE' number='1'>The values are relative to the current time, and the reference base should be ignored. For example, a value of 250 in format STF_MONOTONIC might be presented as '2.50 seconds'.</value>
+        </value-table></p>
+    </value>
+
+</value-table>
+</p>
+
 </category>
 
 </subsection>
@@ -608,9 +689,10 @@ NOT INTENDED FOR USE IN LIFE CRITICAL APPLICATIONS.
     <change>Added ST_TIME and ST_ADDRESS types.</change>
   </revision>
 
-  <revision number="X" date="08 Aug 2020" author="Gerph" title="Restructure as PRM-in-XML">
+  <revision number="6" date="08 Aug 2020" author="Gerph" title="Restructure as PRM-in-XML">
     <change>Exported from Impression, and converted to PRM-in-XML structured format.</change>
-    <change>Restructured document to match PRM structure and style</change>
+    <change>Restructured document to match PRM structure and style.</change>
+    <change>Added note that the features field is not currently defined and should be 0.</change>
   </revision>
 
 <!-- Currently Outstanding
