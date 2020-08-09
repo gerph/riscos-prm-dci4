@@ -4,18 +4,6 @@
 
 <riscos-prm>
 <chapter title="DCI Statistics">
-
-<section title="Currently Outstanding">
-
-<p>
-The name_tag field of the statistic structure has not yet been defined.
-This will eventually provide a link through to some text from an IHV/ISV
-supplied data file. This will be resolved before production code is
-issued.
-</p>
-
-</section>
-
 <section title="Introduction">
 
 <p>The maintenance of statistics such as "packets transmitted" for a network
@@ -65,8 +53,9 @@ single generic display program to cope with all compliant modules.
 </section>
 
 
+<section title='Technical Details'>
 
-<section title="Basics of operation">
+<subsection title="Basics of operation">
 
 <p>A piece of software that wishes to offer statistics is termed a "supplier".
 A piece of software that obtains statistics from a supplier and presents them
@@ -84,9 +73,11 @@ the gatherer actively seeks out the information to be presented.
 </p>
 
 <p>The first stage of enumeration (determining what suppliers are present) is
-performed with a service call, and the second stage (determining what
+performed with a service call (<reference type='service' name='StatisticEnumerate'/>),
+and the second stage (determining what
 statistics are available and their values) is performed through a SWI whose
-SWI number is obtained during the first stage of enumeration.  This SWI
+SWI number is obtained during the first stage of enumeration
+(<reference type='swi' name='StatisticsProvider_Statistics'/>).  This SWI
 number is used for all stages of operation apart from enumeration itself.
 </p>
 
@@ -107,16 +98,17 @@ required.  A supplier indicates the volatility of its statistics and
 typically attempts to group statistics into ranges of the same volatility.
 </p>
 
-</section>
+</subsection>
 
-<section title="Enumerating suppliers">
+<subsection title="Enumerating suppliers">
 <p>The list of available suppliers is determined with a single service
 call, <reference type='service' name='StatisticEnumerate'/>.</p>
 
 <p>
-Each supplier allocates a small structure from the RMA, initializes it and
-links it into the linked list whose head is pointed to by R0.  Whether the
-supplier adds an entry at the head or tail of the list does not matter.  If a
+On receiving this service, each supplier allocates a small structure from the RMA,
+initializes it and links it into the linked list whose head is pointed to by R0.
+Whether the supplier adds an entry at the head or tail of the list does not matter,
+although it is recommended that the entries be added to the head for simplicity.  If a
 gatherer requires any specific order, then it should explicitly sort the
 suppliers list itself.  A gatherer should not cache SWI values across
 invocations of suppliers, as a module might choose a dynamic SWI numbering
@@ -207,44 +199,10 @@ information about these bytes.</offset>
 <p>When a gatherer has finished interacting with a supplier, it should free the
 allocated structures back into the RMA.
 </p>
-</section>
+</subsection>
 
 
-<section title='Services'>
-<service-definition name="StatisticEnumerate"
-                    number="A1"
-                    description="Enumerate providers of extended DCI statistics"
-                    >
-<entry>
-<register-use number="0">Pointer to the head of the enumeration chain</register-use>
-<register-use number="1">Reason code (&hex;A1)</register-use>
-</entry>
-<exit>
-<register-use number="0">New pointer to the head of the enumeration chain containing all the statistic providers</register-use>
-</exit>
-
-<use>
-<p>
-This service call is used to enumerate the statistic providers which are currently
-active. Each supplier should allocate a block in the RMA containing the
-<reference type='category' name='Statistics Provider Structure'/> and
-fill in the details of its provider. It should then update the
-<variable>next</variable> pointer to point to the supplied head of the chain, and
-return the new pointer in R1. It must not claim the service.
-</p>
-
-<p>
-    Statistics gatherers will use this information to decide what to display, and call
-    the supplied SWI number as appropriate. Initially the statistics provider will
-    supply the pointer in R0 as 0 when the service is issued.
-</p>
-</use>
-</service-definition>
-</section>
-
-
-
-<section title="Describing and obtaining statistics">
+<subsection title="Describing and obtaining statistics">
 
 <p>Apart from the enumeration phase, all communication with a supplier is
 performed through the single SWI number obtained during the enumeration
@@ -273,9 +231,7 @@ aligned in memory.
 
 
 <category title='Statistic Description Structure'>
-<p>Each statistic is described with a fixed sized buffer, described in C as
-follows:
-</p>
+<p>Each statistic is described with a fixed sized buffer, described in C as follows:</p>
 
 <p>
 <extended-example type='c'>
@@ -291,7 +247,6 @@ typedef struct stdesc
     unsigned int            spare;          /* Unused. Always zero */
 } dci4_stdesc;
 </extended-example>
-
 </p>
 
 
@@ -402,60 +357,10 @@ yet to be determined. Must be zero.
 </p>
 </category>
 
-</section>
+</subsection>
 
 
-<section title="SWI calls">
-<swi-definition name='StatisticsProvider_Statistics'
-                offset='0' offset-base='StatisticsProvider'
-                description='Obtain statistics from a statistics provider'>
-<entry>
-    <register-use number='0'>SA_DESCRIBE (0) or SA_READ (1) depending on the operation required</register-use>
-    <register-use number='1'>First statistic, inclusive</register-use>
-    <register-use number='2'>Last statistic, inclusive</register-use>
-    <register-use number='3'>First byte of buffer in memory</register-use>
-    <register-use number='4'>Number of bytes in buffer</register-use>
-</entry>
-<entry>
-    <register-use number='0-4' state='preserved'/>
-    <register-use number='5'>Number of statistics processed</register-use>
-    <register-use number='6'>Number of bytes of buffer used</register-use>
-</entry>
-
-<use>
-<p>
-    This SWI is used to obtain a description of the statistics provided
-    by a supplier, or the actual values of those statitics. It is expected
-    that it be called at least twice, once to read the descriptions of
-    the statistics, and then future times to read the values of those
-    statistics.
-</p>
-
-<p>
-    When the operation requested is SA_DESCRIBE (0), the statistics buffer supplied in
-    R1 should be filled with structures as described in <reference type='category' name='Statistic Description Structure'/>.
-</p>
-
-<p>
-    When the operation requested is SA_READ (1), the statistics buffer supplied in
-    R1 should be filled with the values corresponding to those that would be described
-    if SA_DESCRIBE (0) had been requested. Each statistics has a length as defined by
-    the <reference type='category' name='Statistic Description Structure'/>.
-</p>
-
-<p>
-    If the buffer is filled before all statistics are written, the SWI should exit
-    with as much data as would fit into the buffer written and appropriate values in
-    R5 and R6 on exit. Statistics gatherers may recognise this condition and provide
-    extended buffers.
-</p>
-</use>
-</swi-definition>
-</section>
-
-
-
-<section title="Ping pong atomicity">
+<subsection title="Ensuring statistic atomicity">
 
 <p>The supplier is required to perform each read request atomically.  This means
 a gatherer can rely upon a read operation producing consistent statistics,
@@ -513,18 +418,19 @@ other operations can proceed with interrupts enabled.  This minimal critical
 region is the prime motivation behind this scheme.
 </p>
 
-</section>
+</subsection>
 
 
 
-<section title="Additional notes">
-
+<subsection title="Handling dynamic statistics">
 <p>
     Some applications of the statistic interface will require a single RISC OS
 module to behave as multiple suppliers.  For example, a device driver module
 that controls multiple interfaces might well wish to provide an overall set
 of statistics, and then an instance of a set of statistics per interface
-controlled.  A separate SWI number is required for each 'effective supplier'.
+controlled.</p>
+
+<p>A separate SWI number is required for each 'effective supplier'.
 This is not normally a problem, as very few modules approach the limit of the
 64 separate SWIs allocated.  Gatherers are expected to obtain SWI numbers
 through the enumeration method supplied, and should be capable of handling
@@ -534,6 +440,99 @@ attempt to 'cache' these SWI numbers across invocations of the device driver,
 then it might not correctly cater for the addition or removal of interfaces.
 </p>
 
+</subsection>
+
+
+</section>
+
+
+<section title='Services'>
+<service-definition name="StatisticEnumerate"
+                    number="A1"
+                    description="Enumerate providers of extended DCI statistics"
+                    >
+<entry>
+<register-use number="0">Pointer to the head of the enumeration chain</register-use>
+<register-use number="1">Reason code (&hex;A1)</register-use>
+</entry>
+<exit>
+<register-use number="0">New pointer to the head of the enumeration chain containing all the statistic providers</register-use>
+</exit>
+
+<use>
+<p>
+This service call is used to enumerate the statistic providers which are currently
+active. Each supplier should allocate a block in the RMA containing the
+<reference type='category' name='Statistics Provider Structure'/> and
+fill in the details of its provider. It should then update the
+<variable>next</variable> pointer to point to the supplied head of the chain, and
+return the new pointer in R1. It must not claim the service.
+</p>
+
+<p>
+    Statistics gatherers will use this information to decide what to display, and call
+    the supplied SWI number as appropriate. Initially the statistics provider will
+    supply the pointer in R0 as 0 when the service is issued.
+</p>
+</use>
+<related>
+    <reference type='swi' name='StatisticsProvider_Statistics'/>
+</related>
+</service-definition>
+</section>
+
+
+<section title="SWI calls">
+<swi-definition name='StatisticsProvider_Statistics'
+                offset='0' offset-base='StatisticsProvider'
+                description='Obtain statistics from a statistics provider'>
+<entry>
+    <register-use number='0'>SA_DESCRIBE (0) or SA_READ (1) depending on the operation required</register-use>
+    <register-use number='1'>First statistic, inclusive</register-use>
+    <register-use number='2'>Last statistic, inclusive</register-use>
+    <register-use number='3'>First byte of buffer in memory</register-use>
+    <register-use number='4'>Number of bytes in buffer</register-use>
+</entry>
+<exit>
+    <register-use number='0-4' state='preserved'/>
+    <register-use number='5'>Number of statistics processed</register-use>
+    <register-use number='6'>Number of bytes of buffer used</register-use>
+</exit>
+
+<use>
+<p>
+    This SWI is used to obtain a description of the statistics provided
+    by a supplier, or the actual values of those statitics. It is expected
+    that it be called at least twice, once to read the descriptions of
+    the statistics, and then future times to read the values of those
+    statistics.
+</p>
+
+<p>
+    When the operation requested is SA_DESCRIBE (0), the statistics buffer supplied in
+    R1 should be filled with structures as described in <reference type='category' name='Statistic Description Structure'/>.
+</p>
+
+<p>
+    When the operation requested is SA_READ (1), the statistics buffer supplied in
+    R1 should be filled with the values corresponding to those that would be described
+    if SA_DESCRIBE (0) had been requested. Each statistics has a length as defined by
+    the <reference type='category' name='Statistic Description Structure'/>.
+</p>
+
+<p>
+    If the buffer is filled before all statistics are written, the SWI should exit
+    with as much data as would fit into the buffer written and appropriate values in
+    R5 and R6 on exit. Statistics gatherers may recognise this condition and provide
+    extended buffers.
+</p>
+</use>
+
+<related>
+    <reference type='service' name='StatisticEnumerate'/>
+</related>
+
+</swi-definition>
 </section>
 
 </chapter>
@@ -611,7 +610,19 @@ NOT INTENDED FOR USE IN LIFE CRITICAL APPLICATIONS.
 
   <revision number="X" date="08 Aug 2020" author="Gerph" title="Restructure as PRM-in-XML">
     <change>Exported from Impression, and converted to PRM-in-XML structured format.</change>
+    <change>Restructured document to match PRM structure and style</change>
   </revision>
+
+<!-- Currently Outstanding
+
+<p>
+The name_tag field of the statistic structure has not yet been defined.
+This will eventually provide a link through to some text from an IHV/ISV
+supplied data file. This will be resolved before production code is
+issued.
+</p>
+
+-->
 
  </history>
 </meta>

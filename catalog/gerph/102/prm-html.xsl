@@ -1500,11 +1500,17 @@
 
 <!-- A value table is just a table of values with headings -->
 <xsl:template match="value-table">
+<xsl:variable name="head-name">
+  <xsl:choose>
+    <xsl:when test="@head-name != ''"><xsl:value-of select="@head-name" /></xsl:when>
+    <xsl:when test="count(value/@name)>0"><xsl:text>Name</xsl:text></xsl:when>
+  </xsl:choose>
+</xsl:variable>
 <table summary="Opaque table of values" border="0">
  <tr>
   <th align="right" valign="bottom"><xsl:value-of select="@head-number" /></th>
-  <xsl:if test="@head-name != ''">
-   <th align="left" valign="bottom"><xsl:value-of select="@head-name" /></th>
+  <xsl:if test="$head-name != ''">
+   <th align="left" valign="bottom"><xsl:value-of select="$head-name" /></th>
   </xsl:if>
   <th align="left" valign="bottom"><xsl:value-of select="@head-value" /></th>
  </tr>
@@ -1534,11 +1540,17 @@
 
 <!-- An offset table is similar to the value-table -->
 <xsl:template match="offset-table">
+<xsl:variable name="head-name">
+  <xsl:choose>
+    <xsl:when test="@head-name != ''"><xsl:value-of select="@head-name" /></xsl:when>
+    <xsl:when test="count(offset/@name)>0"><xsl:text>Name</xsl:text></xsl:when>
+  </xsl:choose>
+</xsl:variable>
 <table summary="Opaque table of offset/contents" border="0">
  <tr>
   <th align="right" valign="bottom"><xsl:value-of select="@head-number" /></th>
-  <xsl:if test="@head-name != ''">
-   <th align="left" valign="bottom"><xsl:value-of select="@head-name" /></th>
+  <xsl:if test="$head-name != ''">
+   <th align="left" valign="bottom"><xsl:value-of select="$head-name" /></th>
   </xsl:if>
   <th align="left" valign="bottom"><xsl:value-of select="@head-value" /></th>
  </tr>
