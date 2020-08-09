@@ -30,7 +30,7 @@
 <localdb:sections type="tboxmethod" filename="tboxmethods" title="TBox methods" number="yes"/>
 <localdb:sections type="tboxmessage" filename="tboxmessages" title="TBox messages" number="yes"/>
 
-<xsl:output method="html" indent="no"/>
+<xsl:output method="xml" indent="no"/>
 
 <xsl:param name="include-source">no</xsl:param>
 <xsl:param name="hide-empty" select="//options/@hide-empty" />
@@ -64,7 +64,7 @@
 
  <xsl:if test="$make-contents = 'yes'">
   <xsl:message>  Contents</xsl:message>
-  <xsl:document href="{concat('contents-',@type,'s.html')}" method="html" indent="no">
+  <xsl:document href="{concat('contents-',@type,'s.html')}" method="xml" indent="no">
    <html>
     <xsl:apply-templates select="/index">
      <xsl:with-param name="index-entity" select="@type" />
@@ -87,8 +87,9 @@
  
  <xsl:message>  Sorting (names)</xsl:message>
  <!-- and then produce the HTML for those indexes -->
- <xsl:document href="{concat('index-',@type,'s.html')}" method="html" indent="no">
+ <xsl:document href="{concat('index-',@type,'s.html')}" method="xml" indent="no">
 <head>
+  <meta charset="utf-8"/>
   <title>
     <xsl:text>RISC OS Programmers Reference Manuals : </xsl:text>
     <xsl:text>Index</xsl:text>
@@ -140,8 +141,9 @@
                                               (@number='yes')]">
  <xsl:message>  Sorting (numbers)</xsl:message>
  <!-- and then produce the HTML for those indexes -->
- <xsl:document href="{concat('index-',@type,'s-n.html')}" method="html" indent="no">
+ <xsl:document href="{concat('index-',@type,'s-n.html')}" method="xml" indent="no">
 <head>
+  <meta charset="utf-8"/>
   <title>
     <xsl:text>RISC OS Programmers Reference Manuals : </xsl:text>
     <xsl:text>Index</xsl:text>
@@ -478,6 +480,7 @@ which shall be made to the publisher.<br />
 <xsl:template match="index">
 <xsl:param name="index-entity"></xsl:param>
 <head>
+  <meta charset="utf-8"/>
   <title>
     <xsl:text>RISC OS Programmers Reference Manuals : </xsl:text>
     <xsl:text>Contents</xsl:text>
