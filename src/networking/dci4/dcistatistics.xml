@@ -16,22 +16,6 @@ issued.
 
 </section>
 
-<section title="Contents">
-
-<p>
-    Introduction
-    Plus points
-    Minus points
-    Basics of operation
-    Enumerating suppliers - the Service_StatisticEnumerate Service Call
-    Communicating with a supplier through its SWI number:
-    Ping pong atomicity
-    Additional notes
-</p>
-
-</section>
-
-
 <section title="Introduction">
 
 <p>The maintenance of statistics such as "packets transmitted" for a network
@@ -48,32 +32,35 @@ single generic display program to cope with all compliant modules.
 <p>The following characterise the intentions of this interface specification:
 </p>
 
-<subsection title="Plus points">
-
 <p>
-* Simplicity of implementation
-* Single generic statistics display program
-* No essential central information that needs frequent updating
-* Information is for presentation to humans primarily
-* Atomic operations without any latching mechanisms
-* Well behaved with multiple gatherers
-* Well behaved if a supplier unexpectedly disappears
-* Virtually stateless communication
-
+<list>
+    <item><p><strong>Plus points</strong></p>
+        <p>
+        <list>
+            <item>Simplicity of implementation</item>
+            <item>Single generic statistics display program</item>
+            <item>No essential central information that needs frequent updating</item>
+            <item>Information is for presentation to humans primarily</item>
+            <item>Atomic operations without any latching mechanisms</item>
+            <item>Well behaved with multiple gatherers</item>
+            <item>Well behaved if a supplier unexpectedly disappears</item>
+            <item>Virtually stateless communication</item>
+        </list>
+        </p>
+    </item>
+    <item><p><strong>Minus points</strong></p>
+        <p>
+        <list>
+            <item>Not re-entrant - callbacks or user mode code only</item>
+            <item>Restrictive string model</item>
+            <item>Polled interface, rather than event driven</item>
+            <item>Only simple flat structure to statistics</item>
+            <item>Only really suitable for human display</item>
+        </list>
+        </p>
+    </item>
+</list>
 </p>
-</subsection>
-
-<subsection title="Minus points">
-
-<p>
-* Not re-entrant - callbacks or user mode code only
-* Restrictive string model
-* Polled interface, rather than event driven
-* Only simple flat structure to statistics
-* Only really suitable for human display
-</p>
-
-</subsection>
 
 </section>
 
@@ -154,21 +141,25 @@ scheme if it offers multiple effective suppliers.
 </p>
 
 <p>In C, this structure is defined as follows:
+</p>
 
-    typedef struct spctl
-    {
-        struct spctl       *next;           /* Next structure in list */
-        unsigned int        i_version;      /* Interface version */
-        unsigned long       features;       /* Combination of SF_ values */
-        unsigned int        swinumber;      /* The SWI SA_DESCRIBE/SA_READ use */
-        unsigned int        max_stat;       /* Highest stat number (inclusive) */
-        unsigned int        type;           /* Acorn assigned supplier type */
-        unsigned int        s_version;      /* Supplier version */
-        char               *module;         /* Module name (short one) */
-        char               *title;          /* Title string - short */
-        char               *description;    /* Descriptive string - long */
-        unsigned char       reset[8];       /* Unique for each invocation */
-    } dci4_spctl;
+<p>
+<extended-example type='c'>
+typedef struct spctl
+{
+    struct spctl       *next;           /* Next structure in list */
+    unsigned int        i_version;      /* Interface version */
+    unsigned long       features;       /* Combination of SF_ values */
+    unsigned int        swinumber;      /* The SWI SA_DESCRIBE/SA_READ use */
+    unsigned int        max_stat;       /* Highest stat number (inclusive) */
+    unsigned int        type;           /* Acorn assigned supplier type */
+    unsigned int        s_version;      /* Supplier version */
+    char               *module;         /* Module name (short one) */
+    char               *title;          /* Title string - short */
+    char               *description;    /* Descriptive string - long */
+    unsigned char       reset[8];       /* Unique for each invocation */
+} dci4_spctl;
+</extended-example>
 </p>
 
 
@@ -197,14 +188,16 @@ statistic.
 <p>unsigned int type:  This field is available to provide some classification of
 suppliers.  It is the only centrally administered resource in this
 specification, and its use is optional.  The currently defined values are as
-follows (expressed in C):
+follows:
 </p>
 
 <p>
-    #define SPT_GENERAL_SUPPLIER 0   /* Use this if no other suitable type */
-    #define SPT_NETWORK_PROTOCOL 1   /* A DCI4 protocol module */
-    #define SPT_NETWORK_DRIVER   2   /* A DCI4 device driver module */
-    #define SPT_MBUF_MANAGER     3   /* The DCI4 mbuf manager module */
+<value-table>
+    <value name='SPT_GENERAL_SUPPLIER' number='0'>Use this if no other suitable type</value>
+    <value name='SPT_NETWORK_PROTOCOL' number='1'>A DCI4 protocol module</value>
+    <value name='SPT_NETWORK_DRIVER' number='2'>A DCI4 device driver module</value>
+    <value name='SPT_MBUF_MANAGER' number='3'>The DCI4 mbuf manager module</value>
+</value-table>
 </p>
 
 <p>unsigned int s_version:  This is the version number of the supplier module
@@ -295,71 +288,90 @@ aligned in memory.
 
 <p>Each statistic is described with a fixed sized buffer, described in C as
 follows:
+</p>
 
-    typedef struct stdesc
-    {
-        unsigned int            type;           /* ST_ series */
-        unsigned int            format;         /* SxF_ series */
-        unsigned int            presentation;   /* SxP_ series */
-        unsigned int            size;           /* Measured in bytes */
-        unsigned int            volatility;     /* SV_ series */
-        char                   *name;           /* String is static */
-        unsigned int            name_tag;       /* See specification */
-        unsigned int            spare;          /* Unused. Always zero */
-    } dci4_stdesc;
+<p>
+<extended-example type='c'>
+typedef struct stdesc
+{
+    unsigned int            type;           /* ST_ series */
+    unsigned int            format;         /* SxF_ series */
+    unsigned int            presentation;   /* SxP_ series */
+    unsigned int            size;           /* Measured in bytes */
+    unsigned int            volatility;     /* SV_ series */
+    char                   *name;           /* String is static */
+    unsigned int            name_tag;       /* See specification */
+    unsigned int            spare;          /* Unused. Always zero */
+} dci4_stdesc;
+</extended-example>
+
 </p>
 
 
 <p>unsigned int type:  This defines the type of statistic.  Possible values are:
-
-    #define ST_UNUSED           0
-    #define ST_BOOLEAN          1
-    #define ST_STRING           2
-    #define ST_INTEGER8         3
-    #define ST_INTEGER16        4
-    #define ST_INTEGER32        5
-    #define ST_INTEGER64        6
-    #define ST_ADDRESS          7
-    #define ST_TIME             8
 </p>
 
-<p>ST_UNUSED is used by a supplier to reserve a statistic number.  Such a
-statistic always has a value occupying zero bytes, and hence can always be
-enumerated, no matter how many bytes are left in the called supplied buffer.
-A statistic with a type of ST_UNUSED should always be skipped over when
-printing and enumerating - none of the fields beyond the type and size fields
-are valid for unused statistics.
+
+<p>
+ <value-table>
+ <value name='ST_UNUSED' number='0'>
+    <p>ST_UNUSED is used by a supplier to reserve a statistic number.  Such a
+    statistic always has a value occupying zero bytes, and hence can always be
+    enumerated, no matter how many bytes are left in the called supplied buffer.
+    A statistic with a type of ST_UNUSED should always be skipped over when
+    printing and enumerating - none of the fields beyond the type and size fields
+    are valid for unused statistics.
+    </p>
+ </value>
+ <value name='ST_BOOLEAN' number='1'>
+    <p>ST_BOOLEAN values are single bit boolean values.  A variety of different
+    presentation methods may be selected by the supplier in order to maximise
+    coherence between the description and the presentation of a boolean value.
+    Only the least significant bit of a boolean type has a defined value.
+    </p>
+ </value>
+ <value name='ST_STRING' number='2'>
+    <p>ST_STRING values are string values.  Currently, strings are defined using a
+    zero byte as a terminator character {future versions may well introduce
+    counted length strings as well).  A supplier is required to be able to place
+    an upper length value on all strings so that sufficient space may be
+    allocated within the caller supplied buffer for the SA_READ operation.
+    </p>
+ </value>
+ <value name='ST_INTEGER8' number='3'>
+    <p>ST_INTEGER8 is an 8-bit (byte) quantity.</p>
+ </value>
+ <value name='ST_INTEGER16' number='4'>
+    <p>ST_INTEGER8 is an 16-bit (half-word) quantity.</p>
+ </value>
+ <value name='ST_INTEGER32' number='5'>
+    <p>ST_INTEGER8 is an 32-bit (word) quantity.</p>
+ </value>
+ <value name='ST_INTEGER64' number='6'>
+    <p>ST_INTEGER8 is an 64-bit (double-word) quantity.</p>
+ </value>
+ <value name='ST_ADDRESS' number='7'>
+    <p>ST_ADDRESS values are addresses given in a protocol-specific format. A
+    variety of different forms of address are possible. The presentation formats
+    available for this type are presently undefined. This type of statistic is
+    only supported by 1.01 of the DCI statistics format.
+    </p>
+ </value>
+ <value name='ST_TIME' number='8'>
+    <p>ST_TIME values are time values given in a variety of formats. The
+    presentation methods presented allow for times to be specified in a number
+    of ways. This type of statistic is only supported by 1.01 of the DCI
+    statistics format.
+    </p>
+ </value>
+</value-table>
 </p>
 
-<p>ST_BOOLEAN values are single bit boolean values.  A variety of different
-presentation methods may be selected by the supplier in order to maximise
-coherence between the description and the presentation of a boolean value.
-Only the least significant bit of a boolean type has a defined value.
-</p>
 
-<p>ST_STRING values are string values.  Currently, strings are defined using a
-zero byte as a terminator character {future versions may well introduce
-counted length strings as well).  A supplier is required to be able to place
-an upper length value on all strings so that sufficient space may be
-allocated within the caller supplied buffer for the SA_READ operation.
-</p>
 
-<p>ST_INTEGERx values are all integer values.  A variety of different sized
-integers are supported to suit different requirements.  A flexible set of
-presentation methods is supported.
-</p>
 
-<p>ST_ADDRESS values are addresses given in a protocol-specific format. A
-variety of different forms of address are possible. The presentation formats
-available for this type are presently undefined. This type of statistic is
-only supported by 1.01 of the DCI statistics format.
-</p>
 
-<p>ST_TIME values are time values given in a variety of formats. The
-presentation methods presented allow for times to be specified in a number
-of ways. This type of statistic is only supported by 1.01 of the DCI
-statistics format.
-</p>
+
 
 <p>unsigned int format:  this field contains a value indicating the format of
 the value.  The range of values is specific to each type (all the integer
@@ -562,7 +574,7 @@ NOT INTENDED FOR USE IN LIFE CRITICAL APPLICATIONS.
     <change>name_tag as being outstanding added.</change>
   </revision>
 
-  <revision number="5" date="28 April 2003" author="Gerph">
+  <revision number="5" date="28 Apr 2003" author="Gerph">
     <change>Added ST_TIME and ST_ADDRESS types.</change>
   </revision>
 
