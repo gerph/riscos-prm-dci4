@@ -2323,7 +2323,7 @@
 <xsl:template match="revision">
 <tr>
  <td valign="top"><xsl:value-of select="@number" /></td>
- <td valign="top"><xsl:value-of select="translate(@date,' ','&#160;')" /></td>
+ <td valign="top" style='white-space: nowrap;'><xsl:value-of select="@date" /></td>
  <td valign="top"><xsl:value-of select="@author" /></td>
  <td valign="top">
   <xsl:if test="@title != ''">
