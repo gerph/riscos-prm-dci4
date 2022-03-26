@@ -6,9 +6,17 @@
       help="output/help"
       header="output/header"
       input="src"
-      temp="tmp"
-      temprel="../../tmp" />
-<options hide-empty="no" />
+      temp="tmp" />
+<options
+    hide-empty="yes"
+    make-contents="no"
+    include-sections="no"
+    include-sections-depth="1"
+    catalog-version="103"
+    page-format='html5'
+    page-css-variant='prm body-fraunces heading-raleway webfont-fraunces webfont-raleway large-bullets'
+    index-css-variant='prm body-fraunces heading-raleway webfont-fraunces webfont-raleway large-bullets no-edge-index'
+    />
 
 <make-index type="swi" />
 <make-index type="command" />
@@ -22,7 +30,16 @@
 <make-index type="vdu" />
 <make-index type="tboxmessage" />
 <make-index type="tboxmethod" />
-<make-index type="section" />
+
+<make-filelist/>
+<!-- <make-indexdata/> -->
+
+
+<footer>
+    This content is subject to license terms that are still being determined.
+    It is understood that RISC OS Developments have the rights to this documentation,
+    but until this is confirmed, they should be treated with care.
+</footer>
 
 <section title="Overview" dir="overview">
  <page>About this documentation</page>

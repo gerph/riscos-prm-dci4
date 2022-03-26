@@ -17,7 +17,7 @@ cache:
 
 
 #### Static Analysis Jobs ####
-lint:
+.lint:
   stage: static
   script:
     - bash ci/run lint
@@ -45,15 +45,25 @@ lint:
 build:
   stage: build
   script:
-    - ./do-build.sh
+    - mkdir logs artifacts
+
+    # PrinceXML (http://www.princexml.com/) requires a license to be used.
+    # If the documents produced contain no advertising, and are provided for
+    # no cost to anyone, and are published on a site that has no cost and has
+    # no advertising, and providing that a link is provided to the PrinceXML
+    # site, the non-commercial license can be used (even on a server).
+    # Consult https://www.princexml.com/purchase/license_faq/ for more details.
+    #
+    # These criteria are met by the builds we're creating here, and so we can
+    # use the non-commercial license.
+    - PRINCEXML_I_HAVE_A_LICENSE=1 ./build.sh
     - mv output artifacts/docs
+
   artifacts:
     when: always
     paths:
       - artifacts
       - logs
-    reports:
-      junit: artifacts/build-results.xml
   when: always
 
 
