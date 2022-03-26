@@ -3,8 +3,1620 @@
                             "http://www.movspclr.co.uk/dtd/102/prm.dtd">
 
 <riscos-prm>
-<chapter title="MBuf Manager">
+<chapter title="MbufManager">
 <section title="Overview">
+</section>
+
+<section title="0 Currently outstanding">
+<p>C is acceptable as an illustrative language but is not ideally
+suited to a definition language. Language neutral versions of all
+structures, etc, need producing. Not all macros contained within
+the reference mbuf.h file are documented although their behaviour
+is readily determinable from this specification.</p>
+<p>More should probably be said about unsafe data shadowing safe
+data.</p>
+<p>The dci4 client interface contract appendix needs tightening
+up.</p>
+</section>
+
+<section title="1 Conventions">
+<p>'quoted strings' should be envisaged in an italic font.</p>
+<p>"quoted strings" indicate phrases with specific technical
+interpretation, typically only when first introduced.</p>
+<p>[bracketed text] is an aside to reviewers. Comments on such text
+is encouraged.</p>
+<p>77 hyphen (-) characters denote table and figure
+delimitation.</p>
+</section>
+
+<section title="2 Basics of operation">
+<p>A "client" is a program (typically a module and in practise
+probably constrained to be a module) that uses the facilities of
+the "MbufManager".</p>
+<p>Clients establish a session with the MbufManager on
+initialisation, use memory management facilities from the mbuf
+manager during their normal operation, and then close the session
+with the MbufManager just prior to their shutdown.</p>
+<p>Memory is manipulated through the use of a descriptor structure,
+called an mbuf. An mbuf describes a number of contiguous bytes in
+memory.</p>
+<p>The MbufManager imposes some restrictions, requirements and
+conventions upon the use of mbufs. A group of client typically
+implement a further interface contract of their own - the DCI4
+client interface contract is such an interface (see Appendix).</p>
+</section>
+
+<section title="3 MbufManager goals">
+<list>
+    <item>Hide any mechanics not necessary for client operation</item>
+    <item>Provide single mbuf pool, rather than one per protocol</item>
+    <item>Provide facilties suitable for device drivers and protocol modules</item>
+    <item>Provide a balanced compromise between conflicting design goals</item>
+    <item>Provide negligable long term fragmentation</item>
+    <item>Provide efficient implementations of facilities offered</item>
+    <item>Permit pre-allocation of packet storage space (DCI2 doesn't)</item>
+    <item>Permit modular component upgrade path (DCI2 doesn't)</item>
+</list>
+</section>
+
+<section title="4 The mbuf structure and its uses">
+<p>Mbufs are used to provide a descriptive structure layer that
+describe and dictate access to a conceptual block of memory.</p>
+<p>In conventional memory management, the user manipulates a
+pointer to a block of memory. With mbuf memory management, the user
+manipulates a pointer to a descriptive structure (an "mbuf"), which
+itself provides the means to obtain a pointer to the block of
+memory that it "describes". Further, these structures are chained
+together to form a linked list, providing a form of scatter/gather
+memory description. The chain of mbufs describes a single
+conceptual block of memory, even though the actual memory used
+might well be scattered throughout real memory.</p>
+<p>Thus, an extra layer of structuring is inserted between the user
+and the block of memory being manipulated when mbuf memory
+management is used.</p>
+<p>By accessing a block of memory through an mbuf structure, it is
+possible to record size, type and some degree of linkage
+information. By manipulating the fields within an mbuf, it is
+possible to efficiently add and remove data from a described" block
+of memory in a variety of fashions.</p>
+<p>Mbufs are allocated and freed by the MbufManager. Programs that
+requestallocation and freeing operations are called clients.</p>
+<p>A client never has a "struct mbuf" itself, only pointers that at
+some stage came from the MbufManager. (This allows the size of an
+mbuf to grow later; in particular MbufManagers may differ in the
+amount of private data stored with the mbuf.)</p>
+<p>The C definition of an mbuf structure:</p>
+
+<p>
+<extended-example>
+struct ifnet;
+struct pkthdr {
+    int len; /* total packet length */
+    struct ifnet *rcvif; /* receiving interface */
+};
+typedef struct mbuf {
+    struct mbuf *m_next; /* next mbuf in chain */
+    struct mbuf *m_list; /* next mbuf in list (clients only) */
+    ptrdiff_t m_off; /* current offset to data from mbuf itself */
+    size_t m_len; /* current byte count */
+    const ptrdiff_t m_inioff; /* original offset to data from mbuf itself */
+    const size_t m_inilen; /* original byte count (for underlying data) */
+    unsigned char m_type; /* client use only */
+    const unsigned char m_sys1; /* MbufManager use only */
+    const unsigned char m_sys2; /* MbufManager use only */
+    unsigned char m_flags; /* client use only */
+    struct pkthdr m_pkthdr; /* client use only */
+} dci4_mbuf;
+</extended-example>
+</p>
+
+<code>struct mbuf *m_next;</code>
+<p>Although mbufs may be manipulated individually, they are almost
+always used as an mbuf chain. The 'm_next' field of the mbuf
+structure points at the next mbuf in an mbuf chain. There is no
+back pointer. Successive mbufs describe conceptually "later" bytes
+of memory, even if the underlying blocks of actual memory used to
+hold these bytes are not stored consecutively or "later" in memory.
+The end of an mbuf chain is indicated by the 'm_next' field
+containing the NULL pointer.</p>
+<p>A client may allocate an mbuf chain for internal use or for
+communicating data to another (MbufManager) client. An mbuf chain
+may exist only for a small fraction of a second or it may be used
+and retained for weeks. It is the task of the MbufManager to
+ensure that such usage does not cause anything other than
+negligible memory fragmentation.</p>
+<p><code>ptrdiff_t m_off;</code></p>
+<p>The allocation of an mbuf is always accompanied by the
+allocation of an additional block of memory (see the discussion on
+unsafe data later for the exceptions to this). It is this
+additional block of memory that the mbuf is said to "describe".
+Access to this described memory is through manipulation of the
+address of the mbuf itself and fields contained within the mbuf.
+The location of this memory, relative to the mbuf itself, is not
+defined, other than the 'm_off' field contains a suitable bias to
+access this memory.</p>
+<p>size_t m_len;</p>
+<p>The 'm_off' field is the bias to add to the address of the mbuf
+to obtain the address of the first byte of data described by that
+mbuf. The 'm_len' field specifies the number of bytes contained in
+the described data. This might be envisaged as follows:</p>
+<p>Relationships between the address of an mbuf, and the 'm_off',
+'m_next' and 'm_len' fields.</p>
+
+<extended-example title='other'>
+                      Mbufs                      Described
+                                                    data
+     mbuf
+     pointer ------> ========= --------+-------> =========
+                     |       |        / \        |       |
+                     | m_off | ------/   \       |       |
+                     |       |            \      |       |
+                     | m_len | -----------+      |       |
+                     |       |             \     |       |
+                     | m_next| --\          \    |       |
+                     |       |    \          \   |       |
+                     =========     \         --> =========
+                                   /
+            /---------------------/
+            |
+            \------> ========= --------+-------> =========
+                     |       |        / \        |       |
+                     | m_off | ------/   \       |       |
+                     |       |            \      |       |
+                     | m_len | -----------+      |       |
+                     |       |             \     |       |
+                     | m_next| -->NULL      \    |       |
+                     |       |               \   |       |
+                     =========               --> =========
+</extended-example>
+
+<p>Notes:</p>
+<p>Only three of the fields of an mbuf are indicated. This is for
+clarity purposes. The example illustrates an mbuf chain formed from
+two mbufs.</p>
+<p>Example C code to flatten an mbuf chain into the single sequence
+of bytes that it conceptually describes:</p>
+
+<p>
+<extended-example type='c'>
+void flatten_mbuf_chain(struct mbuf *mp, char *buffer)
+{
+    for ( ; mp != NULL; mp = mp-&gt;m_next)
+    {
+        memcpy(buffer, mtod(mp, char *), mp-&gt;m_len);
+        buffer += mp-&gt;m_len;
+    }
+}
+</extended-example>
+</p>
+
+<p>Notes:</p>
+<p>As with most example programs, no thought has been given to the
+handling of exceptional circumstances.</p>
+<p>This algorithm applies equally to safe and unsafe mbuf
+chains.</p>
+<p>'mtod' is a macro, and adds the address of the first byte of the
+mbuf to the value of the 'm_off' field of the mbuf, yielding the
+address of the first&nbsp;byte of data described by the mbuf. It
+also performs a type cast. 'mtod' is supplied as a C macro for
+convenience.</p>
+<p>Only byte alignment is required for the data described by the
+'m_off' and 'm_len' fields. All clients must fully cope with
+non-word aligned addresses and lengths when manipulating the data
+described by an mbuf, although optimisations for aligned data are
+encouraged, as is the generation of aligned data. An mbuf structure
+itself is always at least word aligned in memory.</p>
+<p>When the MbufManager performs an allocation for a client and
+returns an mbuf chain to a client, that client is deemed to have
+taken "ownership" of that mbuf chain. The precise implications of
+ownership form part of the interface contract between clients of
+the MbufManager. For example, the DCI4 specification specifies an
+interface contract between compliant modules using mbufs. One of
+the prime responsibilities of ownership is to free the mbuf chain
+at some stage (or transfer ownership). Whenever the MbufManager
+returns an mbuf chain, it transfer ownership of this chain at the
+same time.</p>
+<p>Whenever the MbufManager receives an mbuf chain it also takes
+ownership of that chain. A summary of ownership transfer for direct
+entry points is given later. Exceptions to these rules are details
+individually throughout the text.</p>
+<p>In order to minimise long term fragmentation (and for various
+other implementation reasons), the sizes of the underlying memory
+blocks that may be allocated for an mbuf to describe are
+constrained to a number of sizes. This permits the situation where
+an mbuf describes only some of the underlying memory actually
+allocated.</p>
+<p>const ptrdiff_t m_inioff;</p>
+<p>const size_t m_inilen;</p>
+<p>The 'm_inioff' and 'm_inilen' fields provide a description of
+the underlying block of memory in the same way as 'm_off' and
+'m_len' fields (respectively) provide a description of the
+described block of memory (which resides somewhere within the
+underling block, although not necessarily always at the start or
+end of it). Any values of 'm_len' and 'm_off' are permitted
+provided that the described block of memory is fully contained
+within the underlying block described by 'm_inioff' and 'm_inilen'
+(but see the field validity table below).</p>
+<p>struct mbuf *m_list;</p>
+<p>unsigned char m_type;</p>
+<p>The 'm_list' and 'm_type' fields are provided for the
+convenience of the client. The contents of these fields when an
+mbuf is passed from one client to another is part of the interface
+contract between clients. When a client owns an mbuf chain, it can
+set these fields to whatever values it requires.</p>
+<p>If these fields are used, a client must explicitly initialise
+them. The MbufManager never examines these fields.</p>
+<p>const unsigned char m_sys1;</p>
+<p>const unsigned char m_sys2;</p>
+<p>The 'm_sys1' and 'm_sys2' fields are private fields maintained
+by the MbufManager. They should never be read or written by a
+client under any circumstances, even transiently. The MbufManager
+is entitled to asynchronously examine these three fields if it
+requires.</p>
+<p>unsigned char m_flags;</p>
+<p>struct pkthdr m_pkthdr;</p>
+<p>The 'm_flags' field, and the 'm_pkthdr' field in version 0.15 or
+later of the MbufManager, are provided for the convenience of the
+client . The contents of these fields when an mbuf is passed from
+one client to another is part of the interface contract between
+clients. When a client owns an mbuf chain, it can set these fields
+to whatever values it requires.</p>
+<p>If these fields are used, a client must explicitly initialise
+them. The MbufManager never examines these fields.</p>
+<p>When an mbuf chain is freed, the storage required for the
+mbuf(s) comprising the chain and the underlying memory associated
+with each mbuf is placed backinto the free pool and becomes
+available for subsequent re-allocation. It is not possible to free
+only one of the mbuf and the underlying storage associated with
+that mbuf. This ensures that, as long as an mbuf chain is
+allocated, then the data it describes is also be correctly
+allocated.</p>
+</section>
+
+<section title="5 Unsafe data">
+<p>"Unsafe data" is a concept that breaks some of the rules just
+outlined. In particular, the memory described by an unsafe mbuf is
+not underlying memory allocated by the MbufManager in the fashion
+just described.</p>
+<p>When an unsafe mbuf is allocated, the MbufManager does not
+allocate associated underlying storage. Rather, the mbuf is
+available for the client to set the 'm_off' and 'm_len' fields such
+that a portion of memory beyond the control of the MbufManager is
+described by the mbuf. The only requirement of the MbufManager on
+the 'm_off' and 'm_len' fields for an unsafe mbuf is that the data they describe must be valid
+whenever an MbufManager operation implicitly or explicitly
+accesses them. In practise, the only time when these fields may
+hold random values is when the mbuf (chain) is being freed or
+transiently during update within a client.</p>
+<p>The MbufManager can tell whether an mbuf describes safe or
+unsafe data from examination of the mbuf. When an unsafe mbuf is
+freed, there is no freeing action performed on the associated
+data.</p>
+<p>It is because there is no directly enforceable relationship (by
+the MbufManager) between the lifetime of an unsafe mbuf and the
+data it describes that the data is termed "unsafe". "Unsafe data"
+does not imply incorrect behaviour. The phrase is used as is a
+reminder of the additional constraints on the described data, and
+serves to encourage the programmer to take the necessary extra
+precautions.</p>
+<p>Unsafe data is often used when it is not necessary to copy the
+data into a safe mbuf chain, eliminating a copy operation and
+increasing performance. A client may arrange its internal
+strategies to permit the use of unsafe data as an optimisation.</p>
+<p>In order for the concept of unsafe data to be useful, some
+statement about the lifetime and validity of the described data
+must be possible. The client interface contract normally adds
+further detail to the requirements for unsafe mbufs.</p>
+<p>Whenever an unsafe mbuf is supplied to the MbufManager in a
+context that the MbufManager may examine the data described, then
+the client pledges that this data will remain valid until that call
+into the MbufManager returns.</p>
+<p>In practise there are two useful ways in which unsafe mbuf
+chains may be manipulated:</p>
+
+<p>
+<list type='ordered'>
+    <item>All use of the data is completed before the recipient (client
+or MbufManager) returns execution control to the supplying client.
+It is still theresponsibility of the recipient client to free the
+mbuf chain.</item>
+    <item>The recipient client copies the unsafe data described into a
+safe mbuf chain before control returns back to the supplying
+client. Responsibilityfor freeing the unsafe mbuf chain still lies
+with the recipient client.</item>
+</list>
+</p>
+
+<p>Ideally, all recipient clients would be capable of processing
+all mbuf chains they receive prior to returning control. Such
+clients could always use unsafe data in an efficient manner.</p>
+<p>As a worst case fallback, whenever a client is supplied with an
+mbuf chain it always performs an 'ensure_safe' operation to ensure
+that the data is safe; this always entails data copying for unsafe
+mbuf chains.</p>
+<p>In practise, "ensuring" (see the description of "ensuring"
+later) potentially unsafe mbufs chain to safe mbuf chains only when
+necessary is a reasonable compromise.</p>
+<p>It is possible (indeed permitted) to allocate a safe mbuf and
+then generate a second reference to the same data with an unsafe
+mbuf. Data described in an mbuf chain may thus be "referenced" in
+almost the same way any other data may</p>
+<p>be used in an unsafe mbuf. The difference is that an unsafe mbuf
+will be required for each describing mbuf in the chain, rather than
+a single unsafe mbuf to describe a single conceptual region of
+memory. Additional constraints are also imposed to ensure that the
+original mbuf chain is not freed before the unsafe mbuf chain.
+Freeing the safe mbuf chain after the return of the call where the
+unsafe mbuf chain is used will achieve correct operation.</p>
+<p>In some traditional mbuf implementations, use is made of native
+memory management facilities to provide the ability to remap memory
+into "mbuf visible" regions, thus avoiding memory copying. This
+facility is not available in this specification. To some degree,
+unsafe data lessens this lack.</p>
+<p>The 'm_inioff' and 'm_inilen' fields of an unsafe mbuf are
+initialised according to the allocation method used. See later for
+details.</p>
+<p><b>Summary of mbuf field validity: client &lt;=&gt; mbuf
+manager</b></p>
+
+<p>Field From mbuf To mbuf</p>
+<p>===== ========= =======</p>
+<p>m_next valid valid</p>
+<p>m_list NULL invalid</p>
+<p>m_off valid invalid</p>
+<p>m_len valid invalid</p>
+<p>m_inioff valid valid*</p>
+<p>m_inilen valid valid*</p>
+<p>m_type invalid invalid</p>
+<p>m_sys1 opaque opaque</p>
+<p>m_sys2 opaque opaque</p>
+<p>m_sys3 opaque opaque</p>
+<p>m_pkthdr invalid invalid</p>
+
+<p>Notes:</p>
+<p>Field: the name of a field within an mbuf structure.</p>
+<p>From mbuf: an mbuf chain being passed from the MbufManager to a
+client.</p>
+<p>To mbuf: an mbuf chain being passed from a client to the mbuf
+manager.</p>
+<p>valid: the field meets the criteria stated within this
+document.</p>
+<p>valid*: unsafe mbufs need not describe real memory in the
+underlying storage.</p>
+<p>There is never any freeing of the underlying storage of an
+unsafe mbuf.</p>
+<p>NULL: the NULL pointer.</p>
+<p>invalid: any value may be present. No manipulation of such a
+value should ever be made. Either the field should be ignored or it
+should be initialised prior to use.</p>
+<p>opaque: never read and never written by any client.</p>
+<p>The 'm_inioff' and 'm_inilen' fields of a safe mbuf are never
+altered by a client - only read. The 'm_inioff' and 'm_inilen'
+fields of an unsafe mbuf may be altered by the client.</p>
+</section>
+
+<section title="6 MbufManager sessions">
+<p>The period of time when a client may allocate (and otherwise
+use) mbufs from the MbufManager is termed a "session". A session
+is initiated (opened) and terminated (closed) with SWI calls. A
+client must allocate and maintain an MbufManager control structure
+(an "mbctl" structure) for a duration encompassing a session
+(typically, the client has a static structure within it's data area
+for this purpose). A pointer to this structure is supplied to the
+MbufManager during both initialisation and termination calls and
+all direct entry points.</p>
+<p>This structure contains, amongst other things, a set of function
+pointers. These function pointers provide direct entry points into
+individual routines within the MbufManager. They are initialised
+by the MbufManager during session initialisation and remain valid
+until session termination. All of the performance critical routines
+of the MbufManager (such as mbuf allocation and freeing) are
+accessed through these direct entry points, which incur
+considerably less overhead than SWI routines. These entry points
+are designed to permit the easy inter-operation of assembler and
+APCS code (such as that generated by the NorCroft C compiler), and
+roughly obey APCS. A list of entry/exit characteristics follows
+(using APCS register naming convention):</p>
+
+<p>
+<list>
+    <item>a1 always points at an mbctl structure for all direct entry calls</item>
+    <item>the processor must be in supervisor mode (but see MBC_USERMODE)</item>
+    <item>a1-a4 are the only parameter registers</item>
+    <item>a2-a4 and ip are corrupted by the call</item>
+    <item>a1 is either the call result or corrupted</item>
+    <item>other registers preserved by call</item>
+    <item>the processor flags are preserved by the call</item>
+    <item>no V set error convention (incompatible with APCS)</item>
+    <item>in general, an error results in a1=0 on exit</item>
+    <item>IRQ state preserved across call</item>
+    <item>IRQs may be disable during calls</item>
+    <item>IRQs may be enabled during calls ONLY if specifically documented</item>
+    <item>FIQs assumed enabled on entry</item>
+    <item>FIQs preserved across calls</item>
+</list>
+</p>
+
+<p>Currently, no direct entry point routine will enable interrupts if they are disabled on entry.</p>
+<p><b>C definition of an MbufManager control structure:</b></p>
+
+<p>
+<extended-example type='c'>
+typedef struct mbctl
+{
+    /* reserved for MbufManager use in establishing context */
+    int opaque; /* MbufManager use only */
+    /* Client initialises before session is established */
+    size_t mbcsize; /* size of mbctl structure from client */
+    unsigned int mbcvers; /* client version of MbufManager spec */
+    unsigned long flags; /* */
+    size_t advminubs; /* Advisory desired minimum underlying block size */
+    size_t advmaxubs; /* Advisory desired maximum underlying block size */
+    size_t mincontig; /* client required min ensure_contig value */
+    unsigned long spare1; /* Must be set to zero on initialisation */
+    /* MbufManager initialises during session establishment */
+    size_t minubs; /* Minimum underlying block size */
+    size_t maxubs; /* Maximum underlying block size */
+    size_t maxcontig; /* Maximum contiguify block size */
+    unsigned long spare2; /* Reserved for future use */
+    /* Allocation routines */
+    struct mbuf * /* MBC_DEFAULT */
+    (* alloc)
+    (struct mbctl *, size_t bytes, void *ptr);
+    struct mbuf * /* Parameter driven */
+    (* alloc_g)
+    (struct mbctl *, size_t bytes, void *ptr, unsigned long flags);
+    struct mbuf * /* MBC_UNSAFE */
+    (* alloc_u)
+    (struct mbctl *, size_t bytes, void *ptr);
+    struct mbuf * /* MBC_SINGLE */
+    (* alloc_s)
+    (struct mbctl *, size_t bytes, void *ptr);
+    struct mbuf * /* MBC_CLEAR */
+    (* alloc_c)
+    (struct mbctl *, size_t bytes, void *ptr);
+    /* Ensuring routines */
+    struct mbuf *
+    (* ensure_safe)
+    (struct mbctl *, struct mbuf *mp);
+    struct mbuf *
+    (* ensure_contig)
+    (struct mbctl *, struct mbuf *mp, size_t bytes);
+    /* Freeing routines */
+    void
+    (* free)
+    (struct mbctl *, struct mbuf *mp);
+    void
+    (* freem)
+    (struct mbctl *, struct mbuf *mp);
+    void
+    (* dtom_free)
+    (struct mbctl *, struct mbuf *mp);
+    void
+    (* dtom_freem)
+    (struct mbctl *, struct mbuf *mp);
+    /* Support routines */
+    struct mbuf * /* No ownership transfer though */
+    (* dtom)
+    (struct mbctl *, void *ptr);
+    int /* Client retains mp ownership */
+    (* any_unsafe)
+    (struct mbctl *, struct mbuf *mp);
+    int /* Client retains mp ownership */
+    (* this_unsafe)
+    (struct mbctl *, struct mbuf *mp);
+    size_t /* Client retains mp ownership */
+    (* count_bytes)
+    (struct mbctl *, struct mbuf *mp);
+    struct mbuf * /* Client retains old, new ownership */
+    (* cat)
+    (struct mbctl *, struct mbuf *old, struct mbuf *new);
+    struct mbuf * /* Client retains mp ownership */
+    (* trim)
+    (struct mbctl *, struct mbuf *mp, int bytes, void *ptr);
+    struct mbuf * /* Client retains mp ownership */
+    (* copy)
+    (struct mbctl *, struct mbuf *mp, size_t off, size_t len);
+    struct mbuf * /* Client retains mp ownership */
+    (* copy_p)
+    (struct mbctl *, struct mbuf *mp, size_t off, size_t len);
+    struct mbuf * /* Client retains mp ownership */
+    (* copy_u)
+    (struct mbctl *, struct mbuf *mp, size_t off, size_t len);
+    struct mbuf * /* Client retains mp ownership */
+    (* import)
+    (struct mbctl *, struct mbuf *mp, size_t bytes, void *ptr);
+    struct mbuf * /* Client retains mp ownership */
+    (* export)
+    (struct mbctl *, struct mbuf *mp, size_t bytes, void *ptr);
+} dci4_mbctl;
+</extended-example>
+</p>
+
+<p>Prior to establishing a session, the client initialises the
+following fields of the mbctl structure:</p>
+
+<p>
+<list>
+    <item>size_t mbcsize;</item>
+    <item>unsigned int mbcvers;</item>
+    <item>unsigned long flags;</item>
+    <item>size_t advminubs;</item>
+    <item>size_t advmaxubs;</item>
+    <item>size_t mincontig;</item>
+    <item>unsigned long spare1;</item>
+</list>
+</p>
+
+<p>The values a client initialises these fields to are defined as
+follows:</p>
+<p><b>mbcsize</b>: The size of the mbctl structure. This is the
+size of the structure understood by the compiler/assembler at
+compilation time. Future versions of this specification may add
+other fields. In C, one might use "sizeof(struct mbctl)".</p>
+<p><b>mbcver</b>s: The version of the MbufManager specification
+that the client is implemented against. This is the major version
+times one hundred plus the minor version. Minor version number
+changes indicate bug fixes and the possible introduction of small
+and upwardly compatible changes. Major revision number changes
+indicate major and possibly not entirely backwardly compatible
+changes.</p>
+<p><b>flags</b>: This bitset supplies various pieces of information
+to the MbufManager. See the description of the <reference type='swi' name='Mbuf_OpenSession'/>
+SWI later on for details of suitable values to enter in this
+field.</p>
+<p><b>advminubs</b>: Advisory minimum underlying block size. This
+value advises the MbufManager of the smallest underlying block
+size that the client thinks appropriate for its requirements.
+Traditional mbuf clients might well use the orignal value of MLEN
+(112 in most cases) for this value. If no particular value seems
+appropriate, a client should set this field to zero.</p>
+<p><b>advmaxubs</b>: Advisory maximum underlying block size. This
+value advises the MbufManager of the largest underlying block size
+that the client thinks appropriate for its requirements. An
+ethernet device driver client might well use the ethernet MTU
+(maximum transmission unit) value of 1500. If no particular value
+seems appropriate, a client should set this field to zero.</p>
+<p><b>mincontig</b>: This specifies the maximum size the client
+will ever specify to the "contiguify" routine. If the MbufManager
+can never meet the value specified, it will refuse to open the
+session. If no particular value seems appropriate, a client should
+set this field to zero.</p>
+<p><b>spare1</b>: This field must be initialised to zero.</p>
+<p>The contents of all other fields of the mbctl structure are
+irrelevant at the start of session initiation.</p>
+<p>The next stage of session initiation is the issuing of an
+<reference type='swi' name='Mbuf_OpenSession'/> SWI call, supplying the address of this mbctl
+structure to the MbufManager as a parameter. If the session
+requested can be support by the MbufManager then it will
+initialise all other fields of the mbctl structure before
+returning. If the session cannot be supported, then no fields of
+the mbctl structure will be modified by the MbufManager and an
+error will be returned.</p>
+<p>If no error is returned, the session is established and the
+client may use the direct entry points now available.</p>
+<p>A session is terminated with the <reference type='swi' name='Mbuf_CloseSession'/> SWI call,
+supplying it the address of the same mbctl structure used to
+establish the connection.</p>
+<p>int opaque;</p>
+<p>The 'opaque' field is for the use of the MbufManager. It is
+initialised during session establishment. It must never be read or
+written by a client during a session.</p>
+<p>All the direct entry points take a fixed first parameter of the
+address ofthe mbctl structure used to establish the session. This
+permits the MbufManager to establish any necessary context.</p>
+</section>
+
+<section title="7 Allocation routines">
+<p>
+<extended-example type='c'>
+struct mbuf * /* Parameter driven */
+(* alloc_g)
+(struct mbctl *, size_t bytes, void *ptr, unsigned long flags);
+</extended-example>
+</p>
+
+<p>There is one general purpose allocation routine (alloc_g), and a
+number of more specialised allocation routines. All of these are
+accessed through the direct entry addresses contained in the
+initialised mbctl structure. The particular values the MbufManager
+supplies for the addresses of the direct entry point routines are
+chosen to be as optimal as possible for the clients indicated
+requirements. The functionality of these specific routines may be
+accessed through the general purpose routine; they are provided
+solely for performance reasons.</p>
+<p>A successful allocation returns a chain of mbufs that satisfy
+all the criteria of the allocation. An unsuccessful allocation
+returns the NULL pointer. A NULL pointer indicates either a lack of
+some resource (typically mbufs or underlying storage) or a set of
+criteria that cannot be satisifed. If, for whatever reason, an
+allocation is constrained to a single mbuf, then the 'm_next' field
+of that mbuf will always be zero. In other words, whatever the
+entry flags may suggest, effectively, an mbuf chain is always
+returned.</p>
+<p>The 'flags' bitset provides a list of constraints and deviations
+that are to be applied to an allocation.</p>
+<p>The default allocation has all bits of the 'flags' bitset clear.
+In particular, the default allocation is for safe data. The defined
+bits are as follows:</p>
+
+<p>MBC_DEFAULT 0x00000000ul</p>
+<p>
+<bitfield-table>
+    <bit number='0' name='MBC_UNSAFE'></bit>
+    <bit number='1' name='MBC_SINGLE'></bit>
+    <bit number='2' name='MBC_CLEAR'></bit>
+    <bit number='2-31' state='reserved'></bit>
+</bitfield-table>
+</p>
+<p>Allocation consists of up to three internal phases:</p>
+<p>
+<list>
+    <item>allocation</item>
+    <item>clearing</item>
+    <item>copying</item>
+</list>
+</p>
+
+<p>Roughly speaking; the allocation phase always happens, the
+clearing phase happens when the MBC_CLEAR bit is set, and the
+copying phase happens when 'ptr' is not the NULL pointer.</p>
+<p>If the allocation phase fails the clearing and copying phases
+are always skipped and the NULL pointer returned. The clearing and
+copying phases are not capable of failing (merely not
+happening).</p>
+</section>
+
+<section title="8 The allocation phase">
+<p>Table of different allocation options</p>
+<p>MBC_UNSAFE bytes MBC_SINGLE type</p>
+
+<p>0 0 ? 1</p>
+
+<p>0 \= 0 0 2</p>
+
+<p>0 \= 0 1 3</p>
+
+<p>1 0 ? 4</p>
+
+<p>1 \= 0 ? 5</p>
+<p>Notes:</p>
+<p>Column headings:</p>
+<p>MBC_UNSAFE: the value of the MBC_UNSAFE bit</p>
+<p>bytes: the value of the 'bytes' parameter</p>
+<p>MBC_SINGLE: the value of the MBC_SINGLE bit</p>
+<p>type: reference to detailed description</p>
+<p>Column contents:</p>
+<p>0: equal to zero, or flag clear</p>
+<p>1: flag set</p>
+<p>\=0: not equal to zero</p>
+<p>?: any value (0 or 1 for bits)</p>
+<p>1) MBC_UNSAFE = 0, bytes = 0, MBC_SINGLE = ?</p>
+<p>The first available mbuf is chosen (so the setting of MBC_SINGLE
+is irrelevant). The actual size of the described data returned is
+unknown in advance, other than it is equal to or larger than the
+minimum underlying block size of the MbufManager (the 'minubs'
+field of the mbctl structure). 'm_len' and 'm_off' are set to
+reflect the underlying block (ie 'm_len' =</p>
+<p>'m_inilen' and 'm_off' = 'm_inioff', respectively). Should a
+clearing or copying phase occur, then the value used for 'bytes'
+will be the value of 'm_len' in the newly allocated mbuf. Such
+copying might be the start of a variable sized mbuf chain building
+algorithm.</p>
+<p>m_next: NULL - always only one mbuf</p>
+<p>m_list: NULL</p>
+<p>m_off: describes underlying block</p>
+<p>m_len: size of underlying block</p>
+<p>m_inioff: describes underlying block</p>
+<p>m_inilen: size of underlying block</p>
+<p>2) MBC_UNSAFE = 0, bytes \= 0, MBC_SINGLE = 0</p>
+<p>A chain of an arbitary number of mbufs is allocated, with a
+total described data size of 'bytes' bytes.</p>
+<p>m_next: chain of mbufs returned</p>
+<p>m_list: NULL</p>
+<p>m_off: describes allocated memory</p>
+<p>m_len: summed over the chain, gives 'bytes'</p>
+<p>m_inioff: describes underlying block</p>
+<p>m_inilen: size of underlying block</p>
+<p>3) MBC_UNSAFE = 0, bytes \= 0, MBC_SINGLE = 1</p>
+<p>Precisely one mbuf is allocated to describe the required number
+of bytes. It is possible for such allocations to fail due to not
+being able to locate an mbuf and underlying block with sufficient
+size.</p>
+<p>m_next: NULL - always only one mbuf</p>
+<p>m_list: NULL</p>
+<p>m_off: describes allocated memory</p>
+<p>m_len: 'bytes'</p>
+<p>m_inioff: describes underlying block</p>
+<p>m_inilen: size of underlying block</p>
+<p>4) MBC_UNSAFE = 1, bytes = 0, MBC_SINGLE = ?</p>
+<p>A single unsafe mbuf is allocated and set to describe no data.
+The value of 'ptr' is irrelevant. The MBC_CLEAR flag will be forced
+clear. 'm_off' and 'm_inioff' will describe the same value as the
+NULL pointer, and 'm_len' and 'm_inilen' will be zero. This is the
+only circumstance in which an mbuf (anywhere in an allocated chain)
+is allocated with zero in the 'm_len' field and returned directly
+from an allocation routine. (Note the anomoly for the 'copy'
+routine when asked to duplicate zero bytes.) The data described by
+an unsafe mbuf is not suitable for 'dtom', unless the data
+described is a "shadow" or "reference" to some previously allocated
+safe data, in which case 'dtom' will return the mbuf pointer for
+the original, safe, mbuf.</p>
+<p>m_next: NULL - always only one mbuf</p>
+<p>m_list: NULL</p>
+<p>m_off: describes the NULL pointer</p>
+<p>m_len: zero</p>
+<p>m_inioff: describes the NULL pointer</p>
+<p>m_inilen: zero</p>
+<p>5) MBC_UNSAFE = 1, bytes \= 0, MBC_SINGLE = ?</p>
+<p>A single unsafe mbuf is allocated. The 'm_len' field is set to
+the value of 'bytes'. 'm_off' is set to describe 'ptr', whatever
+the value of 'ptr'. This means suppling 'ptr' as the NULL pointer
+will cause the unsafe mbuf returned to have a non-zero byte count
+but for the data described to occur from address zero onwards. This
+is only useful when 'm_off' is later initialised to describe real
+memory. The data described by an unsafe mbuf is not suitable for
+'dtom', unless the data described is a "shadow" or "reference" to
+some previously allocated safe data, in which case 'dtom' will
+return the mbuf pointer for the original, safe, mbuf.</p>
+<p>m_next: NULL - always only one mbuf</p>
+<p>m_list: NULL</p>
+<p>m_off: describes 'ptr'</p>
+<p>m_len: 'bytes'</p>
+<p>m_inioff: describes 'ptr'</p>
+<p>m_inilen: 'bytes'</p>
+</section>
+
+<section title="9 The clearing phase">
+<p>The clearing phase will set to zero all the underlying bytes in
+the allocated mbuf chain. The number of bytes zeroed is directly
+independent of the 'bytes' and 'ptr' values ('bytes' as zero
+indirectly dictates the number of bytes allocated). The clearing
+phase only occurs if the following conditions are all met:</p>
+
+<p>
+<list type='ordered'>
+    <item>The allocation phase succeeded</item>
+    <item>The MBC_CLEAR bit is set *</item>
+    <item>The MBC_UNSAFE bit is clear</item>
+</list>
+</p>
+
+<p>*: The MBC_CLEAR bit can be cleared during the allocation phase.
+This clearing overrides any value the bit may have had on entry to
+the allocation routine and prevents the clearing phase from
+occurring.</p>
+</section>
+
+<section title="10 The copying phase">
+<p>The copying phase copies data from 'ptr' into the described
+data. The number of bytes copied is the number of bytes described
+by the mbuf chain. This is the value of 'bytes' supplied to the
+allocation routine if 'bytes' was non-zero, and the underlying
+block size if 'bytes' was zero. The copying phase may be viewed as
+importing data into an mbuf chain from "raw" memory.</p>
+<p>A client cannot determine if copied bytes were cleared during
+the clearing phase or not. The copying phase only occurs if the
+following conditions are all met:</p>
+
+<p>
+<list type='ordered'>
+    <item>The allocation phase succeeded</item>
+    <item>The MBC_UNSAFE bit is clear</item>
+    <item>'ptr' is not the NULL pointer</item>
+</list>
+</p>
+
+<p><b>Summary of allocator routines and implicit or explicit
+'flags' settings</b></p>
+<p>Allocator Control over flags</p>
+<p>alloc MBC_DEFAULT (0)</p>
+<p>alloc_g parameter to the call</p>
+<p>alloc_s MBC_SINGLE</p>
+<p>alloc_u MBC_UNSAFE</p>
+<p>alloc_c MBC_CLEAR</p>
+</section>
+
+<section title="11 Freeing mbufs">
+<p>
+<extended-example type='c'>
+void
+(* free)
+(struct mbctl *, struct mbuf *mp);
+void
+(* freem)
+(struct mbctl *, struct mbuf *mp);
+void
+(* dtom_free)
+(struct mbctl *, struct mbuf *mp);
+void
+(* dtom_freem)
+(struct mbctl *, struct mbuf *mp);
+</extended-example>
+</p>
+<p>Once an mbuf chain or an individual mbuf is finished with, it is
+freed and its resources become available for re-allocation.
+Variants of the free call are available that free either just a
+single mbuf (without examining the 'm_next' field of the mbuf
+supplied) or the entire chain it describes. The routine that frees
+a single mbuf is called 'free' and the routine that potentially
+frees multiple mbufs is called 'freem'.</p>
+<p>Additionally, routines that perform the equivalent of a 'dtom'
+call followed by a freeing call are provided.</p>
+<p>No action is performed by a free call if supplied the NULL
+pointer.</p>
+<p><b>Summary of mbuf and mbuf chain freeing routines:</b></p>
+<p>free Free single mbuf (ignores 'm_next' field)</p>
+<p>freem Free entire mbuf chain (uses 'm_next' field)</p>
+<p>dtom_free Performs 'dtom' action then behaves the same as
+'free'</p>
+<p>dtom_freem Performs 'dtom' action then behaves the same as
+'freem'</p>
+</section>
+
+<section title="12 Support and ensuring routines">
+<p>
+<extended-example type='c'>
+struct mbuf *
+(* dtom)
+(struct mbctl *, void *ptr);
+</extended-example>
+</p>
+
+<p>Under the right circumstances, it is possible to perform a
+transformation from the address of any byte described by an mbuf to
+the address of the mbuf describing that byte. This transformation
+is performed with the 'dtom' routine. The presence of a 'm_next'
+field, and the lack of a hypothetical 'm_prev' field means that
+'dtom' provides access to a portion of the conceptually described
+data, starting with the first byte described by the mbuf that
+describes the supplied address, and extending to the end of the
+mbuf chain. The client cannot directly determine if the mbuf
+returned by 'dtom' is the first mbuf in a chain or an mbuf part-way
+along a chain.</p>
+<p>The required circumstances for 'dtom' to operate correctly are
+that the described data is safe.</p>
+<p>Applying 'dtom' to an unsuitable address will return the NULL
+pointer. The NULL pointer is always an unsuitable address for
+'dtom'.</p>
+<p>The 'dtom' and 'mtod' transformations are not entirely
+symmetrical. 'dtom' will always return the address of the mbuf
+owning the underlying storage referenced, indepedent of the number
+of unsafe mbufs also referencing that storage.</p>
+<p>The transformation performed by 'dtom' is necessarily based on
+the address supplied; this includes whether the address is within
+the region(s) of memory controlled by the MbufManager or not. For
+this reason, if a safe mbuf chain has been "shadowed" with an
+unsafe mbuf chain, then 'dtom' will always return the original safe
+mbuf. Further, freeing the chain returned by 'dtom' will free the
+original, safe mbuf chain, leaving the unsafe mbuf chain describing
+(through reference) now unknown data (this certainly warrants the
+description "unsafe data" and is one of the reasons for the
+'ensure_safe' routine, although in this particular case it would be
+far too late to make the call to 'ensure_safe'). It is the clients
+responsibility to ensure that such problems do not occur (typically
+through appropriate interface contracts between clients).</p>
+
+<p>
+<extended-example type='c'>
+struct mbuf *
+(* ensure_contig)
+(struct mbctl *, struct mbuf *mp, size_t bytes);
+</extended-example>
+</p>
+
+<p>For a protocol client, the removal of protocol layers (headers
+or trailers) when a packet passes up a protocol stack is often made
+easier if all of the bytes constituting a particular header level
+are contiguous. (This permits the protocol to conceptually overlay
+the received packet with a structure describing the protocol
+header.) The 'ensure_contig' routine is used to ensure such
+"contiguousness" requirements are met by an mbuf chain, and
+"contiguifies" the specified number of bytes at the head of the
+mbuf chain supplied. Described data that is contiguified is also
+always at least word aligned for the first byte. This helps with
+the overlaying of word orientated structures.</p>
+
+<p>
+<extended-example type='c'>
+struct mbuf *
+(* ensure_safe)
+(struct mbctl *, struct mbuf *mp);
+</extended-example>
+</p>
+
+<p>If safe data is required and the safeness of an mbuf chain is
+uncertain, then the 'ensure_safe' routine may be used to ensure
+that data in the returned mbuf chain is safe.</p>
+<p>In both cases (that is, 'ensure_contig' and 'ensure_safe'),
+"ensure" is used as a technical term meaning:</p>
+<p>IF</p>
+<p>the data (mbuf chain) meets the required condition</p>
+<p>THEN</p>
+<p>return the data unmodified</p>
+<p>ELSE</p>
+<p>return some data that does meet the required condition</p>
+<p>FI</p>
+<p>The process of generating data that does meet the required
+condition involves allocating one or more mbufs with appropriate
+constraints (equivalent to MBC_SINGLE, and MBC_DEFAULT allocation
+constraints) and replacing existing mbufs in the chain with these
+new mbufs. Any existing mbuf that is replaced is automatically
+freed.</p>
+<p>Any of the ensure routines may fail if they have to perform
+allocations and there is a lack of resource. If this happens, then
+the entire mbuf chain supplied is freed and the NULL pointer is
+returned.</p>
+<p>If the ensure operation does not fail, then the returned mbuf
+chain will meet the desired criteria. Whether an ensure operation
+fails or succeeds, the client must use the returned mbuf chain.
+There is an ownership transfer to the MbufManager whilst the
+ensure operation is performed and then another ownership transfer
+back to the client of the resulting mbuf chain that meets the
+criteria - these two mbuf chains may happen to be the same, but the
+loss and regain of ownership means a client cannot tell.</p>
+<p>If the mbuf chain meets the indicated criteria on entry, then
+the ensure routine cannot fail and will always return the supplied
+pointer without modification.</p>
+<p>Under some circumstances the 'ensure_contig' routine may be able
+to avoid an allocation by moving data around within the existing
+mbuf chain (this requires some underlying bytes not described by
+the mbuf chain itself). If these circumstances apply, they
+cannot generate a failure condition themselves. Thus, if only
+shuffling is required, then 'ensure_contig' cannot fail, but if
+shuffling and allocation are required, then 'ensure_contig' can
+fail through lack of resources for the allocation.</p>
+<p>Note that an mbuf chain may contain a mixture of mbufs, each
+with its own characteristics. For example, an individual mbuf may
+contain safe or unsafe data, it may meet some contiguity
+requirement or not and there may or may not be underlying bytes
+described. An mbuf chain may be composed of any mixture of such
+mbufs. The ensure routines arrange that all necessary mbufs within
+a chain meet the desired criteria.</p>
+<p>'ensure_contig' cannot operate on unsafe mbufs and will fail (ie
+freethe supplied chain and return NULL) if asked to do so.</p>
+<p>'ensure_safe' returns an mbuf chain where every byte described
+by it is known to be safe.</p>
+<p>'ensure_contig' returns an mbuf chain where the first 'N' bytes
+are known to be contiguous.</p>
+
+<p>
+<extended-example type='c'>
+int
+(* any_unsafe)
+(struct mbctl *, struct mbuf *mp);
+int
+(* this_unsafe)
+(struct mbctl *, struct mbuf *mp);
+</extended-example>
+</p>
+
+<p>A client may determine if an mbuf chain has any unsafe data in
+it with the 'any_unsafe' routine. This returns 0 for either no
+unsafe data (ie all data safe) or if supplied the NULL pointer. It
+returns 1 if the mbuf chain supplied contains unsafe data. The
+'this_unsafe' returns the same values but only examines the mbuf
+supplied - that is, it does not follow the 'm_next' field.</p>
+<p>
+<extended-example type='c'>
+size_t
+(* count_bytes)
+(struct mbctl *, struct mbuf *mp);
+</extended-example>
+</p>
+
+<p>The number of bytes described by an mbuf chain may be quickly
+determined with the 'count_bytes' routine. If supplied the NULL
+pointer, then 0 is returned.</p>
+<p>
+<extended-example type='c'>
+struct mbuf *
+(* cat)
+(struct mbctl *, struct mbuf *old, struct mbuf *new);
+</extended-example>
+</p>
+
+<p>One mbuf chain may be appended to the end of another mbuf chain
+with the 'cat' routine. The mbuf chain that gets appended to is the
+first mbuf parameter ('old'). The mbuf chain to be appended is the
+second mbuf parameter ('new'). Note that there is no ownership
+transfer of the second mbuf parameter. If 'old' is the NULL
+pointer, the 'new' is returned without examination. If 'old' is not
+the NULL pointer and 'new' is the NULL pointer then 'old' is
+returned without any modifications made to it.</p>
+<p>
+<extended-example type='c'>
+struct mbuf *
+(* trim)
+(struct mbctl *, struct mbuf *mp, int bytes, void *ptr);
+</extended-example>
+</p>
+
+<p>The 'trim' routine is used to remove bytes from either the head
+or the tail of an mbuf chain. It may optionally copy the bytes
+described to another piece of memory (performing a "flattening"
+operation in the process). All trimming is performed by adjusting
+'m_off' and 'm_len'. No mbufs are removed (unlinked and freed) from
+the either the head or the tail of the chain. If 'bytes' is greater
+than zero, then it specifies the number of bytes to remove from the
+head of the mbuf chain. If 'bytes' is zero then no alterations are
+performed and no data is copied. If 'bytes' is less than zero, then
+the absolute value of 'bytes' is the number of bytes to remove from
+the tail of the mbuf chain.</p>
+<p>If the NULL pointer is supplied for the mbuf chain, no
+operations are performed. If 'ptr' is not the NULL pointer, then
+any bytes "trimmed" from the mbuf chain will be copied into the
+supplied area of memory. If 'ptr' is the NULL pointer, then no data
+copying is performed and only a trimming operation occurs. The
+magic value M_COPYALL may be used for the 'bytes' parameter to
+indicate the entire mbuf chain. This is only useful if a copy is
+also being performed, although it will always correctly set the
+mbuf chain to describe zero bytes. If the number of bytes to trim
+(after tail adjustment</p>
+<p>if applicable) is greater than the number of bytes described by
+the mbuf chain, then behaviour is as if M_COPYALL was supplied for
+a trim byte count.</p>
+<p>
+<extended-example type='c'>
+struct mbuf *
+(* copy)
+(struct mbctl *, struct mbuf *mp, size_t off, size_t len);
+struct mbuf *
+(* copy_p)
+(struct mbctl *, struct mbuf *mp, size_t off, size_t len);
+struct mbuf *
+(* copy_u)
+(struct mbctl *, struct mbuf *mp, size_t off, size_t len);
+</extended-example>
+</p>
+
+<p>The 'copy' routine is used to duplicate a portion of an mbuf
+chain. An mbuf chain is always allocated, even if it eventually
+describes zero bytes. This distinguishes successful allocations
+that required no data from unsuccessful allocations and makes the
+behaviour of the 'len' parameter more orthogonal. The returned mbuf
+chain will have a minimum byte count of zero and a maximum byte
+count equal to the byte count of the supplied mbuf chain. The
+portion</p>
+<p>of the mbuf chain copied is the intersecting region between the
+described data of the supplied mbuf chain and the region starting
+'off' bytes into the supplied chain and continuing for 'len' bytes.
+The first byte described by an mbuf chain is byte&nbsp;0.</p>
+<p>The 'alloc' allocator routine is used. This means the returned
+mbuf chain will be safe, may have any number of mbufs, is directly
+suitable for the 'dtom' routine and any unused underlying storage
+may hold random values. If a lack of resources occur, the NULL
+pointer is returned. If 'mp' is the NULL pointer, then the NULL
+pointer is returned. If 'len' holds the magic value M_COPYALL, then
+all remaining bytes in the mbuf chain from 'off' onwards are
+copied. M_COPYALL has the value 0x7f000000, in hexadecimal in C
+notation. The mbuf chain supplied will not be altered.</p>
+<p>The 'copy_p' routine behaves as 'copy' does, except that the
+m_type, m_flags and m_pkthdr fields are assumed to contain
+significant information. This prevents two small mbufs with
+different m_type values from being merged into a single larger
+mbuf. This does not prevent a single mbuf being copied into more
+than one mbuf; this would replicate the m_type field. If the usage
+of m_type is more sophisticated than the simple 'tagging' discussed
+above, then it is likely than the client will require a custom
+copying routine.</p>
+<p>The 'm_copy_u' routine produces an unsafe copy of an mbuf chain.
+This means no new underlying storage will be allocated. The chain
+returned will have the same number of mbufs as that supplied. The
+m_type, m_flags and m_pkthdr fields are replicated from the old
+chain to the new chain. The 'alloc_u' routine is used to perform
+the new allocations.</p>
+<p>
+<extended-example type='c'>
+struct mbuf *
+(* import)
+(struct mbctl *, struct mbuf *mp, size_t bytes, void *ptr);
+</extended-example>
+</p>
+
+<p>Data may be copied from raw memory into an mbuf chain with the
+'import' routine. Copying starts at 'ptr' for reading and the first
+byte described by the mbuf chain for writing. Copying proceeds
+until either the entire mbuf chain has been filled or 'bytes' bytes
+have been read. The magic value M_COPYALL may be used to indicate
+that the entire mbuf chain should be filled. The return value is
+the mbuf chain supplied. If either the mbuf chain or 'ptr' is the
+NULL pointer then no operation is performed.</p>
+<p>
+<extended-example type='c'>
+struct mbuf *
+(* export)
+(struct mbctl *, struct mbuf *mp, size_t bytes, void *ptr);
+</extended-example>
+</p>
+
+<p>Data may be copied from an mbuf chain into raw memory with the
+'export' routine. Copying starts at the first byte described by the
+mbuf chain for reading and 'ptr' for writing. Copying proceeds
+until either the entire mbuf</p>
+<p>chain has been copied or 'bytes' bytes have been written to raw
+memory. The magic value M_COPYALL may be used to indicate that the
+entire mbuf chain should be copied to raw memory. The return value
+is the mbuf chain supplied. If either the mbuf chain or 'ptr' is
+the NULL pointer then no operation is performed.</p>
+<p><b>Summary of mbuf chain ownership transfer for direct entry
+points</b></p>
+<p>Routine Category</p>
+<p>alloc Fresh</p>
+<p>alloc_g Fresh</p>
+<p>alloc_u Fresh</p>
+<p>alloc_s Fresh</p>
+<p>alloc_c Fresh</p>
+<p>ensure_safe Release and gain</p>
+<p>ensure_contig Release and gain</p>
+<p>free Release</p>
+<p>freem Release</p>
+<p>dtom_free Release</p>
+<p>dtom_freem Release</p>
+<p>dtom No transfer</p>
+<p>any_unsafe No transfer</p>
+<p>this_unsafe No transfer</p>
+<p>count_bytes No transfer</p>
+<p>cat No transfer</p>
+<p>trim No transfer</p>
+<p>copy Fresh *</p>
+<p>copy_p Fresh *</p>
+<p>copy_u Fresh *</p>
+<p>import No transfer</p>
+<p>export No transfer</p>
+<p><b>Notes:</b></p>
+<p>Fresh: A new mbuf chain is generated and the client receives
+ownership of this new chain when it receives the chain itself.</p>
+<p>Fresh *: Ownership of the supplied mbuf chain remains with the
+caller.</p>
+<p>Release: Ownership of the mbuf chain supplied is passed to the
+MbufManager.</p>
+<p>Release and gain: Ownership of the mbuf chain supplied is passed
+to the MbufManager. Ownership of the returned chain is passed to
+the client at the same time as the mbuf chain itself.</p>
+<p>No transfer: No ownership transfer occurs (and hence no linkage
+changes are performed), but the MbufManager does expect a valid
+mbuf chain that remains static during the period of the call.</p>
+</section>
+
+<section title="13 SWI Entry points">
+<p>All SWIs defined here obey the RISC OS convention of indicating
+success by returning with the V flag clear and failure by returning
+with the V flag set and r0 pointing at a standard RISC OS error
+block. For convenience, this is omitted from the definition of each
+SWI individually. All SWIs defined here also obey the standard
+convention regarding interrupts, unless otherwise specified. That
+is: IRQ interrupt state is preserved across the SWI, although it
+may be enabled during the SWI. FIQ interrupt state is assumed
+enabled and not altered. This is described as the normal behaviour
+in the text below.</p>
+
+<swi-definition name="Mbuf_OpenSession" number="4A580"
+                description="Establishes a session with the MbufManager"
+                irqs='preserved, but may be enabled during call'
+                fiqs='preserved'>
+<entry>
+    <register-use number='0'>Address of an 'mbctl' structure</register-use>
+</entry>
+<exit>
+    <register-use number='0-9' state='preserved'/>
+</exit>
+
+<use>
+<p>This SWI is used by clients to establish a session with the MbufManager. This informs the MbufManager of the clients mbuf
+requirements, and informs the client of the direct entry point
+addresses into the MbufManager that are appropriate for its mbuf
+requirements. A certain amount of validation of the proposed
+session is performed by the MbufManager. This may result in
+modifications of behaviour within the MbufManager and it may also
+result in a refusal to accept a session, with an error being
+returned in the normal fashion.</p>
+
+<p>The flags field of the mbctl structure provides additional
+information to the MbufManager about the required session. The
+only flag with a defined meaning at present is the MBC_USERMODE
+flag.</p>
+
+<p>The MBC_USERMODE flag may be specified in the flags field to
+request that the direct entry points be suitable for user mode
+calling. If this is not specified, then the direct entry points
+must be called in supervisor mode. If MBC_USERMODE is specified,
+then the direct entry points supplied must be called in user mode.
+This permits normal user mode applications to interact with the
+MbufManager. Care must be taken with unsafe data to ensure that
+the memory described is valid when the user mode application is not
+the current application, and hence might not have its memory
+currently 'mapped in'.</p>
+
+<p>All other bits in the flags bitset should be zero.</p>
+<p>MBC_USERMODE</p>
+<p>0 - This client requires supervisor mode direct entry
+points.</p>
+<p>1 - This client requires user mode direct entry points.</p>
+<p>Errors:</p>
+<p>As normal.</p>
+<p>"MbufManager unsuitable for client"</p>
+<p>Notes:</p>
+<p>The addresess of the routines supplied for the direct entry
+points may vary according to the requirements indicated by a
+client. In some circumstances, the MbufManager is able to supply a
+"null" routine: ie an immediate return.</p>
+<p>Further details of the fields and their uses is found elsewhere
+in this document.</p>
+</use>
+</swi-definition>
+
+
+
+<swi-definition name="Mbuf_CloseSession" number="4A581"
+                description="Terminates a session with the MbufManager"
+                irqs='preserved, but may be enabled during call'
+                fiqs='preserved'>
+<entry>
+    <register-use number='0'>Address of an 'mbctl' structure previously supplied</register-use>
+</entry>
+<exit>
+    <register-use number='0-9' state='preserved'/>
+</exit>
+
+<use>
+<p>This SWI is uses to terminate a session that has previously been successfully created with the Mbuf_OpenSession SWI.</p>
+<p>Errors:</p>
+<p>As normal.</p>
+<p>"No such session"</p>
+<p>Notes:</p>
+<p>This SWI is used to terminate a session. The address supplied
+must be the same as that supplied to Mbuf_Init when the session was
+created. Whether an error is returned or not, the client must
+consider the session closed after issuing this SWI.</p>
+</use>
+</swi-definition>
+
+
+
+
+<swi-definition name="Mbuf_Memory" number="4A582"
+                description="Controls maximum memory usage"
+                irqs='preserved, but may be disabled during call'
+                fiqs='preserved'>
+<entry>
+    <register-use number='0'>New limit to use in bytes, or 0 to read current limit</register-use>
+</entry>
+<exit>
+    <register-use number='0'>Approximate limit active when SWI issued</register-use>
+    <register-use number='1-9' state='preserved'/>
+</exit>
+
+<use>
+
+<p>Provides a means to limit the maximum amount of memory that may
+be claimed by the MbufManager for mbuf and underlying storage.</p>
+<p>Errors:</p>
+<p>As normal.</p>
+<p>Notes:</p>
+<p>If zero is supplied as the new desired limit, then the limit is
+not altered and only an examination is performed. Limits are
+specified in bytes. They are approximate figures only (due to the
+underlying allocations being performed in granularities larger than
+a single byte). They are normally within one about kilobyte of the
+actual value. A new, larger limit does not cause more memory to be
+automatically claimed. The MbufManager may attempt to dynamically
+maintain an appropriately sized free pool. This limit provides a
+ceiling to any dynamic fluctuations. A user interface might well
+use a granularity of four kilobytes.</p>
+</use>
+</swi-definition>
+
+
+<swi-definition name="Mbuf_Statistic" number="4A583"
+                description="Returns statistics for the MbufManager"
+                >
+<entry>
+</entry>
+<exit>
+</exit>
+
+<use>
+<p>This SWI provides an entry point that conforms to the DCI4
+Statistic Interface. Please refer to that document for further
+details.</p>
+<fixme> Provide links to the Statistics documentation </fixme>
+<fixme> Provide at least the register call information </fixme>
+</use>
+</swi-definition>
+
+
+<swi-definition name="Mbuf_Control" number="4A584"
+                description="General purpose control interface for MbufManager"
+                irqs='preserved'
+                fiqs='preserved'>
+<entry>
+    <register-use number='0'>
+        <p>Reason code:</p>
+        <p>
+         <value-table>
+          <value number="0">
+           <reference type="swi" name="MBuf_Control" reason="0" use-description="yes" />
+          </value>
+         </value-table>
+        </p>
+    </register-use>
+</entry>
+<exit>
+    <register-use number='1-9'>Dependant on reason code</register-use>
+</exit>
+
+<use>
+<p>This is a general purpose control interface to the MbufManager.
+Different implementations may implement different control
+calls.</p>
+<p>Notes:</p>
+<p>Issuing this SWI with a reason code of 0 is a good method of
+checking for the presence of the MbufManager.</p>
+</use>
+</swi-definition>
+
+
+<swi-definition name="Mbuf_Control" number="4A584"
+                reasonname='Version' reason='0'
+                description="Read version number of the MbufManager"
+                irqs='preserved'
+                fiqs='preserved'>
+<entry>
+    <register-use number='0'>0 (reason code)</register-use>
+</entry>
+<exit>
+    <register-use number='0'>MbufManager version &times; 100</register-use>
+    <register-use number='1-9' state='preserved'/>
+</exit>
+
+<use>
+This SWI reason is used to read the version of the MbufManager.
+</use>
+</swi-definition>
+</section>
+
+<section title="14 Service calls">
+
+<service-definition name="MbufManagerStatus"
+                    number="A2"
+                    description="MbufManager state change notifications"
+                    >
+<entry>
+ <register-use number="1">Reason code (&hex;A2)</register-use>
+ <register-use number="2">Sub-reason code :
+  <value-table>
+   <value number="0">
+    <reference type="service" name="MbufManagerStatus" reason="0" use-description="yes" />
+   </value>
+   <value number="1">
+    <reference type="service" name="MbufManagerStatus" reason="1" use-description="yes" />
+   </value>
+   <value number="2">
+    <reference type="service" name="MbufManagerStatus" reason="2" use-description="yes" />
+   </value>
+  </value-table>
+ </register-use>
+</entry>
+<exit>
+ <register-use number="1" state='preserved'/>
+</exit>
+
+<use>
+The MbufManager issues service calls to notify clients and
+potential clients of desired and actual state changes. The service
+call used is Service_MbufManagerStatus (service call number 0xa2,
+in C). A reason code is passed in r0 to indicate the reason for the
+service call.
+</use>
+</service-definition>
+
+<service-definition name="MbufManagerStatus"
+                    number="A2"
+                    reason="0"
+                    reasonname="Started"
+                    description="MbufManager has started"
+                    >
+<entry>
+ <register-use number="1">reason code (&hex;8A)</register-use>
+ <register-use number="2">Sub-reason code (0)</register-use>
+</entry>
+<exit>
+ <register-use number="1" state='preserved'/>
+</exit>
+
+<use>
+    <p>MbufManager has started and is now available for use. It is
+possible to issue SWIs to the MbufManager as soon as this service
+call has been seen (it is issued from a callback to ensure this is
+possible).</p>
+</use>
+</service-definition>
+
+
+<service-definition name="MbufManagerStatus"
+                    number="A2"
+                    reason="1"
+                    reasonname="Stopping"
+                    description="MbufManager is shutting down"
+                    >
+<entry>
+ <register-use number="1">reason code (&hex;8A)</register-use>
+ <register-use number="2">Sub-reason code (1)</register-use>
+</entry>
+<exit>
+ <register-use number="1" state='preserved'/>
+</exit>
+
+<use>
+<p>The MbufManager is finishing. There are no open sessions if
+this reason code is used. The MbufManager will refuse to die if
+there are any open sessions.</p>
+</use>
+</service-definition>
+
+
+<service-definition name="MbufManagerStatus"
+                    number="A2"
+                    reason="2"
+                    reasonname="Scavenge"
+                    description="MbufManager wishes to reclaim buffers"
+                    >
+<entry>
+ <register-use number="1">reason code (&hex;8A)</register-use>
+ <register-use number="2">Sub-reason code (2)</register-use>
+</entry>
+<exit>
+ <register-use number="1" state='preserved'/>
+</exit>
+
+<use>
+<p>This reason code is used to indicate that the MbufManager is
+running short of allocatable memory and any clients with allocated
+data that may be easily recreated (such as cached data) should
+release this memory (ideally) before returning from the service
+call.</p>
+</use>
+</service-definition>
+
+</section>
+
+<section title="15 The life and death of an MbufManager">
+<p>The components necessary to form a working DCI4 environment may
+be loaded in a number of different orders. To permit sensible,
+defined behaviour for all of these orders, the MbufManager and all
+device drivers provide mechanisms to announce their arrival and
+departure, and for their presence to be determined through a polled
+action.</p>
+<p>The MbufManager announces its arrival with the Service_MbufManagerStatus
+service call with a reason code of
+<reference type='service' name='MbufManagerStatus' reason='0'>MbufManagerStatus_Started</reference>. An client that cannot detect the
+presence of the MbufManager when it (the client) loads (via an
+<reference type='swi' name='Mbuf_Control'/> SWI call, for example) should place itself in a
+'pre-active' state and await this service call. The MbufManager
+will respond to SWIs when the service call is issued.</p>
+<p>Any attempt to kill the MbufManager when there are open
+sessions will be refused.</p>
+<p>If the MbufManager is requested to die and there are not open
+sessions, it will issue the <reference type='service' name='MbufManagerStatus' reason='1'/> reason code in a
+Service_MbufManagerStatus service call to notify potential clients
+of this.</p>
+<p>Clients that can remain inactive without an open session with
+the MbufManager should do so, to give the user more flexibility
+should it be necessary to upgrade the MbufManager. Either way,
+killing all modules with open sessions should always permit the
+MbufManager to be killed.</p>
+</section>
+
+<section title="16 Glossary">
+<p>A "NULL pointer" is a pointer with all bits clear. It is never a
+valid address of examination or modification for virtually all
+programs under virtually all circumstances.</p>
+<p>A linked list of mbufs constructed with the 'm_next' field is
+referred to as a "chain of mbufs".</p>
+<p>A linked list of mbufs constructed with the 'm_list' field is
+referred to as a "list of mbufs" or a "list of mbuf chains".</p>
+<p>A chain and a list may consist of just one mbuf. The ends of the
+chain and list are indicated by the NULL pointer.</p>
+<p>Lists of chains are constructed, but not vice versa (certainly
+within this specification).</p>
+</section>
+
+<section title="A1 Appendix - DCI4 MbufManager client interface contract">
+<p>Ownership of an mbuf chain grants permission to examine and
+modify the described data, alter the order of the chain, etc. It
+also brings the responsibility to either pass ownership to another
+client or to ensure that the mbuf chain is (eventually) freed.</p>
+<p>In short, ownership permits useful things to be done with an
+mbuf chain, and carries with it the responsibility to free the
+data.</p>
+<p>When a client obtains a pointer to an mbuf chain from outside
+itself (ie from another client or from the MbufManager), it is
+deemed to have taken ownership of that chain. When it supplies that
+pointer to another client or the MbufManager, it has lost
+ownership. An mbuf chain is never owned by more than one
+client.</p>
+<p>The presence of asynchronous execution mechanisms (such as
+interrupts) requires a more precise definition. During ownership
+transfer, there is a transient period where the relinquishing
+client has called the recipient client, but the call has not yet
+returned. Depending upon the precise definition, during this period
+of time, the mbuf chain could be viewed as being owned by zero, one
+or two clients. The definition for this specification is that the
+mbuf chain is owned by zero clients.</p>
+<p>This requires the relinquishing client to take whatever steps
+are necessary to ensure that it cannot continue to access an mbuf
+chain before calling the recipient client. An example of such steps
+might be to remove the mbuf chain pointer from a list of such
+pointers examined by an interrupt routine of the relinquishing
+client or to set a semaphore of some form.</p>
+<p>The mbuf pointer supplied to the call that transfers ownership
+should be the only copy of that pointer value that the
+relinquishing client has.</p>
+<p>In short, once ownership transfer is committed to, the original
+owner has already lost ownership.</p>
+<p>[Is this adequate. Does it supply the necessary degree of
+precision?]</p>
+<p>Whenever one client passes an mbuf chain that describes unsafe
+data (an "unsafe mbuf chain") to another client, it pledges that
+the data will remain valid until the recipient client returns
+through the thread of control that supplied the unsafe mbuf
+chain.</p>
+<p>If the recipient client were to retain the supplied mbuf chain
+beyond this point in time, then it might describe invalid data (it
+is possible that exceptions will arise if an attempt is made to
+access the described data, for example).</p>
+<p>A device driver never supplies a protocol module an unsafe mbuf
+chain (this is a DCI4 protocol to device driver restriction
+only).</p>
+<p>[I dislike this restriction, but it is necessary for the
+sweeping 'dtom' statement to apply.]</p>
+<p>When a device driver supplies a received packet chain to a
+protocol module, the m_type field of the first mbuf holds MT_HEADER
+(2) and all the other m_type fields hold MT_DATA (1).</p>
+<p>When a protocol module supplies an mbuf chain to a device
+driver, the m_type field of all described mbufs is invalid and must
+not influence the behaviour of the device driver.</p>
+<p><b>Summary of mbuf field validity: dci4 client &lt;=&gt; dci4
+client</b></p>
+<p>Field From protocol From device driver</p>
+<p>m_next valid valid</p>
+<p>m_list valid* valid*</p>
+<p>m_off valid valid</p>
+<p>m_len valid valid</p>
+<p>m_inioff valid valid</p>
+<p>m_inilen valid valid</p>
+<p>m_type invalid valid</p>
+<p>m_sys1 opaque opaque</p>
+<p>m_sys2 opaque opaque</p>
+<p>m_flags invalid invalid</p>
+<p>m_pkthdr invalid invalid</p>
+<p>Notes:</p>
+<p>Field: the name of a field within an mbuf structure.</p>
+<p>From protocol: an mbuf chain for transmission</p>
+<p>From device driver: a newly received mbuf chain for protocol
+processing.</p>
+<p>From protocol: an mbuf chain being passed from a protocol to a
+device driver for transmission.</p>
+<p>valid: the field meets the criteria stated within this
+document.</p>
+<p>valid*: This is a list of mbuf chains. A protocol can avoid
+fragmenting datagrams down to the device driver mtu by using a list
+of unsafe mbufs to shadow the real data. The device driver uses
+'ensure_safe' if it needs to retain an mbuf beyond the transmit
+call returning.</p>
+<p>invalid: any value may be present. No manipulation of such a
+value should ever be made. Either the field should be ignored or it
+should be initialised prior to use.</p>
+<p>opaque: never read and never written by any client.</p>
+<p>The 'm_inioff' and 'm_inilen' fields of a safe mbuf are never
+altered by a client - only read. The 'm_inioff' and 'm_inilen'
+fields of an unsafe mbuf may be altered by the client.</p>
+</section>
+
+<section title="A2 Appendix - Supplementary clarifications">
+<p>There are no supplementary clarifications known to be required
+at present.</p>
 </section>
 
 </chapter>
@@ -16,11 +1628,81 @@
   <email name="Charles Ferguson" address="gerph@gerph.org" />
  </maintainer>
  <disclaimer>
-    <p>Insert disclaimer here, once, we've worked out what it should be.</p>
+<p>Copyright (C) 1994 ANT Limited., PO BOX 300, Cambridge, England.
+All rights reserved.</p>
+<p>Redistribution and use in source code and executable binary
+forms are permitted provided that:</p>
+<p>(1) source distributions retain this entire copyright notice and comment,
+and (2) distributions including executable binaries contain the following
+acknowledgement:</p>
+<p>"This product includes software developed by ANT Limited and its
+contributors. Copyright (C) ANT Limited 1994."</p>
+<p>and also in the documentation and other materials provided with
+the distribution and in all advertising materials mentioning
+features or use of this software. Neither the name of ANT Limited
+nor the names of its contributors may be used to endorse or promote
+products derived from this software without specific prior written
+permission.</p>
+<p>THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR
+IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+PURPOSER. NOT INTENDED FOR USE IN LIFE CRITICAL APPLICATIONS.</p>
  </disclaimer>
 
  <history>
-  <revision number="X" date="08 Aug 2020" author="Gerph" title="Issue X" />
+  <revision number="0.01 Issue 1" date="14 Sep 1994" author="Borris">
+    <change>A draft specification containing most necessary details and only a few contradictions.</change>
+  </revision>
+
+  <revision number="0.01 Issue 2" date="15 Sep 1994" author="Borris">
+    <change>An internally coherent document that specifies something that can useful be implemented. A example "mbuf.h" header file illustrates how C clients might be started. This file also contains a set of wrappers to make interfacing existing traditional mbuf source code easier (such as the internet source code).</change>
+  </revision>
+
+  <revision number="0.02 Issue 1" date="21 Sep 1994" author="Borris">
+    <change>All safe mbufs are now dtom'able.</change>
+    <change>Better specified direct entry point register conventions. Basically, these entry points are now suitable for APCS routines - a2-a4 trashed on exit and maybe a1.</change>
+    <change>Rewrote the description of allocation to remove abiguities and increase understandability.</change>
+    <change>Added a table summarising owner transfer for the direct entry points.</change>
+  </revision>
+
+  <revision number="0.02 Issue 2" date="Sep 1994" author="Borris">
+    <change>Minor corrections. Stricter definitions for most of the support routines.</change>
+    <change>Fixed duplicate maxcontig field definition in mbctl.</change>
+  </revision>
+
+  <revision number="0.99 Issue 1" date="1994" author="Borris">
+    <change>Removed the restriction that the copying phase of an allocation only occurred if there was a data import to be performed (ie ptr != NULL).</change>
+    <change>Rename maxcontig_c to mincontig and maxcontig_m to maxcontig in struct mbctl.</change>
+    <change>mbctl.trim returns the mbuf chain it was given for convenience.</change>
+    <change>m_type field is initialised to the value one for each mbuf allocated. [this has subsequently been taken out again - see below]</change>
+    <change>Clarified m_list field after allocation.</change>
+  </revision>
+
+  <revision number="1.00 Issue 1" date="14 Nov 1994" author="Borris">
+    <change>Service_MbufManagerStatus (0xa2) defined and added.</change>
+    <change>MBC_USERMODE flag for getting user mode direct entry points added.</change>
+    <change>Details added in the OpenSession SWI documentation.</change>
+    <change>Added section on life and death of an MbufManager to detail startup interactions (the mmintro document that provides an introduction of DCI2 to DCI4 mbuf usage has also been expanded similarly).</change>
+    <change>Definitions for MBC_DONTWAIT and MBC_DTOMABLE added, although these flags are not currently used (they probably will be one day, though).</change>
+    <change>Reduce currently outstanding section correspondingly.</change>
+    <change>Extended legal stuff at head of document.</change>
+    <change>m_type from allocation is undefined - device drivers are expected to initialise it before supplying received data to protocols though. Field means nothing when data moves from protocol to device driver.</change>
+    <change>m_copy variants called m_copy_p (preserve m_type information) and m_copy_u (make an unsafe copy) have been added and changes to reflect this made to header files and structure definitions.</change>
+    <change>Added MT_HEADER and MT_DATA related comments to the DCI4 protocol/device driver interface contract section.</change>
+    <change>Corrections to dci4 protocol/client contract summary table.</change>
+  </revision>
+
+  <revision number="1.00 Issue 2" date="Nov 1994" author="Borris">
+    <change>Removed comment about ensure_contig being able to do its job at the tail end of an mbuf chain as well as the head. Added comment about unsafe mbufs not being suitable for ensure_contig to operate on.</change>
+  </revision>
+
+  <revision number="1.01 Issue 3" date="Apr 1997" author="KBracey">
+    <change>Added information about m_pkthdr and m_flags fields.</change>
+  </revision>
+
+  <revision number="X" date="08 Aug 2020" author="Gerph" title="Restructure as PRM-in-XML">
+    <change>Formatting changes have been made to use structured data formats, with tables of structures in addition to the C structure definitions.</change>
+  </revision>
  </history>
 </meta>
 
