@@ -31,7 +31,7 @@ set -o pipefail
 
 PRINCE_VERSION=14.2
 #PRMINXML_VERSION=1.02.65
-PRMINXML_VERSION=1.03.65.html5-css.105
+PRMINXML_VERSION=1.03.65.html5-css.222
 SYSTEM="$(uname -s)"
 
 if [[ "$SYSTEM" = 'Darwin' ]] ; then
