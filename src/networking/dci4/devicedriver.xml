@@ -2093,7 +2093,10 @@ these flags should also be set.</p>
   <email name="Charles Ferguson" address="gerph@gerph.org" />
  </maintainer>
  <disclaimer>
-    <p>Insert disclaimer here, once, we've worked out what it should be.</p>
+    <p>Original documentation for DCI 4 driver &copy; Acorn Computers Ltd; drawing number 0284,036/FS.</p>
+    <p>Rights to this documentation have transferred to RISC OS Developments with the
+        ownership of RISC OS. Reproduced with permission.
+    </p>
  </disclaimer>
 
  <history>

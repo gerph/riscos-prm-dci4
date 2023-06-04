@@ -3,6 +3,7 @@
 <index>
 
 <dirs output="output/html"
+      index="output/index"
       help="output/help"
       header="output/header"
       input="src"
@@ -20,25 +21,25 @@
 
 <make-index type="swi" />
 <make-index type="command" />
-<make-index type="message" />
-<make-index type="upcall" />
+<!-- <make-index type="message" /> -->
+<!-- <make-index type="upcall" /> -->
 <make-index type="service" />
 <make-index type="sysvar" />
-<make-index type="entry" />
-<make-index type="vector" />
+<!-- <make-index type="entry" /> -->
+<!-- <make-index type="vector" /> -->
 <make-index type="error" />
-<make-index type="vdu" />
-<make-index type="tboxmessage" />
-<make-index type="tboxmethod" />
+<!-- <make-index type="vdu" /> -->
+<!-- <make-index type="tboxmessage" /> -->
+<!-- <make-index type="tboxmethod" /> -->
 
 <make-filelist/>
 <!-- <make-indexdata/> -->
 
 
 <footer>
-    This content is subject to license terms that are still being determined.
-    It is understood that RISC OS Developments have the rights to this documentation,
-    but until this is confirmed, they should be treated with care.
+    Each chapter has a separate copyright statement. Consult the document information
+    within the chapter for more details. This content is published in good faith
+    to preserve the interface information in a modern format.
 </footer>
 
 <section title="Overview" dir="overview">
@@ -136,7 +137,8 @@
  <page>InetConfigre</page>
  <page>MimeMap</page>
 
- <section title="DCI 4 networking" dir="dci4">
+ <section title="DCI 4 networking" dir="dci4"
+          docgroup-name="DCI 4 networking">
   <page href="devicedriver">Network Device drivers</page>
   <page href="mbufmanager">Mbuf Manager</page>
   <page href="dcistatistics">DCI Statistics</page>

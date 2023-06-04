@@ -1,9 +1,10 @@
 #!/bin/bash
 ##
-# Build the index, obtaining the tools first.
+# Build the documentation, obtaining the tools first.
 #
 # We will obtain all the tools we need from the OS.
-# We will try to get a version of PRM-in-XML that we can work with.
+# We will try to get a version of PRM-in-XML that we can work with (or use
+#   the local version).
 # We will obtain PrinceXML to generate PDFs.
 #
 # Because PrinceXML requires that you have a license to use it,
@@ -18,20 +19,26 @@
 #
 # Consult the PrinceXML documentation for license details.
 #
+# To override the version of PRM-in-XML which is used, set the environment
+# variable PRMINXML_VERSION to either 'local' or a version number from the
+# PRM-in-XML distribution:
+#
 # Supported operating systems:
 #
 #   macOS
-#   Ubuntu Linux (18.04-21.04)
+#   Ubuntu Linux (18.04, 20.04, 21.04)
 #   Centos (7 and 8)
 #   Debian (10)
+#   Linux Mint (18 and 20)
 #
 
 set -e
 set -o pipefail
 
 PRINCE_VERSION=14.2
-#PRMINXML_VERSION=1.02.65
-PRMINXML_VERSION=1.03.65.html5-css.222
+#DEFAULT_PRMINXML_VERSION=1.02.65
+DEFAULT_PRMINXML_VERSION=1.03.65.html5-css.222
+PRMINXML_VERSION=${PRMINXML_VERSION:-$DEFAULT_PRMINXML_VERSION}
 SYSTEM="$(uname -s)"
 
 if [[ "$SYSTEM" = 'Darwin' ]] ; then
@@ -156,14 +163,19 @@ function install_package() {
 
 install_package wget
 install_package perl
-install_package git
 install_package xsltproc
 install_package xmllint libxml2-utils
 install_package make
 
 
 
-if ! type -p riscos-prminxml >/dev/null 2>&1 ; then
+if [[ "$PRMINXML_VERSION" == 'local' ]] ; then
+    echo +++ Using local version of riscos-prminxml
+    if ! type -p riscos-prminxml >/dev/null 2>&1 ; then
+        echo "No 'riscos-prminxml' tool is available." >&2
+        exit 1
+    fi
+else
     # riscos-prminxml isn't installed, so let's get a copy.
     if [[ ! -x "./riscos-prminxml-$PRMINXML_VERSION/riscos-prminxml" ]] ; then
         echo +++ Obtaining riscos-prminxml
@@ -189,7 +201,12 @@ if ! type -p prince >/dev/null 2>&1 && [[ "$PRINCEXML_I_HAVE_A_LICENSE" = 1 ]] ;
         elif [[ "$SYSTEM" = 'Linux' ]] ; then
             # I'm assuming this is amd64.
             PRINCE_DISTRO_RELEASE=${DISTRO_RELEASE}
-            if [[ "$DISTRO" = 'ubuntu' ]] ; then
+            PRINCE_DISTRO=${DISTRO}
+            if [[ "${PRINCE_DISTRO}" = 'linuxmint' ]] ; then
+                PRINCE_DISTRO=linux-generic
+                PRINCE_DISTRO_RELEASE=""
+                PRINCE_ARCH='x86_64'
+            elif [[ "${PRINCE_DISTRO}" = 'ubuntu' ]] ; then
                 if [[ "$DISTRO_RELEASE" =~ 20.10|21.04|21.10 ]] ; then
                     PRINCE_DISTRO_RELEASE=20.04
                 elif [[ "$DISTRO_RELEASE" =~ 18.10|19.04|19.10 ]] ; then
@@ -197,13 +214,13 @@ if ! type -p prince >/dev/null 2>&1 && [[ "$PRINCEXML_I_HAVE_A_LICENSE" = 1 ]] ;
                 fi
                 # FIXME: Determine the actual architecture
                 PRINCE_ARCH='amd64'
-            elif [[ "$DISTRO" = 'debian' ]] ; then
+            elif [[ "$PRINCE_DISTRO" = 'debian' ]] ; then
                 PRINCE_ARCH='amd64'
-            elif [[ "$DISTRO" = 'centos' ]] ; then
+            elif [[ "$PRINCE_DISTRO" = 'centos' ]] ; then
                 PRINCE_ARCH='x86_64'
             fi
-            url="https://www.princexml.com/download/prince-$PRINCE_VERSION-${DISTRO}${PRINCE_DISTRO_RELEASE}-${PRINCE_ARCH}.tar.gz"
-            extract_dir="prince-${PRINCE_VERSION}-${DISTRO}${PRINCE_DISTRO_RELEASE}-${PRINCE_ARCH}"
+            url="https://www.princexml.com/download/prince-$PRINCE_VERSION-${PRINCE_DISTRO}${PRINCE_DISTRO_RELEASE}-${PRINCE_ARCH}.tar.gz"
+            extract_dir="prince-${PRINCE_VERSION}-${PRINCE_DISTRO}${PRINCE_DISTRO_RELEASE}-${PRINCE_ARCH}"
             ext="tar.gz"
         else
             echo "Unrecognised OS" >&2
@@ -265,7 +282,4 @@ fi
 
 
 echo Run the build...
-riscos-prminxml -f index -L logs index.xml
-if [[ "$PRINCEXML_I_HAVE_A_LICENSE" = 1 ]] ; then
-    cd output/html && prince --verbose -o ../index.pdf -l filelist.txt
-fi
+make "$@"
