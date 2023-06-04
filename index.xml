@@ -20,14 +20,14 @@
     />
 
 <make-index type="swi" />
-<make-index type="command" />
+<!-- <make-index type="command" /> -->
 <!-- <make-index type="message" /> -->
 <!-- <make-index type="upcall" /> -->
 <make-index type="service" />
-<make-index type="sysvar" />
+<!-- <make-index type="sysvar" /> -->
 <!-- <make-index type="entry" /> -->
 <!-- <make-index type="vector" /> -->
-<make-index type="error" />
+<!-- <make-index type="error" /> -->
 <!-- <make-index type="vdu" /> -->
 <!-- <make-index type="tboxmessage" /> -->
 <!-- <make-index type="tboxmethod" /> -->
