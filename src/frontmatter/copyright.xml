@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<!DOCTYPE riscos-prm PUBLIC "-//Gerph//DTD PRM documentation 1.03//EN"
+                            "http://gerph.org/dtd/103/prm.dtd">
+
+<riscos-prm>
+<chapter title="Copyright">
+    <!-- The first section appears at the top of the page -->
+    <section title="Disclaimer">
+        <p>The authors have taken care to produce this document but make no warranty, express or implied as to the accuracy of the information presented here.</p>
+    </section>
+
+    <!-- The second section appears at the bottom of the page -->
+    <section title="Statement">
+        <p>Copyright &copy; 2023, Many authors.</p>
+        <p>DCI 4 driver information &copy; Acorn Computers Ltd, RISC OS Developments.</p>
+        <p>This product includes software developed by ANT Limited and its
+contributors. Copyright (C) ANT Limited 1994.</p>
+    </section>
+
+</chapter>
+</riscos-prm>

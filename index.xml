@@ -17,6 +17,7 @@
     page-format='html5'
     page-css-variant='prm body-fraunces heading-raleway webfont-fraunces webfont-raleway large-bullets'
     index-css-variant='prm body-fraunces heading-raleway webfont-fraunces webfont-raleway large-bullets no-edge-index'
+    edgeindex-max='5'
     />
 
 <make-index type="swi" />
@@ -34,6 +35,16 @@
 
 <make-filelist/>
 <!-- <make-indexdata/> -->
+
+
+<cover src="cover.svg"
+       title="RISC OS DCI networking"
+       subtitle="Work In Progress"
+       author=""
+       publisher="Gerph Publications"/>
+
+<front-matter type="title" href="frontmatter/title" title="Title"/>
+<front-matter type="copyright" href="frontmatter/copyright" title="Copyright"/>
 
 
 <footer>
