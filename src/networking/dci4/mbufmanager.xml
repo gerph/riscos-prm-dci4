@@ -143,7 +143,7 @@ the described data. This might be envisaged as follows:</p>
 <p>Relationships between the address of an mbuf, and the 'm_off',
 'm_next' and 'm_len' fields.</p>
 
-<extended-example title='other'>
+<extended-example type='format'>
                       Mbufs                      Described
                                                     data
      mbuf
@@ -356,8 +356,8 @@ unsafe data lessens this lack.</p>
 <p>The 'm_inioff' and 'm_inilen' fields of an unsafe mbuf are
 initialised according to the allocation method used. See later for
 details.</p>
-<p><b>Summary of mbuf field validity: client &lt;=&gt; mbuf
-manager</b></p>
+<p><strong>Summary of mbuf field validity: client &lt;=&gt; mbuf
+manager</strong></p>
 
 <p>Field From mbuf To mbuf</p>
 <p>===== ========= =======</p>
@@ -438,7 +438,7 @@ roughly obey APCS. A list of entry/exit characteristics follows
 </p>
 
 <p>Currently, no direct entry point routine will enable interrupts if they are disabled on entry.</p>
-<p><b>C definition of an MbufManager control structure:</b></p>
+<p><strong>C definition of an MbufManager control structure:</strong></p>
 
 <p>
 <extended-example type='c'>
@@ -550,39 +550,39 @@ following fields of the mbctl structure:</p>
 
 <p>The values a client initialises these fields to are defined as
 follows:</p>
-<p><b>mbcsize</b>: The size of the mbctl structure. This is the
+<p><strong>mbcsize</strong>: The size of the mbctl structure. This is the
 size of the structure understood by the compiler/assembler at
 compilation time. Future versions of this specification may add
 other fields. In C, one might use "sizeof(struct mbctl)".</p>
-<p><b>mbcver</b>s: The version of the MbufManager specification
+<p><strong>mbcver</strong>s: The version of the MbufManager specification
 that the client is implemented against. This is the major version
 times one hundred plus the minor version. Minor version number
 changes indicate bug fixes and the possible introduction of small
 and upwardly compatible changes. Major revision number changes
 indicate major and possibly not entirely backwardly compatible
 changes.</p>
-<p><b>flags</b>: This bitset supplies various pieces of information
+<p><strong>flags</strong>: This bitset supplies various pieces of information
 to the MbufManager. See the description of the <reference type='swi' name='Mbuf_OpenSession'/>
 SWI later on for details of suitable values to enter in this
 field.</p>
-<p><b>advminubs</b>: Advisory minimum underlying block size. This
+<p><strong>advminubs</strong>: Advisory minimum underlying block size. This
 value advises the MbufManager of the smallest underlying block
 size that the client thinks appropriate for its requirements.
 Traditional mbuf clients might well use the orignal value of MLEN
 (112 in most cases) for this value. If no particular value seems
 appropriate, a client should set this field to zero.</p>
-<p><b>advmaxubs</b>: Advisory maximum underlying block size. This
+<p><strong>advmaxubs</strong>: Advisory maximum underlying block size. This
 value advises the MbufManager of the largest underlying block size
 that the client thinks appropriate for its requirements. An
 ethernet device driver client might well use the ethernet MTU
 (maximum transmission unit) value of 1500. If no particular value
 seems appropriate, a client should set this field to zero.</p>
-<p><b>mincontig</b>: This specifies the maximum size the client
+<p><strong>mincontig</strong>: This specifies the maximum size the client
 will ever specify to the "contiguify" routine. If the MbufManager
 can never meet the value specified, it will refuse to open the
 session. If no particular value seems appropriate, a client should
 set this field to zero.</p>
-<p><b>spare1</b>: This field must be initialised to zero.</p>
+<p><strong>spare1</strong>: This field must be initialised to zero.</p>
 <p>The contents of all other fields of the mbctl structure are
 irrelevant at the start of session initiation.</p>
 <p>The next stage of session initiation is the issuing of an
@@ -807,8 +807,8 @@ following conditions are all met:</p>
 </list>
 </p>
 
-<p><b>Summary of allocator routines and implicit or explicit
-'flags' settings</b></p>
+<p><strong>Summary of allocator routines and implicit or explicit
+'flags' settings</strong></p>
 <p>Allocator Control over flags</p>
 <p>alloc MBC_DEFAULT (0)</p>
 <p>alloc_g parameter to the call</p>
@@ -845,7 +845,7 @@ frees multiple mbufs is called 'freem'.</p>
 call followed by a freeing call are provided.</p>
 <p>No action is performed by a free call if supplied the NULL
 pointer.</p>
-<p><b>Summary of mbuf and mbuf chain freeing routines:</b></p>
+<p><strong>Summary of mbuf and mbuf chain freeing routines:</strong></p>
 <p>free Free single mbuf (ignores 'm_next' field)</p>
 <p>freem Free entire mbuf chain (uses 'm_next' field)</p>
 <p>dtom_free Performs 'dtom' action then behaves the same as
@@ -1139,8 +1139,8 @@ memory. The magic value M_COPYALL may be used to indicate that the
 entire mbuf chain should be copied to raw memory. The return value
 is the mbuf chain supplied. If either the mbuf chain or 'ptr' is
 the NULL pointer then no operation is performed.</p>
-<p><b>Summary of mbuf chain ownership transfer for direct entry
-points</b></p>
+<p><strong>Summary of mbuf chain ownership transfer for direct entry
+points</strong></p>
 <p>Routine Category</p>
 <p>alloc Fresh</p>
 <p>alloc_g Fresh</p>
@@ -1164,7 +1164,7 @@ points</b></p>
 <p>copy_u Fresh *</p>
 <p>import No transfer</p>
 <p>export No transfer</p>
-<p><b>Notes:</b></p>
+<p><strong>Notes:</strong></p>
 <p>Fresh: A new mbuf chain is generated and the client receives
 ownership of this new chain when it receives the chain itself.</p>
 <p>Fresh *: Ownership of the supplied mbuf chain remains with the
@@ -1371,7 +1371,9 @@ checking for the presence of the MbufManager.</p>
 </exit>
 
 <use>
-This SWI reason is used to read the version of the MbufManager.
+    <p>
+    This SWI reason is used to read the version of the MbufManager.
+    </p>
 </use>
 </swi-definition>
 </section>
@@ -1403,12 +1405,19 @@ This SWI reason is used to read the version of the MbufManager.
 </exit>
 
 <use>
+    <p>
 The MbufManager issues service calls to notify clients and
 potential clients of desired and actual state changes. The service
 call used is Service_MbufManagerStatus (service call number 0xa2,
 in C). A reason code is passed in r0 to indicate the reason for the
 service call.
+    </p>
 </use>
+<related>
+    <reference type="service" name="MbufManagerStatus" reason="0"/>
+    <reference type="service" name="MbufManagerStatus" reason="1"/>
+    <reference type="service" name="MbufManagerStatus" reason="2"/>
+</related>
 </service-definition>
 
 <service-definition name="MbufManagerStatus"
@@ -1431,6 +1440,9 @@ possible to issue SWIs to the MbufManager as soon as this service
 call has been seen (it is issued from a callback to ensure this is
 possible).</p>
 </use>
+<related>
+    <reference type="service" name="MbufManagerStatus" reason="1"/>
+</related>
 </service-definition>
 
 
@@ -1453,6 +1465,9 @@ possible).</p>
 this reason code is used. The MbufManager will refuse to die if
 there are any open sessions.</p>
 </use>
+<related>
+    <reference type="service" name="MbufManagerStatus" reason="0"/>
+</related>
 </service-definition>
 
 
@@ -1477,6 +1492,8 @@ data that may be easily recreated (such as cached data) should
 release this memory (ideally) before returning from the service
 call.</p>
 </use>
+<related>
+</related>
 </service-definition>
 
 </section>
@@ -1577,8 +1594,8 @@ protocol module, the m_type field of the first mbuf holds MT_HEADER
 <p>When a protocol module supplies an mbuf chain to a device
 driver, the m_type field of all described mbufs is invalid and must
 not influence the behaviour of the device driver.</p>
-<p><b>Summary of mbuf field validity: dci4 client &lt;=&gt; dci4
-client</b></p>
+<p><strong>Summary of mbuf field validity: dci4 client &lt;=&gt; dci4
+client</strong></p>
 <p>Field From protocol From device driver</p>
 <p>m_next valid valid</p>
 <p>m_list valid* valid*</p>

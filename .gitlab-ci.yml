@@ -20,7 +20,7 @@ cache:
 .lint:
   stage: static
   script:
-    - bash ci/run lint
+    - ./build.sh lint
   artifacts:
     when: always
     paths:
@@ -28,17 +28,6 @@ cache:
     reports:
       junit:
         - artifacts/lint-results.xml
-
-.docs:
-  stage: static
-  script:
-    - bash ci/run docs
-  artifacts:
-    when: always
-    paths:
-      - artifacts
-    reports:
-      junit: artifacts/docs-results.xml
 
 
 #### Build Jobs ####
@@ -67,78 +56,7 @@ build:
   when: always
 
 
-#### Unit Test Jobs (or general test) ####
-.test:
-  stage: unittest
-  script:
-    - bash ci/run test
-  dependencies: []
-  artifacts:
-    when: always
-    paths:
-      - artifacts
-    reports:
-      junit:
-        - artifacts/test-results.xml
-
-.test-python3:
-  stage: unittest
-  script:
-    - bash ci/run test -3
-  dependencies: []
-  artifacts:
-    when: always
-    paths:
-      - artifacts
-    reports:
-      junit:
-        - artifacts/test-results.xml
-
-.coverage:
-  stage: unittest
-  script:
-    - bash ci/run coverage
-  coverage: '/^Overall Coverage: (\d+(?:\.\d+)?)%.*$/'
-  dependencies: []
-  artifacts:
-    when: always
-    paths:
-      - artifacts
-
-
-#### Integration Test Jobs ####
-.inttest:
-  stage: inttest
-  script:
-    - bash ci/run inttest
-  dependencies: []
-  artifacts:
-    when: always
-    paths:
-      - artifacts
-    reports:
-      junit:
-        - artifacts/test-results.xml
-  when: always
-
-.inttest-python3:
-  stage: inttest
-  script:
-    - bash ci/run inttest -3
-  dependencies: []
-  artifacts:
-    when: always
-    paths:
-      - artifacts
-    reports:
-      junit:
-        - artifacts/test-results.xml
-  when: always
-
-
 #### Stages to execute ####
 stages:
   - static
   - build
-#  - unittest
-#  - inttest

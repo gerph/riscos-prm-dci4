@@ -1599,15 +1599,14 @@ went away.</p></offset>
 <offset number='32' name='st_tx_bytes'>The total number of bytes transmitted since driver initialisation.</offset>
 <offset number='36' name='st_tx_general_errors'>A count of the number of non-specific network errors that occured during transmission.</offset>
 <offset number='40' name='st_last_dest_addr'>Hardware address of the last interface to which a frame was sent.</offset>
-<fixme>The specification is missing a number of these descriptions</fixme>
 <offset number='68' name='st_jabbers'>The number of times the interface was caught jabbering.</offset>
-<fixme> Another missing </fixme>
 <offset number='76' name='st_unwanted_frames'>The number of frames received, but not claimed by any protocol module.</offset>
 <offset number='80' name='st_rx_frames'>The total number of frames received since driver initialisation.</offset>
 <offset number='84' name='st_rx_bytes'>The total number of bytes received since driver initialisation.</offset>
 <offset number='88' name='st_tx_general_errors'>A count of the number of non-specific network errors that occured during frame reception.</offset>
 <offset number='92' name='st_last_src_addr'>Hardware address of the last interface from which a frame was received.</offset>
 </offset-table>
+<fixme>The specification is missing a number of these descriptions - 44-64, 72.</fixme>
 </p>
 
 <p>Note that statistics are gathered for <strong>all</strong> frames received
