@@ -1,0 +1,1664 @@
+<!DOCTYPE html><html xmlns="http://www.w3.org/TR/xhtml1/strict" lang="en"><!--
+  Auto-generated using XSLT stylesheet created by Gerph.
+-->
+<head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><meta charset="utf-8"></meta><meta name="author" content="PRM-in-XML authors"></meta><meta name="description" content="PRM-in-XML staging documents"></meta><title>RISC OS DCI 4 reference manuals</title><style type="text/css">
+body {
+  font-family: serif;
+}
+h1 {
+  font-size: 2rem;
+}
+h2 {
+  font-size: 1.5rem;
+}
+h3 {
+  font-size: 1rem;
+}
+h4 {
+  font-size: 1rem;
+}
+h5 {
+  font-size: 1rem;
+}
+h1, h2, h3, h4, h5 {
+  font-family: sans-serif;
+  font-weight: bold;
+}
+
+/* Markers for bad content */
+dd {
+    background-color: pink;
+}
+dl {
+    background-color: lightblue;
+}
+dt {
+    background-color: lightgreen;
+}
+
+/* Errors we recognise */
+.error-reference {
+    color: red;
+    font-size: 3em;
+}
+
+header {
+}
+body.chapter header h1 {
+  margin-top: 0em;
+  padding-top: 0.67em;
+  padding-bottom: 0.67em;
+  border-top: 2px solid black;
+  border-bottom: 2px solid black;
+}
+body.front-matter-title h1 {
+    font-size: 4rem;
+}
+body.front-matter-title h2 {
+    font-size: 2.5rem;
+}
+body.front-matter-title h3 {
+    font-size: 2rem;
+}
+body.front-matter-title {
+    text-align: center;
+    width: 100%;
+    max-height: 70%;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 45%;
+}
+
+/* Copyright page doesn't actually have any headings */
+body.front-matter-copyright h1, body.front-matter-copyright h2 {
+    display: none;
+}
+
+body.front-matter-copyright section.section {
+    break-before: auto;
+}
+
+body.front-matter-copyright section.section:not(:first-of-type) {
+    position: absolute;
+    bottom: 0;
+}
+
+/* Dedication page is a simple text */
+body.front-matter-dedication h1, body.front-matter-dedication h2 {
+    display: none;
+}
+
+body.front-matter-dedication section.section {
+    font-size: 2rem;
+    font-style: italic;
+    text-align: center;
+    max-height: 70%;
+    margin-left: 20%;
+    margin-right: 20%;
+    margin-top: 45%;
+}
+
+/* Epigraph has multiple blocks of quotes */
+body.front-matter-epigraph h1, body.front-matter-epigraph h2 {
+    display: none;
+}
+
+body.front-matter-epigraph section.section:first-of-type {
+    break-before: recto;
+}
+
+body.front-matter-epigraph section.section {
+    font-size: 1.5rem;
+    font-style: italic;
+    max-height: 80%;
+    margin-left: 15%;
+    margin-right: 15%;
+    margin-top: 25%;
+}
+
+body.front-matter-epigraph section.subsection {
+    display: flex;
+    flex-direction: column;
+}
+
+body.front-matter-epigraph section.subsection p {
+    margin-top: 0.5em;
+    margin-bottom: 0.5em;
+}
+
+body.front-matter-epigraph section.subsection h3 {
+    order: 1;
+    font-style: normal;
+    text-align: right;
+    margin-top: 0;
+    margin-bottom: 3rem;
+}
+body.front-matter-epigraph section.subsection h3:before {
+    content: "\2014\00A0";
+}
+
+
+
+/* Paged content page type from the body */
+body.cover {
+    /* Usually quite different */
+    page: cover;
+}
+body.front-matter {
+    /* Generally omits headers and footers, and styles differently */
+    page: front-matter;
+}
+body.front-matter footer {
+    display: none;
+}
+body.indexed-contents {
+    /* Resets the page counter to 1, uses roman page numbers */
+    page: contents;
+    counter-reset: page 1;
+}
+body.chapter {
+    /* Regular chapters */
+    page: chapter;
+}
+body.chapter-front-matter {
+    /* Chapters styled in the usual way, but using roman page numbers */
+    page: chapter;
+}
+
+
+/* Cover page default style */
+body.cover {
+    height: 100pvh;
+}
+body.cover article {
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    height: 100pvh;
+}
+
+body.cover .cover-title {
+    font-size: 3rem;
+    text-align: center;
+    margin-top: 1rem;
+    margin-bottom: 0.5rem;
+    order: 1;
+}
+body.cover .cover-subtitle {
+    font-size: 2rem;
+    text-align: center;
+    margin-top: 0.5rem;
+    margin-bottom: 1rem;
+    order: 2;
+}
+
+body.cover img.cover-image {
+    width: 100%;
+    display: block;
+    margin-bottom: 3rem;
+    order: 3;
+}
+
+body.cover .cover-author {
+    font-size: 1.5rem;
+    text-align: right;
+    margin-top: 0.5rem;
+    margin-bottom: 0.5rem;
+    display: inline-block;
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    order: 4;
+}
+
+body.cover .cover-publisher {
+    font-size: 1.5rem;
+    text-align: left;
+    margin-bottom: 0.5rem;
+    display: inline-block;
+    position: absolute;
+    bottom: 0;
+    order: 4;
+}
+
+
+header .chapter-vars,
+header h1 .chapter-docgroup-name,
+header h1 .chapter-docgroup-part {
+  display: none
+}
+body.chapter header h1 .chapter-number {
+  display: inline-block;
+}
+body.chapter header h1 .chapter-number::after {
+  display: inline-block;
+  content: "\00a0";
+}
+header h1 .chapter-name {
+  display: inline-block;
+}
+
+nav {
+  border-bottom: 2px solid black;
+}
+nav h2 {
+}
+nav > ul {
+  padding-left: 5rem;
+}
+
+body.chapter section.section {
+  border-bottom: 2px solid black;
+  padding-bottom: 1rem;
+}
+body.chapter section.section {
+  padding-left: 5rem;
+}
+body.chapter section.section h2 {
+  margin-left: -5rem;
+}
+body.chapter section.subsection h3 {
+  margin-left: -5rem;
+}
+body.chapter section.subsubsection h4 {
+  margin-left: -2.5rem;
+}
+body.chapter section.category h5 {
+}
+
+/* Try to keep together the headings */
+body.chapter section.section h2 + p,
+body.chapter section.subsection h3 + p,
+body.chapter section.subsubsection h4 + p,
+body.chapter section.category h5 + p {
+    break-before: avoid;
+}
+body.chapter section.section h2 + table,
+body.chapter section.subsection h3 + table,
+body.chapter section.subsubsection h4 + table,
+body.chapter section.category h5 + table {
+    break-before: avoid;
+}
+
+
+.service-definition, .swi-definition, .vector-definition, .upcall-definition, .command-definition, .vdu-definition, .error-definition, .sysvar-definition, .message-definition, .tboxmessage-definition, .tboxmethod-definition, .entry-definition {
+  border-top: 2px solid black;
+}
+.definition-header {
+  margin-top: 1.25rem;
+  margin-bottom: 1.25rem;
+}
+.definition-title {
+  display: block;
+  font-family: sans-serif;
+  font-weight: bold;
+  font-size: 1.5rem;
+  text-align: right;
+}
+.definition-name-prefix {
+}
+.definition-name {
+}
+.definition-reason {
+}
+.definition-reason-name {
+    display: block;
+}
+.definition-subtitle {
+  display: block;
+  font-family: sans-serif;
+  font-weight: bold;
+  font-size: 1.5em;
+  text-align: right;
+}
+.definition-subtitle::before {
+  content: '(';
+}
+.definition-subtitle::after {
+  content: ')';
+}
+.definition-number {
+}
+.definition-number-prefix {
+}
+.definition-description {
+    display: block;
+}
+section.definition {
+  margin-left: 0em;
+  margin-bottom: 1em;
+}
+section.definition::before {
+  display: block;
+  font-weight: bold;
+  font-family: sans-serif;
+  font-size: 1.1rem;
+  margin-left: -2.5rem;
+  margin-top: 2rem;
+  margin-bottom: 0.5rem;
+}
+.definition-internal {
+}
+.definition-entry::before {
+  content: 'On entry';
+}
+.definition-exit::before {
+  content: 'On exit';
+}
+.definition-interrupts::before {
+  content: 'Interrupts';
+}
+.definition-processor::before {
+  content: 'Processor mode';
+}
+.definition-reentrancy::before {
+  content: 'Re-entrancy';
+}
+.definition-use::before {
+  content: 'Use';
+}
+.definition-syntax::before {
+  content: 'Syntax';
+}
+.definition-parameters::before {
+  content: 'Parameters';
+}
+.definition-message::before {
+  content: 'Message';
+}
+.definition-message-source::before {
+  content: 'Source';
+}
+.definition-message-destination::before {
+  content: 'Destination';
+}
+.definition-message-delivery::before {
+  content: 'Delivery';
+}
+.definition-declarations::before {
+  content: 'Declarations';
+}
+.definition-compatibility::before {
+  content: 'Compatibility';
+}
+.definition-examples::before {
+  content: 'Examples';
+}
+.definition-related-apis::before {
+  content: 'Related APIs';
+}
+.definition-related-commands::before {
+  content: 'Related * commands';
+}
+.definition-related-swis::before {
+  content: 'Related SWIs';
+}
+.definition-related-services::before {
+  content: 'Related services';
+}
+.definition-related-tboxmethods::before {
+  content: 'Related Toolbox methods';
+}
+.definition-related-tboxmessages::before {
+  content: 'Related Toolbox messages';
+}
+.definition-related-vectors::before {
+  content: 'Related vectors';
+}
+.definition-related-upcalls::before {
+  content: 'Related upcalls';
+}
+.definition-related-errors::before {
+  content: 'Related error messages';
+}
+.definition-related-sysvars::before {
+  content: 'Related system variables';
+}
+.definition-related-entries::before {
+  content: 'Related entry points';
+}
+.definition-related-messages::before {
+  content: 'Related messages';
+}
+.definition-related-vdus::before {
+  content: 'Related VDU codes';
+}
+.register-use-register {
+  text-align: right;
+}
+.register-name {
+}
+.processor-flag-name {
+  text-align: right;
+}
+.definition-syntax-line {
+  font-family: monospace;
+}
+.definition-parameters-list {
+    border-spacing: 0.375rem 0px;
+}
+.definition-parameters-list td {
+    vertical-align: top;
+    border-spacing: 0px;
+}
+.definition-parameter > td {
+    padding-bottom: 0.5em;
+}
+.definition-parameter-aliases {
+}
+.definition-parameter-aliases td {
+    padding: 0px;
+}
+.definition-parameter-or {
+}
+.definition-parameter-or-alias {
+    font-style: italic;
+    margin-left: -1.75em;
+}
+table {
+    border-spacing: 2px 0px;
+}
+
+.user-table {
+    border: 0;
+    /* In all our tables we try to avoid breaking the tables up */
+    break-inside: avoid;
+}
+.user-table td, .user-table th {
+    padding-left: 0.5em;
+}
+.user-table td {
+    padding-top: 0.375em;
+}
+.user-table .table-number {
+    min-width: 3em;
+}
+.table-head {
+    vertical-align: bottom;
+}
+.table-head .table-number {
+    text-align: right;
+}
+.table-head .table-data-size {
+    text-align: right;
+}
+.table-head .table-name {
+    text-align: left;
+}
+.table-head .table-extra {
+    text-align: left;
+}
+.table-head .table-value {
+    text-align: left;
+}
+.table-body {
+    vertical-align: top;
+}
+.table-body .table-number {
+    text-align: right;
+}
+.offset-table > .table-body > tr > .table-number::before {
+    content: '+';
+}
+.message-table > .table-body > tr > .table-number::before {
+    content: 'R1+';
+}
+.offset-table > .table-head > tr > .table-number,
+.message-table > .table-head > tr > .table-number,
+.offset-table > .table-body > tr > .table-number,
+.message-table > .table-body > tr > .table-number {
+    text-align: left;
+}
+
+.table-body .table-data-size {
+    text-align: right;
+}
+.table-body .table-name {
+    text-align: left;
+}
+.table-body .table-extra {
+    text-align: left;
+}
+.table-body .table-value {
+    text-align: left;
+}
+.table-body .table-value.table-value-bitstate {
+    text-align: right;
+}
+
+.version-table:before {
+    content: "Compatibility";
+    font-weight: bold;
+    line-height: 2em;
+}
+.version-table {
+    padding-left: 0.5em;
+}
+.version-table .version {
+    padding-left: 1em;
+}
+
+.version + .version {
+    margin-top: 1em;
+}
+.version-qualifiers {
+    font-style: italic;
+    display: block;
+}
+.version-supplier {
+    margin-right: 1em;
+}
+.version-module {
+    margin-right: 1em;
+}
+.version-module-name:after {
+    content: "\00a0\00a0";
+}
+.version-module, .version-riscos {
+    margin-right: 1em;
+}
+.version-lt:before {
+    content: "<\00a0";
+}
+.version-ltge-separator:before {
+    content: ",\00a0\00a0";
+}
+.version-ge:before {
+    content: "\2265\00a0";
+}
+.version-riscos:before {
+    content: "RISC\00a0OS\00a0";
+}
+.version-hardware {
+    margin-right: 1em;
+}
+.version-architecture {
+    margin-right: 1em;
+}
+.version-content {
+    padding-left: 2em;
+}
+
+.userreplace {
+  font-style: italic;
+}
+.userreplace::before {
+  content: "<";
+}
+.userreplace::after {
+  content: ">";
+}
+.optional::before {
+  content: "[";
+}
+.optional::after {
+  content: "]";
+}
+.userinput {
+  font-family: monospace;
+  font-weight: bold;
+}
+.systemoutput {
+  font-family: monospace;
+}
+.menuoption {
+  font-weight: bold;
+}
+.actionbutton {
+  font-weight: bold;
+}
+.variable {
+  font-family: monospace;
+}
+.command {
+  font-family: monospace;
+}
+.function {
+  font-family: monospace;
+}
+.filename {
+  font-family: monospace;
+}
+.sysvar {
+  font-family: monospace;
+}
+.extended-example {
+  display: block;
+  font-family: monospace;
+  white-space: pre;
+  margin-top: 1em;
+  margin-bottom: 1em;
+}
+
+th, td {
+  vertical-align: top;
+}
+
+td > p:first-of-type {
+    margin-top: 0em;
+}
+
+article li > p:first-of-type {
+    margin-top: 0em;
+}
+
+.images {
+    text-align: center;
+}
+
+figure {
+    margin-left: 2rem;
+    margin-right: 2rem;
+    margin-top: 0.5rem;
+    object-fit: scale-down;
+    display: inline-block;
+    text-align: center;
+}
+figure figcaption {
+    text-align: center;
+    font-style: italic;
+    max-width: 66%;
+    margin-left: auto;
+    margin-right: auto;
+}
+img {
+    max-width: 100%;
+}
+
+/* Strong emphasis is in bold, regular emphasis is in italic */
+strong {
+    font-style: normal;
+    font-weight: bold;
+}
+em {
+    font-style: italic;
+    font-weight: normal;
+}
+
+.fixme {
+    display: inline-block;
+    border-radius: 4px;
+    border: 2px solid red;
+    padding: 0.125em 0.5em;
+}
+
+.fixme-label::before {
+    content: "⚠";
+    color: red;
+    margin-right: 0.25em;
+    vertical-align: middle;
+}
+
+kbd {
+    font-size: 1rem;
+    font-family: monospace;
+    white-space: nowrap;
+    border: 1px solid #aaa;
+    border-style: outset;
+    border-radius: 4px;
+    padding: 0.25em 0.25em 0.125em 0.25em;
+    margin: 0px 0.125em 0px 0px;
+    vertical-align: baseline;
+    line-height: 1.8em;
+}
+
+.key {
+    background: #f0f0f0;
+}
+
+.mouse {
+    background: #f0f0c0;
+}
+
+
+@media print {
+    .mouse {
+        background: #e0e0e0;
+    }
+}
+
+
+span.mouse-repeat:before {
+    display: inline-block;
+    margin-right: 0.125em;
+}
+
+span.mouse-repeat-2:before {
+    content: "2×";
+}
+span.mouse-repeat-3:before {
+    content: "3×";
+}
+span.mouse-repeat-4:before {
+    content: "4×";
+}
+
+span.mouse-action:after {
+    display: inline-block;
+    margin-right: 0.25em;
+}
+
+
+
+footer {
+  padding-bottom: 1em;
+  padding-top: 1em;
+  border-bottom: 2px solid black;
+}
+section.meta > * {
+  margin-left: 2.5em;
+}
+section.meta h2 {
+  margin-left: 0em;
+}
+div.meta tr th {
+  text-align: right;
+}
+div.meta tr.history table th {
+  text-align: left;
+}
+div.meta table.history {
+  border: none;
+  border-spacing: 0.375rem 0px;
+}
+div.meta table.history th {
+  text-align: left;
+  padding-top: 0px;
+}
+.revision-date {
+  white-space: nowrap;
+}
+ul.revision-changes {
+  padding-left: 1em;
+  margin-left: 0.5em;
+}
+h5.revision-title {
+  font-size: 1em;
+  font-weight: bold;
+  font-family: serif;
+  margin-top: 0em;
+  margin-bottom: 0em;
+}
+div.meta tr.history ul {
+  margin-top: 0em;
+  margin-bottom: 0em;
+}
+div.meta td.disclaimer > p {
+  margin-block-start: 0em;
+  padding-top: 0em;
+  margin-top: 0em;
+  margin-bottom: 0em;
+}
+
+.maintainer .email {
+    display: block;
+}
+
+
+ul.indexed-bar {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: flex-start;
+    padding-left: 0em;
+    margin-left: 0rem;
+}
+ul.indexed-bar li {
+    display: inline-block;
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+    margin-left: 0.125rem;
+    margin-right: 0.125rem;
+    /*background-color: lightgray;*/
+    text-align: center;
+}
+ul.indexed-bar li span {
+    display: block;
+    margin-top: 0.25rem;
+    margin-bottom: 0.25rem;
+}
+.index-bar-index-number {
+    font-size: smaller;
+}
+span.index-bar-selected {
+    background-color: lightblue;
+    font-style: italic;
+}
+
+footer.indexed-footer p {
+    margin-bottom: 0em;
+    margin-top: 0em;
+}
+
+footer.indexed-footer p + p {
+    margin-top: 0.25rem;
+}
+
+nav.indexed-bar-bottom {
+    margin-top: 0.25rem;
+    border-top: 2px solid black;
+}
+
+section.indexed-root {
+    margin-left: 3rem;
+    margin-right: 3rem;
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+}
+
+section.indexed-section {
+    margin-top: 2rem;
+    margin-bottom: 0rem;
+    padding-left: 3rem;
+}
+section.indexed-document-section {
+    margin-top: 0.25rem;
+    margin-bottom: 0.25rem;
+    padding-left: 3rem;
+}
+section.indexed-document-section-1 {
+    margin-top: 1rem;
+    margin-bottom: 0rem;
+    padding-bottom: 1rem;
+    padding-left: 6rem;
+}
+div.indexed-page {
+    padding-left: 3rem;
+    line-height: 1.5em;
+}
+section.indexed-definitions {
+    padding-left: 4.5rem;
+}
+h2.indexed-section-name {
+}
+
+@media screen {
+    nav.indexed-bar li.index-bar-index span.index-bar-index-number:before {
+        content: "(";
+    }
+    nav.indexed-bar li.index-bar-index span.index-bar-index-number:after {
+        content: ")";
+    }
+}
+
+section.indexed-table {
+    margin-top: 1em;
+    margin-bottom: 1em;
+    padding-left: 2em;
+    padding-right: 2em;
+}
+table.indexed-table {
+    border-spacing: 1em 0px;
+}
+table.indexed-table th {
+    text-align: left;
+}
+table.indexed-table th.indexed-table-heading-page {
+    text-align: right;
+}
+tr.indexed-table-headings th {
+    padding-bottom: 0.75em;
+}
+
+/* The indexed-table-link isn't needed any more, but might be something someone wants to style */
+table .indexed-table-link,
+table .indexed-table-heading-link {
+    display: none;
+}
+table .indexed-table-reason:before {
+    content: " ";
+}
+
+
+/* Styling specific to the print */
+@media print {
+
+    /* Change the bookmark text for the headings */
+    h1 {
+        prince-bookmark-level: none;
+    }
+    h1 .chapter-name {
+        prince-bookmark-level: 1;
+    }
+    h1 .chapter-name {
+        string-set: chapter-name content()
+    }
+
+    body.chapter h1 .chapter-name {
+        prince-bookmark-label: string(chapter-number-prefixed) " " content();
+    }
+
+    /* The cover has no bookmarks */
+    body.cover h2 {
+        prince-bookmark-level: none;
+    }
+    body.cover h1 {
+        prince-bookmark-level: none;
+    }
+    body.cover h3 {
+        prince-bookmark-level: none;
+    }
+
+    /* All the front-matter pages take their headings from the chapter name,
+       even though it's hidden */
+    body.front-matter h1 .chapter-name,
+    body.front-matter h2,
+    body.front-matter h3 {
+        prince-bookmark-level: none;
+    }
+    body.front-matter section.section:first-of-type {
+        prince-bookmark-level: 1;
+        prince-bookmark-label: string(chapter-name);
+    }
+    body.front-matter.front-matter-title section.section:first-of-type {
+        /* In the bookmark, we want to label it with Title, not the book title, as that'll look weird if there's a half-title */
+        prince-bookmark-label: "Title";
+    }
+    body.front-matter.front-matter-half-title section.section:first-of-type {
+        /* But we'll remove the half title anyhow */
+        prince-bookmark-level: none;
+    }
+
+    /* Avoid multiple dividers at the top of the page (the header bar + the definition border) */
+    .service-definition, .swi-definition, .vector-definition, .upcall-definition, .command-definition, .vdu-definition, .error-definition, .sysvar-definition, .message-definition, .tboxmessage-definition, .tboxmethod-definition, .entry-definition {
+        border-top: none;
+    }
+
+    /* The contents of the chapter makes little sense */
+    header nav {
+        display: none;
+    }
+
+    /* Add on the page that the reference exists on */
+    a[href]::after {
+        content: " (on page " target-counter(attr(href), page) ")";
+    }
+    a.reference-link[href]::after {
+        content: none;
+    }
+    a[href^="mailto:"]::after, a[href^="http:"]::after, a[href^="https:"]::after {
+        content: none;
+    }
+
+    /* Special style that's used on the contents pages */
+    body.indexed-contents a[href]::after {
+        content: "\A0\A0\A0" target-counter(attr(href), page);
+    }
+    body.indexed-contents .front-matter-link a[href]::after {
+        content: "";
+    }
+
+    /* Special style that's used on the index pages */
+    body.indexed-index .indexed-table-label a[href]::after {
+        content: "";
+    }
+    body.indexed-index .indexed-table-page a[href]::after {
+        content: target-counter(attr(href), page);
+    }
+
+
+    /* In the regular version these are a comma separated list;
+       instead make them one per line as they'll be longer and the links will be irrelevant */
+    .definition-related .reference {
+        display: block;
+    }
+    .definition-related-divider {
+        display: none;
+    }
+
+    /* Stop the border of the top of the sections being repeated on subsequent pages */
+    section {
+        box-decoration-break: slice;
+    }
+
+    /* The links on top of the contents page are not useful when printing */
+    nav.indexed-bar-top {
+        display: none;
+    }
+
+    /* The links on the bottom can be magiced into becoming a set of indexed links
+     * There's quite a bit of magic here, but it appears to work
+     */
+    nav.indexed-bar-bottom {
+        border-top: none !important;
+        padding-left: 6rem;
+    }
+    nav.indexed-bar-bottom ul {
+        display: block;
+        font-style: normal !important;
+        line-height: 1.5em;
+    }
+    nav.indexed-bar-bottom ul:before {
+        display: block;
+        content: "Indexes";
+        font-family: sans-serif;
+        font-size: 1.8rem;
+        padding-bottom: 0.83rem;
+    }
+    nav.indexed-bar-bottom ul li {
+        display: block;
+        padding-left: 3rem;
+        text-align: left;
+    }
+    nav.indexed-bar-bottom span.index-bar-contents {
+        display: none;
+    }
+    nav.indexed-bar-bottom li.index-bar-index span {
+        display: block;
+    }
+    nav.indexed-bar-bottom li.index-bar-index span.index-bar-index-number {
+        font-size: inherit;
+    }
+    nav.indexed-bar-bottom li.index-bar-index span.index-bar-index-number a:before {
+        content: "\a0\a0\a0\a0\a0...\0000a0by\a0";
+    }
+
+    /* Remove the bottom nav bar entirely on non-contents pages */
+    body.indexed-index nav.indexed-bar-bottom {
+        display: none;
+    }
+    body.indexed-index footer {
+        display: none;
+    }
+
+    .indexed-page-section {
+        clear: right;
+    }
+    .indexed-index a[href] {
+        display: inline-block;
+        width: 100%;
+    }
+    .indexed-contents a[href]::after,
+    .indexed-index a[href]::after {
+        font-style: italic;
+    }
+    .indexed-index a[href]::after {
+        clear: right;
+        float: right;
+        font-style: italic;
+    }
+
+    /* Hide the section as it's not as useful in the printed version */
+    .indexed-table-section, .indexed-table-heading-section {
+        display: none;
+    }
+
+    /* Cover pages go much closer to the edges */
+    @page cover {
+        margin: 1cm;
+        padding: 0;
+    }
+}
+
+@media screen {
+    /* Hide the page fields when shown on the screen */
+    .indexed-table-page, .indexed-table-heading-page {
+        display: none;
+    }
+}
+
+/* Paged media page breaks */
+.service-definition, .swi-definition, .vector-definition, .upcall-definition, .command-definition, .vdu-definition, .error-definition, .sysvar-definition, .message-definition, .tboxmessage-definition, .tboxmethod-definition, .entry-definition {
+    break-before: page;
+}
+section.section {
+    break-before: page;
+}
+section.section:first-of-type {
+    break-before: avoid;
+}
+section.section .service-definition:first-of-type,
+section.section .swi-definition:first-of-type,
+section.section .vector-definition:first-of-type,
+section.section .upcall-definition:first-of-type,
+section.section .command-definition:first-of-type,
+section.section .vdu-definition:first-of-type,
+section.section .error-definition:first-of-type,
+section.section .sysvar-definition:first-of-type,
+section.section .message-definition:first-of-type,
+section.section .tboxmessage-definition:first-of-type,
+section.section .tboxmethod-definition:first-of-type,
+section.section .entry-definition:first-of-type {
+    break-before: avoid;
+}
+
+
+/* Usually the section is immediately followed by a definition block,
+ * but when they include a descriptive paragraph before those blocks
+ * we want to force to a new page.
+ */
+section.section p + .service-definition:first-of-type,
+section.section p + .swi-definition:first-of-type,
+section.section p + .vector-definition:first-of-type,
+section.section p + .upcall-definition:first-of-type,
+section.section p + .command-definition:first-of-type,
+section.section p + .vdu-definition:first-of-type,
+section.section p + .error-definition:first-of-type,
+section.section p + .sysvar-definition:first-of-type,
+section.section p + .message-definition:first-of-type,
+section.section p + .tboxmessage-definition:first-of-type,
+section.section p + .tboxmethod-definition:first-of-type,
+section.section p + .entry-definition:first-of-type {
+    break-before: page;
+}
+
+/* If we have a heading which is followed by content, we would like to keep that content
+   together with the heading. This appears to be effective in PrinceXML but not in
+   Firefox or Chrome; maybe something subtle I've missed. */
+section.section > h2,
+section.subsection > h3,
+section.subsubsection > h4 {
+    page-break-after: avoid;
+}
+section.section > h2 + *,
+section.subsection > h3 + *,
+section.subsubsection > h4 + * {
+    page-break-before: avoid;
+}
+
+section.meta h2 {
+    break-before: page;
+}
+
+section.definition {
+    page-break-inside: avoid;
+}
+
+/* The 'Use' block is large, so making it always break tends to lead to the Use
+   section being on the next page. So instead of keeping all the 'Use' block together,
+   we instead try to keep the first paragraph with the section header. */
+section.definition.definition-use {
+    page-break-inside: auto;
+}
+section.definition.definition-use > p:first-of-type {
+    break-before: avoid;
+    page-break-inside: avoid;
+}
+
+footer {
+    page-break-inside: avoid;
+}
+
+
+.indexed-table-field { string-set: indexed-field content() }
+.chapter-docgroup-name { string-set: docgroup-name content() }
+.chapter-docgroup-part { string-set: docgroup-part content() }
+.chapter-name { string-set: chapter-name content() }
+.chapter-number {
+    string-set: chapter-number content(),
+                chapter-number-prefixed "Chapter " content() " ";
+}
+/* If the chapter-number wasn't given, then we make 'chapter-number-prefixed'
+ * an empty string. This means that it can be used as the PDF bookmark label
+ * with a prefix (eg 'Chapter 5 ') which makes it easier to look through the
+ * TOC to find the right chapter.
+ */
+.chapter-number:empty {
+    string-set: chapter-number-prefixed "";
+}
+.chapter-page-prefix { string-set: chapter-page-prefix content() }
+section.section h2,
+section.meta h2 {
+    string-set: section-name content()
+}
+
+
+</style><style type="text/css">
+/* Specify the text size (but only when printed; when on screen we use natural size) */
+@media print {
+    :root {
+      font-size: 10pt;
+    }
+}
+
+/* Grey divider lines */
+body.chapter header h1 {
+  border-top: 0.375rem solid #bbbbbb;
+  border-bottom: 0.375rem solid #bbbbbb;
+}
+
+nav {
+  border-bottom: 0.375rem solid #bbbbbb;
+}
+nav.indexed-bar-bottom {
+  border-top: 0.375rem solid #bbbbbb;
+}
+body.chapter section.section {
+  border-bottom: 0.375rem solid #bbbbbb;
+}
+
+footer {
+  border-bottom: 0.375rem solid #bbbbbb;
+}
+
+@media screen {
+    .service-definition, .swi-definition, .vector-definition, .upcall-definition, .command-definition, .vdu-definition, .error-definition, .sysvar-definition, .message-definition, .tboxmessage-definition, .tboxmethod-definition, .entry-definition {
+      border-top: 0.375rem solid #bbbbbb;
+    }
+    footer {
+      border-bottom: 0.375rem solid #bbbbbb;
+    }
+}
+
+/* Indent the chapter name like the PRM did */
+body.chapter header h1 {
+  position: relative;
+}
+body.chapter header h1 .chapter-number {
+  position: absolute;
+  width: 5rem;
+}
+body.chapter header h1 .chapter-name {
+  padding-left: 5rem;
+  display: inline-block;
+}
+
+/* Heading sizes are much bigger, and not always bold */
+body.chapter h1 {
+  font-size: 2rem;
+  font-weight: normal;
+}
+body.chapter h2 {
+  font-size: 1.8rem;
+  font-weight: normal;
+}
+body.chapter h3 {
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+body.chapter h4 {
+  font-size: 1.2rem;
+  font-weight: normal;
+}
+body.chapter h5 {
+  font-size: 1rem;
+  font-weight: bold;
+}
+
+th {
+  font-weight: bold;
+}
+
+/* Lists are bulleted in line with the left text */
+article ol {
+    margin-left: 1em;
+    padding-left: 1em;
+}
+article ul {
+    margin-left: 0;
+    padding-left: 1.5em;
+}
+article ul > li {
+    margin-left: 0;
+    padding-left: 1em;
+}
+article ol > li {
+    margin-left: 0;
+    padding-left: 0.5em;
+}
+/* All lists are just plain bullets; they don't vary */
+ul {
+    list-style-type: disc;
+}
+
+/* Definitions are not bold, and are bigger */
+.definition-title, .definition-subtitle {
+    font-size: 1.8rem;
+    font-weight: normal;
+}
+
+/* Links are always in italic (in the article - not in the contents) */
+article a:link, article a:visited, article a:hover, article a:active {
+    font-style: italic;
+}
+/* (and not in the 'related' sections) */
+article .definition-related a:link,
+article .definition-related a:visited,
+article .definition-related a:hover,
+article .definition-related a:active {
+    font-style: normal;
+}
+
+/* Styling specific to the print */
+@media print {
+    a[href] {
+        /*text-decoration: underline;
+        text-underline-style: dashed;
+        text-underline-color: gray;*/
+        text-decoration: none;
+        color: black;
+    }
+
+    body.chapter header h1,
+    body.contents header h1,
+    body.indexed header h1 {
+        /* Force on to the right pages */
+        break-before: recto;
+
+        /* Remove the top border because we will use the divider
+         * provided by the @page @top-left/@top-right.
+         */
+        border-top: 0px none;
+        padding-top: 0.5rem;
+    }
+}
+
+
+@page {
+    size: 17.5cm 25.0cm portrait;
+
+    margin-top: 2cm;
+    margin-bottom: 2cm;
+    margin-inside: 2cm;
+    margin-outside: 1.25cm;
+}
+
+@page:left {
+    margin-left: 2cm;
+
+    @top-left {
+        content: string(section-name);
+        font-style: italic;
+        font-family: sans-serif;
+        vertical-align: bottom;
+        padding-bottom: 0.25rem;
+        border-bottom: 0.375rem solid #bbbbbb;
+        margin-bottom: 1em;
+    }
+
+    @bottom-left {
+        content: string(chapter-page-prefix) counter(page);
+        font-family: sans-serif;
+        vertical-align: top;
+        padding-top: 0.25rem;
+        /* border-top: 0.375rem solid #bbbbbb; */
+        margin-top: 1em;
+    }
+}
+
+@page:right {
+    margin-right: 2cm;
+
+    @top-right {
+        content: string(chapter-name);
+        font-style: italic;
+        font-family: sans-serif;
+        vertical-align: bottom;
+        padding-bottom: 0.25rem;
+        border-bottom: 0.375rem solid #bbbbbb;
+        margin-bottom: 1em;
+    }
+
+    @bottom-right {
+        content: string(chapter-page-prefix) counter(page);
+        font-family: sans-serif;
+        vertical-align: top;
+        padding-top: 0.25rem;
+        /* border-top: 0.375rem solid #bbbbbb; */
+        margin-top: 1em;
+    }
+
+    @right-top {
+        display: inline;
+        margin-left: 1.5rem;
+
+        /* 5% gap at top/bottom, dividing the 90% remaining into edgeindex-max
+         * blocks, of which this is the edgeindex'th one (0-indexed).
+         */
+        margin-top: calc((5 + (90 / var(--edgeindex-max)) * var(--edgeindex-number)) * 1%);
+        margin-bottom: calc((100 - (5 + (90 / var(--edgeindex-max)) * (var(--edgeindex-number) + 1))) * 1%);
+
+        padding-top: 1rem;
+        padding-bottom: 1rem;
+        writing-mode: vertical-rl;
+        padding-left: 0.5rem;
+        font-family: sans-serif;
+        font-weight: bold;
+        font-size: 0.75rem;
+        content: string(docgroup-name);
+        color: white;
+        background-color: #bbbbbb;
+    }
+}
+
+/* Numbering the contents + chapter-front-matter pages with lower-roman
+   works for the footers of the page, but does not work for the links that
+   are generated. The style is not known, so the page number will come out
+   wrongly. So for now, this is just disabled.
+ */
+/*
+@page contents:right {
+    @bottom-right {
+        content: string(chapter-page-prefix) counter(page, lower-roman);
+    }
+}
+@page contents:left {
+    @bottom-left {
+        content: string(chapter-page-prefix) counter(page, lower-roman);
+    }
+}
+*/
+
+/* Numbering and the headers are omitted for the cover */
+@page cover {
+    /* Headers */
+    @top-left {
+        content: "";
+        border-bottom: none;
+    }
+    @top-right {
+        content: "";
+        border-bottom: none;
+    }
+
+    /* Footers */
+    @bottom-right {
+        content: "";
+    }
+    @bottom-left {
+        content: "";
+    }
+
+    /* Edge index */
+    @right-top {
+        content: "";
+        background-color: transparent;
+    }
+}
+
+/* Numbering and the headers are omitted for pages in the front-matter */
+@page front-matter {
+    /* Headers */
+    @top-left {
+        content: "";
+        border-bottom: none;
+    }
+    @top-right {
+        content: "";
+        border-bottom: none;
+    }
+
+    /* Footers */
+    @bottom-right {
+        content: "";
+    }
+    @bottom-left {
+        content: "";
+    }
+
+    /* Edge index */
+    @right-top {
+        content: "";
+        background-color: transparent;
+    }
+}
+
+@page:first {
+  @top-right {
+    content: '';
+  }
+}
+
+pre {
+    font-size: 0.825rem;
+    white-space: pre-wrap !important;
+}
+
+</style><style type="text/css">
+body {
+  font-family: "Fraunces 28pt", "Fraunces", serif;
+}
+body.indexed th {
+  font-weight: bold;
+}
+table.history h5 {
+  font-weight: normal;
+  font-family: "Fraunces 28pt", "Fraunces", serif;
+}
+
+@media print {
+    /* Special changes for the generated index text */
+    nav.indexed-bar-bottom ul {
+      font-family: "Fraunces 28pt", "Fraunces", serif !important;
+    }
+}
+</style><style type="text/css">
+h1, h2, h3, h4, h5 {
+  font-family: "Raleway", sans-serif;
+  font-variant-numeric: lining-nums;
+  font-variant: prince-opentype(lnum(1));
+}
+.definition-title, .definition-subtitle {
+  font-family: "Raleway", sans-serif;
+  font-variant-numeric: lining-nums;
+  font-variant: prince-opentype(lnum(1));
+}
+section.definition::before {
+  font-family: "Raleway", sans-serif;
+  font-variant-numeric: lining-nums;
+  font-variant: prince-opentype(lnum(1));
+}
+@media screen {
+    .indexed-bar {
+      font-family: "Raleway", sans-serif;
+      font-variant-numeric: lining-nums;
+      font-variant: prince-opentype(lnum(1));
+    }
+}
+
+/* Need to override the headers and footers if present */
+@page:left {
+
+    @top-left {
+        font-family: "Raleway", sans-serif;
+    }
+
+    @bottom-left {
+        font-family: "Raleway", sans-serif;
+    }
+
+    @top-right {
+        font-family: "Raleway", sans-serif;
+    }
+
+    @bottom-right {
+        font-family: "Raleway", sans-serif;
+    }
+}
+
+@page:right {
+    margin-right: 2cm;
+
+    @top-left {
+        font-family: "Raleway", sans-serif;
+    }
+
+    @bottom-left {
+        font-family: "Raleway", sans-serif;
+    }
+
+    @top-right {
+        font-family: "Raleway", sans-serif;
+    }
+
+    @bottom-right {
+        font-family: "Raleway", sans-serif;
+    }
+
+    @right-top {
+        font-family: "Raleway", sans-serif;
+    }
+}
+
+@media print {
+    /* Special changes for the generated index text */
+    nav.indexed-bar-bottom ul:before {
+        font-family: "Raleway", sans-serif;
+    }
+}
+
+</style><style type="text/css">
+@import url('https://fonts.googleapis.com/css2?family=Fraunces&display=block');
+</style><style type="text/css">
+@import url('https://fonts.googleapis.com/css2?family=Raleway&display=block');
+</style><style type="text/css">
+ul > li::marker {
+    content: '\25CF';
+}
+header nav li,
+footer section.meta li {
+    padding-left: 0.5rem;
+}
+article ul > li {
+    padding-left: 1.5rem;
+}
+</style><style type="text/css">
+@page:right {
+    @right-top {
+        background-color: #ffffff;
+    }
+}
+</style>
+
+<style type="text/css">
+.index-title {
+  margin-right: 1em;
+  font-weight: bold;
+}
+.index-link {
+  padding-top: 0.125em;
+  padding-bottom: 0.125em;
+}
+</style>
+
+</head><body class="chapter"><header><span class="chapter-vars"><span class="chapter-page-prefix"></span><style type="text/css">:root {  --edgeindex-number: 0;  --edgeindex-max: 4;</style></span><h1 class="chapter-title" id="chapter_index"><span class="chapter-docgroup-name"></span><span class="chapter-docgroup-part"></span><span class="chapter-number"></span><span class="chapter-name">RISC OS DCI 4 reference manuals</span></h1>
+<article><section class="section"><h2 class="section" id="section_introduction">Introduction</h2>
+    <p>
+        The PRM-in-XML project is an initiative to make a standardised documentation
+        format for the RISC OS Programmer's Reference Manuals. The tooling for
+        generating such documentation can be found in the
+        <a href="https://github.com/gerph/riscos-prminxml-tool">riscos-prminxml-tool</a>
+        GitHub repository. Additional justification and details about the project itself
+        can be found in an article about the project published in
+        <a href="https://www.iconbar.com/articles/RISC_OS_Documentation/index1700.html">The Iconbar</a>.
+    </p>
+    <p>
+        The documents published here describe the DCI 4 stack interfaces which provide
+        hardware layers for the network protocol modules.
+        The full repository can be found in the
+        <a href="https://github.com/gerph/riscos-prm-dci4">riscos-prm-dci4</a>
+        repository on GitHub.
+    </p>
+
+    <p>
+        The documentation is generated in different styles to show off the different
+        presentation formats, and provide users with a choice of how they wish to see
+        their documents.
+    </p>
+</section></article>
+
+
+<nav><h2 class="contents">Styles</h2>
+
+<ul>

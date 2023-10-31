@@ -4,15 +4,17 @@
 
 TOOL = riscos-prminxml
 
+LOGDIR=logs
+
 all: pdf
 
 lint: dirs
-	${TOOL} --lint -f index -L logs index.xml
-	cat logs/2-build.log
+	${TOOL} --lint -f index -L ${LOGDIR} index.xml
+	cat ${LOGDIR}/2-build.log
 
 output: dirs
-	${TOOL} -f index -L logs index.xml
-	cat logs/2-build.log
+	${TOOL} -f index -L ${LOGDIR} index.xml
+	cat ${LOGDIR}/2-build.log
 
 pdf: output
 ifeq (${PRINCEXML_I_HAVE_A_LICENSE},1)
@@ -26,7 +28,7 @@ else
 endif
 
 dirs:
-	mkdir -p logs
+	mkdir -p ${LOGDIR}
 
 zip: output
 	rm -f src.zip output.zip

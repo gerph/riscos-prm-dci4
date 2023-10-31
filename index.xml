@@ -1,7 +1,5 @@
 <?xml version="1.0"?>
-
 <index>
-
 <dirs output="output/html"
       index="output/index"
       help="output/help"
@@ -418,26 +416,6 @@
  <page>Significant changes</page>
  <page>Glossary</page>
 </section>
-
-<!-- Command help messages -->
-<help path="boot/library/archive"/>
-<help path="boot/library/archive"/>
-<help path="boot/library/archive"/>
-<help path="boot/library/internet"/>
-<help path="boot/library/internet"/>
-<help path="boot/library/internet"/>
-<help path="boot/library/internet"/>
-<help path="boot/library/internet"/>
-<help path="boot/library/internet"/>
-<help path="boot/library/internet"/>
-<help path="boot/library/internet"/>
-<help path="boot/library/internet"/>
-<help path="boot/library/riscos"/>
-<help path="boot/library/riscos"/>
-<help path="boot/library/riscos"/>
-<help path="boot/library/riscos"/>
-<help path="boot/library/riscos"/>
-<help path="boot/utilities"/>
 
 </index>
 

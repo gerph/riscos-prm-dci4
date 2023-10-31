@@ -23,10 +23,27 @@
 # variable PRMINXML_VERSION to either 'local' or a version number from the
 # PRM-in-XML distribution:
 #
+# Parameters may be given to request a specific style be used - there are a
+# number of styles in the `build-style.sh` script, for example:
+#
+#   ./build.sh prm-modern
+#
+# Currently defined styles are:
+#
+#   regular
+#   unstyled
+#   prm
+#   prm-ro2
+#   prm-modern
+#
+# To build all styles, use:
+#
+#   ./build.sh all
+#
 # Supported operating systems:
 #
 #   macOS
-#   Ubuntu Linux (18.04, 20.04, 21.04)
+#   Ubuntu Linux (18.04, 20.04, 22.04)
 #   Centos (7 and 8)
 #   Debian (10)
 #   Linux Mint (18 and 20)
@@ -35,9 +52,9 @@
 set -e
 set -o pipefail
 
-PRINCE_VERSION=14.2
+PRINCE_VERSION=15.1
 #DEFAULT_PRMINXML_VERSION=1.02.65
-DEFAULT_PRMINXML_VERSION=1.03.65.html5-css.222
+DEFAULT_PRMINXML_VERSION=1.03.343
 PRMINXML_VERSION=${PRMINXML_VERSION:-$DEFAULT_PRMINXML_VERSION}
 SYSTEM="$(uname -s)"
 
@@ -207,7 +224,9 @@ if ! type -p prince >/dev/null 2>&1 && [[ "$PRINCEXML_I_HAVE_A_LICENSE" = 1 ]] ;
                 PRINCE_DISTRO_RELEASE=""
                 PRINCE_ARCH='x86_64'
             elif [[ "${PRINCE_DISTRO}" = 'ubuntu' ]] ; then
-                if [[ "$DISTRO_RELEASE" =~ 20.10|21.04|21.10 ]] ; then
+                if [[ "$DISTRO_RELEASE" =~ 22.10 ]] ; then
+                    PRINCE_DISTRO_RELEASE=22.04
+                elif [[ "$DISTRO_RELEASE" =~ 20.10|21.04|21.10 ]] ; then
                     PRINCE_DISTRO_RELEASE=20.04
                 elif [[ "$DISTRO_RELEASE" =~ 18.10|19.04|19.10 ]] ; then
                     PRINCE_DISTRO_RELEASE=18.04
@@ -218,6 +237,10 @@ if ! type -p prince >/dev/null 2>&1 && [[ "$PRINCEXML_I_HAVE_A_LICENSE" = 1 ]] ;
                 PRINCE_ARCH='amd64'
             elif [[ "$PRINCE_DISTRO" = 'centos' ]] ; then
                 PRINCE_ARCH='x86_64'
+                if [[ "$DISTRO_RELEASE" == 8 ]] ; then
+                    # CentOS 8 is old and Prince wasn't updated beyond 14.2
+                    PRINCE_VERSION=14.2
+                fi
             fi
             url="https://www.princexml.com/download/prince-$PRINCE_VERSION-${PRINCE_DISTRO}${PRINCE_DISTRO_RELEASE}-${PRINCE_ARCH}.tar.gz"
             extract_dir="prince-${PRINCE_VERSION}-${PRINCE_DISTRO}${PRINCE_DISTRO_RELEASE}-${PRINCE_ARCH}"
@@ -263,6 +286,18 @@ if ! type -p prince >/dev/null 2>&1 && [[ "$PRINCEXML_I_HAVE_A_LICENSE" = 1 ]] ;
                 install_package liblcms2-2
                 install_package libcurl4
                 install_package libfontconfig1
+
+                # Version 15 requires some other libraries as well
+                if [[ "${PRINCE_VERSION%.*}" -ge "15" ]] ; then
+                    if [[ "${DISTRO}" != 'centos' || "$DISTRO_RELEASE" != 7 ]] ; then
+                        install_package libwebpdemux2
+                    fi
+                    if [[ "${DISTRO}" = 'ubuntu' ]] ; then
+                        if [[ "$DISTRO_RELEASE" =~ 22 ]] ; then
+                            install_package libavif13
+                        fi
+                    fi
+                fi
             fi
         fi
     fi
@@ -282,4 +317,26 @@ fi
 
 
 echo Run the build...
-make "$@"
+build="${1:-}"
+if [[ "$#" != 0 ]] ; then
+    shift
+fi
+and_zip=false
+if [[ "$build" == '' ]] ; then
+    build=regular
+
+elif [[ "$build" == 'zip' ]] ; then
+
+    build=all
+    and_zip=true
+fi
+
+if [[ "$build" == 'lint' ]] ; then
+    make lint
+else
+    ./build-style.sh "$build" "$@"
+    ./index-generator.pl output/index.html output
+fi
+if $and_zip ; then
+    make zip
+fi
