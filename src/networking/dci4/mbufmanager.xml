@@ -1721,9 +1721,14 @@ PURPOSER. NOT INTENDED FOR USE IN LIFE CRITICAL APPLICATIONS.</p>
     <change>Added information about m_pkthdr and m_flags fields.</change>
   </revision>
 
-  <revision number="X" date="08 Aug 2020" author="Gerph" title="Restructure as PRM-in-XML">
+  <revision number="1.02CJF" date="08 Aug 2020" author="Gerph" title="Restructure as PRM-in-XML">
     <change>Formatting changes have been made to use structured data formats, with tables of structures in addition to the C structure definitions.</change>
   </revision>
+
+  <revision number="1.03CJF" date="01 Nov 2022" author="Gerph" title="Tidy up XML">
+    <change>Tidied up the XML and some of the structure to better match PRM-in-XML expectations and lint cleanly.</change>
+  </revision>
+
  </history>
 </meta>
 

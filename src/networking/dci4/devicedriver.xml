@@ -343,11 +343,31 @@ and has been removed.</p>
 </category>
 </subsection>
 
-<subsection title="4.2 Service Call Descriptions">
+<subsection title="4.2 Obsolete services">
 
-<p>Note: as already mentioned in section 4, the old, unnamed,
+<p>As already mentioned in section 4, the old, unnamed,
 service call 0x41200 will not be issued by DCI 4 compliant versions
 of the Internet module when it is terminating.</p>
+</subsection>
+
+<subsection title="4.3 Device Driver Initialisation">
+<p>When a device driver module initialises, it is expected to issue
+a <reference type='service' name='DCIDriverStatus'/> service call to announce that it is
+starting; at the time this startup call is issued, the module must
+also be capable of handling SWIs raised by any protocol module
+interested in the device driver. Unfortunately, the RISC OS kernel
+does not recognise a module's SWIs until <strong>after</strong> its
+initialisation routine has returned, which means that driver
+modules must take explicit steps to allow SWIs to be caught before
+issuing the service call, i.e. they must either:</p>
+
+<p>
+<list type='ordered'>
+    <item><p>Install a handler on the unknown SWI software vector ("UKSWIV"), and check all unknown SWIs for an appropriate chunk number.</p></item>
+    <item><p>Setup a callback handler in the initialisation routine, and then issue the service call from within this callback handler.</p></item>
+</list>
+</p>
+</subsection>
 
 <service-definition name="EnumerateNetworkDrivers" number='9B'
                     description="List all active network drivers in the system">
@@ -517,27 +537,6 @@ interrupt state preserved.</p>
 </related>
 </service-definition>
 
-</subsection>
-
-<subsection title="4.3 Device Driver Initialisation">
-<p>When a device driver module initialises, it is expected to issue
-a <reference type='service' name='DCIDriverStatus'/> service call to announce that it is
-starting; at the time this startup call is issued, the module must
-also be capable of handling SWIs raised by any protocol module
-interested in the device driver. Unfortunately, the RISC OS kernel
-does not recognise a module's SWIs until <strong>after</strong> its
-initialisation routine has returned, which means that driver
-modules must take explicit steps to allow SWIs to be caught before
-issuing the service call, i.e. they must either:</p>
-
-<p>
-<list type='ordered'>
-    <item><p>Install a handler on the unknown SWI software vector ("UKSWIV"), and check all unknown SWIs for an appropriate chunk number.</p></item>
-    <item><p>Setup a callback handler in the initialisation routine, and then issue the service call from within this callback handler.</p></item>
-</list>
-</p>
-
-</subsection>
 </section>
 
 <section title="5 Device Driver SWIs">
@@ -720,7 +719,6 @@ of no significance to them.</p></value>
 </category>
 </subsection>
 
-<subsection title="5.3 SWI Descriptions">
 <swi-definition name="DCIDriver_DCIVersion" offset="00" offset-base='DCIDriver'
                 description="Returns DCI version numbers supported by the device driver">
 <entry>
@@ -1064,8 +1062,8 @@ operations (see state diagram below)</bit>
 </p>
 
 <p>
-<image src='devicedriver-multicast.draw' type='draw' height='15em' caption=''>
-<image src='devicedriver-multicast.svg' type='svg' height='15em' caption=''/>
+<image src='devicedriver-multicast.draw' type='draw' height='200' caption=''>
+<image src='devicedriver-multicast.svg' type='svg' height='200' caption=''/>
 </image>
 </p>
 
@@ -1120,7 +1118,6 @@ should return EINVAL.</p>
 </related>
 </swi-definition>
 
-</subsection>
 </section>
 
 <section title="6 Received Frames">
@@ -2187,6 +2184,10 @@ these flags should also be set.</p>
         <change>Exported from Impression, and converted to PRM-in-XML structured format.</change>
         <change>Formatting changes have been made to use structured data formats, with tables of structures in addition to the C structure definitions.</change>
         <change>Removed the st_net_error field from the statistics C definition; this field had been removed from the definitions in 4.02 (as seen in TCPIPLibs) but was still present within this document.</change>
+    </revision>
+
+    <revision number="1.05CJF" date="01 Nov 2022" author="Gerph" title="Tidy up XML">
+        <change>Tidied up the XML and some of the structure to better match PRM-in-XML expectations and lint cleanly.</change>
     </revision>
  </history>
 </meta>
