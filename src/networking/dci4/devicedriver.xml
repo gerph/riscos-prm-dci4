@@ -1062,8 +1062,8 @@ operations (see state diagram below)</bit>
 </p>
 
 <p>
-<image src='devicedriver-multicast.draw' type='draw' height='200' caption=''>
-<image src='devicedriver-multicast.svg' type='svg' height='200' caption=''/>
+<image src='devicedriver-multicast.draw' type='draw' height='250' caption=''>
+<image src='devicedriver-multicast.svg' type='svg' height='250' caption=''/>
 </image>
 </p>
 
@@ -1183,8 +1183,8 @@ protocol module itself.</p></item>
 </p>
 
 <p>
-<image src='devicedriver-filtering.draw' type='draw' height='15em' caption='Figure 1: Filtering Ethernet 2.0 and IEEE 802.3 class frames'>
-<image src='devicedriver-filtering.svg' type='svg' height='15em' caption='Figure 1: Filtering Ethernet 2.0 and IEEE 802.3 class frames'/>
+<image src='devicedriver-filtering.draw' type='draw' height='250' caption='Figure 1: Filtering Ethernet 2.0 and IEEE 802.3 class frames'>
+<image src='devicedriver-filtering.svg' type='svg' height='250' caption='Figure 1: Filtering Ethernet 2.0 and IEEE 802.3 class frames'/>
 </image>
 </p>
 
@@ -1439,8 +1439,8 @@ Information Block, and therefore <strong>all</strong> the frames passed in
 any one call to the handler must come from a single unit.</p>
 
 <p>
-<image src='devicedriver-mbufchaining.draw' type='draw' height='25em' caption='Figure 2: Linking mbuf chains'>
-<image src='devicedriver-mbufchaining.svg' type='svg' height='25em' caption='Figure 2: Linking mbuf chains'/>
+<image src='devicedriver-mbufchaining.draw' type='draw' height='600' caption='Figure 2: Linking mbuf chains'>
+<image src='devicedriver-mbufchaining.svg' type='svg' height='600' caption='Figure 2: Linking mbuf chains'/>
 </image>
 </p>
 
