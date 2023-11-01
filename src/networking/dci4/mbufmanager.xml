@@ -47,6 +47,7 @@ client interface contract is such an interface (see Appendix).</p>
 </section>
 
 <section title="3 MbufManager goals">
+<p>
 <list>
     <item>Hide any mechanics not necessary for client operation</item>
     <item>Provide single mbuf pool, rather than one per protocol</item>
@@ -57,6 +58,7 @@ client interface contract is such an interface (see Appendix).</p>
     <item>Permit pre-allocation of packet storage space (DCI2 doesn't)</item>
     <item>Permit modular component upgrade path (DCI2 doesn't)</item>
 </list>
+</p>
 </section>
 
 <section title="4 The mbuf structure and its uses">
@@ -110,7 +112,7 @@ typedef struct mbuf {
 </extended-example>
 </p>
 
-<code>struct mbuf *m_next;</code>
+<p><code>struct mbuf *m_next;</code></p>
 <p>Although mbufs may be manipulated individually, they are almost
 always used as an mbuf chain. The 'm_next' field of the mbuf
 structure points at the next mbuf in an mbuf chain. There is no
@@ -135,7 +137,7 @@ address of the mbuf itself and fields contained within the mbuf.
 The location of this memory, relative to the mbuf itself, is not
 defined, other than the 'm_off' field contains a suitable bias to
 access this memory.</p>
-<p>size_t m_len;</p>
+<p><code>size_t m_len;</code></p>
 <p>The 'm_off' field is the bias to add to the address of the mbuf
 to obtain the address of the first byte of data described by that
 mbuf. The 'm_len' field specifies the number of bytes contained in
@@ -143,6 +145,7 @@ the described data. This might be envisaged as follows:</p>
 <p>Relationships between the address of an mbuf, and the 'm_off',
 'm_next' and 'm_len' fields.</p>
 
+<p>
 <extended-example type='format'>
                       Mbufs                      Described
                                                     data
@@ -169,6 +172,7 @@ the described data. This might be envisaged as follows:</p>
                      |       |               \   |       |
                      =========               --> =========
 </extended-example>
+</p>
 
 <p>Notes:</p>
 <p>Only three of the fields of an mbuf are indicated. This is for
@@ -226,8 +230,8 @@ blocks that may be allocated for an mbuf to describe are
 constrained to a number of sizes. This permits the situation where
 an mbuf describes only some of the underlying memory actually
 allocated.</p>
-<p>const ptrdiff_t m_inioff;</p>
-<p>const size_t m_inilen;</p>
+<p><code>const ptrdiff_t m_inioff;</code></p>
+<p><code>const size_t m_inilen;</code></p>
 <p>The 'm_inioff' and 'm_inilen' fields provide a description of
 the underlying block of memory in the same way as 'm_off' and
 'm_len' fields (respectively) provide a description of the
@@ -237,8 +241,8 @@ end of it). Any values of 'm_len' and 'm_off' are permitted
 provided that the described block of memory is fully contained
 within the underlying block described by 'm_inioff' and 'm_inilen'
 (but see the field validity table below).</p>
-<p>struct mbuf *m_list;</p>
-<p>unsigned char m_type;</p>
+<p><code>struct mbuf *m_list;</code></p>
+<p><code>unsigned char m_type;</code></p>
 <p>The 'm_list' and 'm_type' fields are provided for the
 convenience of the client. The contents of these fields when an
 mbuf is passed from one client to another is part of the interface
@@ -246,15 +250,15 @@ contract between clients. When a client owns an mbuf chain, it can
 set these fields to whatever values it requires.</p>
 <p>If these fields are used, a client must explicitly initialise
 them. The MbufManager never examines these fields.</p>
-<p>const unsigned char m_sys1;</p>
-<p>const unsigned char m_sys2;</p>
+<p><code>const unsigned char m_sys1;</code></p>
+<p><code>const unsigned char m_sys2;</code></p>
 <p>The 'm_sys1' and 'm_sys2' fields are private fields maintained
 by the MbufManager. They should never be read or written by a
 client under any circumstances, even transiently. The MbufManager
 is entitled to asynchronously examine these three fields if it
 requires.</p>
-<p>unsigned char m_flags;</p>
-<p>struct pkthdr m_pkthdr;</p>
+<p><code>unsigned char m_flags;</code></p>
+<p><code>struct pkthdr m_pkthdr;</code></p>
 <p>The 'm_flags' field, and the 'm_pkthdr' field in version 0.15 or
 later of the MbufManager, are provided for the convenience of the
 client . The contents of these fields when an mbuf is passed from
