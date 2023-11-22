@@ -37,7 +37,7 @@ function generate_documents() {
     riscos-prminxml --catalog "$catalog" -f index -L "${OUTPUTDIR}/logs-$name" "${TMPINDEX}"
     if [[ "$PRINCEXML_I_HAVE_A_LICENSE" = 1 && -f "${OUTPUTDIR}/$name/html/filelist.txt" ]] ; then
         ( cd "${OUTPUTDIR}/$name/html" &&
-          prince --verbose -o "../RISC_OS_PRM_Staging.pdf" -l filelist.txt )
+          prince --verbose -o "../RISC_OS_PRM_DCI4.pdf" -l filelist.txt )
     fi
     cp "${TMPINDEX}" "${OUTPUTDIR}/$name/index.xml"
 }

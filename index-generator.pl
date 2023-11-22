@@ -48,7 +48,7 @@ my $tail = read_file('index-tail.html');
 my @rows;
 for my $style (sort { ($style_weights{$a} // 10) <=> ($style_weights{$b}) } @styles) {
     my $title = $style_names{$style} // "(UNTITLED: $style)";
-    my $pdffile = "$style/RISC_OS_PRM_Staging.pdf";
+    my $pdffile = "$style/RISC_OS_PRM_DCI4.pdf";
 
     my $row = "<li class='index-link'>";
     $row .= "<span class='index-title'><a href='$style/html/index.html'>$title</a></span>";
