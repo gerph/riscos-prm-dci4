@@ -1,5 +1,6 @@
 # RISC OS DCI 4 Networking
 
+[![DCI 4 Documentation](https://img.shields.io/badge/Generated-Documents-yellow)](https://gerph.github.io/riscos-prm-dci4/)
 ## Introduction
 
 The content here comprises the documentation for the DCI 4 network stack on RISC OS.
