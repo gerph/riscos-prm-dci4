@@ -52,7 +52,8 @@
 set -e
 set -o pipefail
 
-PRINCE_VERSION=15.1
+PRINCE_VERSION=15.4.1
+PRINCE_BASE_VERSION=15.4
 #DEFAULT_PRMINXML_VERSION=1.02.65
 DEFAULT_PRMINXML_VERSION=1.03.343
 PRMINXML_VERSION=${PRMINXML_VERSION:-$DEFAULT_PRMINXML_VERSION}
@@ -240,6 +241,7 @@ if ! type -p prince >/dev/null 2>&1 && [[ "$PRINCEXML_I_HAVE_A_LICENSE" = 1 ]] ;
                 if [[ "$DISTRO_RELEASE" == 8 ]] ; then
                     # CentOS 8 is old and Prince wasn't updated beyond 14.2
                     PRINCE_VERSION=14.2
+                    PRINCE_BASE_VERSION=14.2
                 fi
             fi
             url="https://www.princexml.com/download/prince-$PRINCE_VERSION-${PRINCE_DISTRO}${PRINCE_DISTRO_RELEASE}-${PRINCE_ARCH}.tar.gz"
@@ -280,7 +282,12 @@ if ! type -p prince >/dev/null 2>&1 && [[ "$PRINCEXML_I_HAVE_A_LICENSE" = 1 ]] ;
 
             if [[ "$SYSTEM" = 'Linux' ]] ; then
                 # We also seem to need some libraries to be installed (there's no binary so this will just install)
-                install_package libtiff5
+                if [[ "${DISTRO}" = 'ubuntu' && "$DISTRO_RELEASE" =~ 24 ]] || \
+                   [[ "${DISTRO}" = 'debian' && "$DISTRO_RELEASE" =~ 12 ]] ; then
+                    install_package libtiff6
+                else
+                    install_package libtiff5
+                fi
                 install_package libgif7
                 install_package libpng16-16
                 install_package liblcms2-2
@@ -288,13 +295,21 @@ if ! type -p prince >/dev/null 2>&1 && [[ "$PRINCEXML_I_HAVE_A_LICENSE" = 1 ]] ;
                 install_package libfontconfig1
 
                 # Version 15 requires some other libraries as well
-                if [[ "${PRINCE_VERSION%.*}" -ge "15" ]] ; then
+                if [[ "${PRINCE_BASE_VERSION%.*}" -ge "15" ]] ; then
                     if [[ "${DISTRO}" != 'centos' || "$DISTRO_RELEASE" != 7 ]] ; then
                         install_package libwebpdemux2
                     fi
                     if [[ "${DISTRO}" = 'ubuntu' ]] ; then
                         if [[ "$DISTRO_RELEASE" =~ 22 ]] ; then
                             install_package libavif13
+                        fi
+                        if [[ "$DISTRO_RELEASE" =~ 24 ]] ; then
+                            install_package libavif16
+                        fi
+                    fi
+                    if [[ "${DISTRO}" = 'debian' ]] ; then
+                        if [[ "$DISTRO_RELEASE" =~ 12 ]] ; then
+                            install_package libavif15
                         fi
                     fi
                 fi
