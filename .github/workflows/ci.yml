@@ -59,7 +59,7 @@ jobs:
           # use the non-commercial license.
           sudo env PRINCEXML_I_HAVE_A_LICENSE=1 ./build.sh all
 
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v6
         with:
           name: PRM-DCI4
           path: output
