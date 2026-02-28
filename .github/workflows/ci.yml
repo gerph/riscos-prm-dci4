@@ -97,7 +97,7 @@ jobs:
         with:
           prerelease: false
           draft: true
-          artifacts: "PRM-DCI4-${{ steps.get_version.outputs.VERSION }}.zip,PRM-DCI4/prm/RISC_OS_PRM_Staging.pdf"
+          artifacts: "PRM-DCI4-${{ steps.get_version.outputs.VERSION }}.zip,PRM-DCI4/prm/RISC_OS_PRM_DCI4.pdf"
           artifactContentType: application/zip
 
   publish:
