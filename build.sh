@@ -209,6 +209,11 @@ fi
 
 if ! type -p prince >/dev/null 2>&1 && [[ "$PRINCEXML_I_HAVE_A_LICENSE" = 1 ]] ; then
     # princexml isn't installed, so we need to get a version.
+    if [[ "$DISTRO" = 'ubuntu' && "$DISTRO_RELEASE" =~ ^26 ]] ; then
+        # Prince XML 15 has no Ubuntu 26.04 build; 17 is the first that does.
+        PRINCE_VERSION=17
+        PRINCE_BASE_VERSION=17
+    fi
     prince_install="${scriptdir}/prince-install-$PRINCE_VERSION-$DISTRO-$DISTRO_RELEASE"
     if [[ ! -d "$prince_install" ]] ; then
         echo "+++ Obtaining prince"
@@ -280,7 +285,14 @@ if ! type -p prince >/dev/null 2>&1 && [[ "$PRINCEXML_I_HAVE_A_LICENSE" = 1 ]] ;
         # Check if we have a working prince installation
         if ! prince --version > /dev/null 2>&1 ; then
 
-            if [[ "$SYSTEM" = 'Linux' ]] ; then
+            if [[ "$SYSTEM" = 'Linux' && "$DISTRO" = 'ubuntu' && "$DISTRO_RELEASE" =~ ^26 ]] ; then
+                # The libraries that Prince XML 17 links against on Ubuntu 26.04
+                for lib in libtiff6 libgif7 libpng16-16t64 liblcms2-2 libcurl4t64 \
+                           libfontconfig1 libfreetype6 libjpeg-turbo8 libwebp7 \
+                           libwebpdemux2 libavif16 libaom3 libxml2-16 ; do
+                    install_package "$lib"
+                done
+            elif [[ "$SYSTEM" = 'Linux' ]] ; then
                 # We also seem to need some libraries to be installed (there's no binary so this will just install)
                 if [[ "${DISTRO}" = 'ubuntu' && "$DISTRO_RELEASE" =~ 24 ]] || \
                    [[ "${DISTRO}" = 'debian' && "$DISTRO_RELEASE" =~ 12 ]] ; then
